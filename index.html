@@ -78,6 +78,9 @@ td{padding:.35rem .65rem;border-top:1px solid var(--border)}
 .info-tip .info-content li{padding:.3rem 0;border-bottom:1px dashed var(--border)}
 .info-tip .info-content li:last-child{border-bottom:none}
 .info-tip .rot{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)}
+.chip{position:relative}
+.chip-rm{background:transparent;border:none;color:var(--text-faint);font-size:1.3rem;cursor:pointer;padding:0;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.chip-rm:hover,.chip-rm:active{color:var(--danger);background:rgba(220,38,38,.1)}
 </style>
 </head>
 <body>
@@ -90,13 +93,18 @@ const OC=["No odour when compared to the clean site","Probably some doubt as to 
 const RI={High:"Residential, hospitals, schools, tourist/cultural",Medium:"Workplaces, commercial/retail, recreation fields",Low:"Industrial, farms, footpaths, roads"};
 const EM={6:["Large","Very Large","Very Large","Very Large","Very Large"],5:["Medium","Large","Large","Very Large","Very Large"],4:["Small","Medium","Medium","Large","Large"],3:["Small","Medium","Medium","Medium","Medium"],2:["Small","Small","Medium","Medium","Medium"],1:["Small","Small","Small","N/A","N/A"]};
 const FM={"Very Large":{Low:"Substantial adverse",Medium:"Substantial adverse",High:"Substantial adverse"},Large:{Low:"Moderate adverse",Medium:"Moderate adverse",High:"Substantial adverse"},Medium:{Low:"Slight adverse",Medium:"Slight adverse",High:"Moderate adverse"},Small:{Low:"Negligible",Medium:"Negligible",High:"Slight adverse"}};
-const HD=[{d:"Bakery (fresh bread)",s:3.53},{d:"Rose",s:3.08},{d:"Strawberry",s:2.93},{d:"Orange",s:2.86},{d:"Floral",s:2.79},{d:"Chocolate",s:2.78},{d:"Fruity, citrus",s:2.72},{d:"Violets",s:2.68},{d:"Peach",s:2.67},{d:"Apple",s:2.61},{d:"Pineapple",s:2.59},{d:"Vanilla",s:2.57},{d:"Cherry",s:2.55},{d:"Cinnamon",s:2.54},{d:"Fried chicken",s:2.53},{d:"Fragrant",s:2.52},{d:"Lemon",s:2.50},{d:"Minty, peppermint",s:2.50},{d:"Popcorn",s:2.47},{d:"Melon",s:2.41},{d:"Meaty (cooked, good)",s:2.34},{d:"Coffee",s:2.33},{d:"Caramel",s:2.32},{d:"Pear",s:2.26},{d:"Maple syrup",s:2.26},{d:"Lavender",s:2.25},{d:"Fruity, other than citrus",s:2.23},{d:"Fresh green vegetables",s:2.19},{d:"Cologne",s:2.16},{d:"Herbal, green, cut grass",s:2.14},{d:"Cedarwood",s:2.11},{d:"Honey",s:2.08},{d:"Grape juice",s:2.07},{d:"Buttery, fresh butter",s:2.04},{d:"Sweet",s:2.03},{d:"Almond",s:2.01},{d:"Banana",s:2.00},{d:"Spicy",s:1.99},{d:"Peanut butter",s:1.99},{d:"Perfumery",s:1.96},{d:"Grapefruit",s:1.95},{d:"Coconut",s:1.93},{d:"Nutty",s:1.92},{d:"Clove",s:1.67},{d:"Cooked vegetables",s:1.58},{d:"Raisins",s:1.56},{d:"Aromatic",s:1.41},{d:"Tea leaves",s:1.40},{d:"Green pepper",s:1.39},{d:"Celery",s:1.36},{d:"Crushed grass",s:1.34},{d:"Hay",s:1.31},{d:"Raw cucumber",s:1.30},{d:"Leather",s:1.30},{d:"Seasoning (for meat)",s:1.27},{d:"Oak wood, cognac",s:1.23},{d:"Anise (liquorice)",s:1.21},{d:"Bark, birch bark",s:1.18},{d:"Soupy",s:1.13},{d:"Caraway",s:1.06},{d:"Malty",s:1.05},{d:"Incense",s:1.01},{d:"Molasses",s:1.00},{d:"Eucalyptus",s:0.99},{d:"Laurel leaves",s:0.97},{d:"Soapy",s:0.96},{d:"Woody, resinous",s:0.94},{d:"Dill",s:0.87},{d:"Grainy (as grain)",s:0.63},{d:"Geranium leaves",s:0.57},{d:"Beany",s:0.54},{d:"Mushroom",s:0.52},{d:"Eggy (fresh eggs)",s:0.45},{d:"Raw potato",s:0.26},{d:"Musky",s:0.21},{d:"Black pepper",s:0.19},{d:"Cork",s:0.19},{d:"Dry, powdery",s:-0.07},{d:"Yeasty",s:-0.07},{d:"Burnt candle",s:-0.08},{d:"Beery",s:-0.14},{d:"Rope",s:-0.16},{d:"Garlic, onion",s:-0.17},{d:"Crushed weeds",s:-0.21},{d:"Alcoholic",s:-0.47},{d:"Cardboard",s:-0.54},{d:"Camphor",s:-0.55},{d:"Sauerkraut",s:-0.60},{d:"Fresh tobacco smoke",s:-0.66},{d:"Kippery-smoked fish",s:-0.69},{d:"Turpentine (pine oil)",s:-0.73},{d:"Paint",s:-0.75},{d:"Nail polish remover",s:-0.81},{d:"Varnish",s:-0.85},{d:"Chalky",s:-0.85},{d:"Medicinal",s:-0.89},{d:"Wet paper",s:-0.94},{d:"Metallic",s:-0.94},{d:"New rubber",s:-0.96},{d:"Seminal, sperm-like",s:-1.04},{d:"Animal",s:-1.13},{d:"Gasoline, solvent",s:-1.16},{d:"Mothballs",s:-1.25},{d:"Sour, vinegar",s:-1.26},{d:"Creosote",s:-1.35},{d:"Bitter",s:-1.38},{d:"Oily, fatty",s:-1.41},{d:"Burnt paper",s:-1.47},{d:"Burn, smoky",s:-1.53},{d:"Ether, anaesthetic",s:-1.54},{d:"Disinfectant, carbolic",s:-1.60},{d:"Tar",s:-1.63},{d:"Chemical",s:-1.64},{d:"Blood, raw meat",s:-1.64},{d:"Kerosene",s:-1.67},{d:"Cleaning fluid",s:-1.69},{d:"Sooty",s:-1.69},{d:"Musty, earthy, mouldy",s:-1.94},{d:"Fishy",s:-1.98},{d:"Stale",s:-2.04},{d:"Burnt milk",s:-2.19},{d:"Mouse-like",s:-2.20},{d:"Wet wool, wet dog",s:-2.28},{d:"Household gas",s:-2.30},{d:"Sharp, pungent, acid",s:-2.34},{d:"Sulphurous",s:-2.45},{d:"Ammonia",s:-2.47},{d:"Sweaty",s:-2.53},{d:"Dirty linen",s:-2.55},{d:"Fermented (rotten fruit)",s:-2.76},{d:"Stale tobacco smoke",s:-2.83},{d:"Sour milk",s:-2.91},{d:"Burnt rubber",s:-3.01},{d:"Rancid",s:-3.15},{d:"Urine",s:-3.34},{d:"Sickening (vomit)",s:-3.34},{d:"Faecal (like manure)",s:-3.36},{d:"Cat urine",s:-3.64},{d:"Sewer odour",s:-3.68},{d:"Putrid, foul, decayed",s:-3.74},{d:"Cadaverous (dead animal)",s:-3.75}];
+const HD=[{d:"Bakery (fresh bread)",s:3.53},{d:"Rose",s:3.08},{d:"Strawberry",s:2.93},{d:"Orange",s:2.86},{d:"Floral",s:2.79},{d:"Chocolate",s:2.78},{d:"Fruity - citrus",s:2.72},{d:"Violets",s:2.68},{d:"Peach",s:2.67},{d:"Apple",s:2.61},{d:"Pineapple",s:2.59},{d:"Vanilla",s:2.57},{d:"Cherry",s:2.55},{d:"Cinnamon",s:2.54},{d:"Fried chicken",s:2.53},{d:"Fragrant",s:2.52},{d:"Lemon",s:2.50},{d:"Minty - peppermint",s:2.50},{d:"Popcorn",s:2.47},{d:"Melon",s:2.41},{d:"Meaty (cooked - good)",s:2.34},{d:"Coffee",s:2.33},{d:"Caramel",s:2.32},{d:"Pear",s:2.26},{d:"Maple syrup",s:2.26},{d:"Lavender",s:2.25},{d:"Fruity - other than citrus",s:2.23},{d:"Fresh green vegetables",s:2.19},{d:"Cologne",s:2.16},{d:"Herbal - green - cut grass",s:2.14},{d:"Cedarwood",s:2.11},{d:"Honey",s:2.08},{d:"Grape juice",s:2.07},{d:"Buttery - fresh butter",s:2.04},{d:"Sweet",s:2.03},{d:"Almond",s:2.01},{d:"Banana",s:2.00},{d:"Spicy",s:1.99},{d:"Peanut butter",s:1.99},{d:"Perfumery",s:1.96},{d:"Grapefruit",s:1.95},{d:"Coconut",s:1.93},{d:"Nutty",s:1.92},{d:"Clove",s:1.67},{d:"Cooked vegetables",s:1.58},{d:"Raisins",s:1.56},{d:"Aromatic",s:1.41},{d:"Tea leaves",s:1.40},{d:"Green pepper",s:1.39},{d:"Celery",s:1.36},{d:"Crushed grass",s:1.34},{d:"Hay",s:1.31},{d:"Raw cucumber",s:1.30},{d:"Leather",s:1.30},{d:"Seasoning (for meat)",s:1.27},{d:"Oak wood - cognac",s:1.23},{d:"Anise (liquorice)",s:1.21},{d:"Bark - birch bark",s:1.18},{d:"Soupy",s:1.13},{d:"Caraway",s:1.06},{d:"Malty",s:1.05},{d:"Incense",s:1.01},{d:"Molasses",s:1.00},{d:"Eucalyptus",s:0.99},{d:"Laurel leaves",s:0.97},{d:"Soapy",s:0.96},{d:"Woody - resinous",s:0.94},{d:"Dill",s:0.87},{d:"Grainy (as grain)",s:0.63},{d:"Geranium leaves",s:0.57},{d:"Beany",s:0.54},{d:"Mushroom",s:0.52},{d:"Eggy (fresh eggs)",s:0.45},{d:"Raw potato",s:0.26},{d:"Musky",s:0.21},{d:"Black pepper",s:0.19},{d:"Cork",s:0.19},{d:"Dry - powdery",s:-0.07},{d:"Yeasty",s:-0.07},{d:"Burnt candle",s:-0.08},{d:"Beery",s:-0.14},{d:"Rope",s:-0.16},{d:"Garlic - onion",s:-0.17},{d:"Crushed weeds",s:-0.21},{d:"Alcoholic",s:-0.47},{d:"Cardboard",s:-0.54},{d:"Camphor",s:-0.55},{d:"Sauerkraut",s:-0.60},{d:"Fresh tobacco smoke",s:-0.66},{d:"Kippery-smoked fish",s:-0.69},{d:"Turpentine (pine oil)",s:-0.73},{d:"Paint",s:-0.75},{d:"Nail polish remover",s:-0.81},{d:"Varnish",s:-0.85},{d:"Chalky",s:-0.85},{d:"Medicinal",s:-0.89},{d:"Wet paper",s:-0.94},{d:"Metallic",s:-0.94},{d:"New rubber",s:-0.96},{d:"Seminal - sperm-like",s:-1.04},{d:"Animal",s:-1.13},{d:"Gasoline - solvent",s:-1.16},{d:"Mothballs",s:-1.25},{d:"Sour - vinegar",s:-1.26},{d:"Creosote",s:-1.35},{d:"Bitter",s:-1.38},{d:"Oily - fatty",s:-1.41},{d:"Burnt paper",s:-1.47},{d:"Burn - smoky",s:-1.53},{d:"Ether - anaesthetic",s:-1.54},{d:"Disinfectant - carbolic",s:-1.60},{d:"Tar",s:-1.63},{d:"Chemical",s:-1.64},{d:"Blood - raw meat",s:-1.64},{d:"Kerosene",s:-1.67},{d:"Cleaning fluid",s:-1.69},{d:"Sooty",s:-1.69},{d:"Musty - earthy - mouldy",s:-1.94},{d:"Fishy",s:-1.98},{d:"Stale",s:-2.04},{d:"Burnt milk",s:-2.19},{d:"Mouse-like",s:-2.20},{d:"Wet wool - wet dog",s:-2.28},{d:"Household gas",s:-2.30},{d:"Sharp - pungent - acid",s:-2.34},{d:"Sulphurous",s:-2.45},{d:"Ammonia",s:-2.47},{d:"Sweaty",s:-2.53},{d:"Dirty linen",s:-2.55},{d:"Fermented (rotten fruit)",s:-2.76},{d:"Stale tobacco smoke",s:-2.83},{d:"Sour milk",s:-2.91},{d:"Burnt rubber",s:-3.01},{d:"Rancid",s:-3.15},{d:"Urine",s:-3.34},{d:"Sickening (vomit)",s:-3.34},{d:"Faecal (like manure)",s:-3.36},{d:"Cat urine",s:-3.64},{d:"Sewer odour",s:-3.68},{d:"Putrid - foul - decayed",s:-3.74},{d:"Cadaverous (dead animal)",s:-3.75}];
+HD.sort(function(a,b){return a.s-b.s});  // most-negative first
 const WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","Variable","Calm"];
 const BF=["0 - Calm","1 - Light air","2 - Light breeze","3 - Gentle breeze","4 - Moderate breeze","5 - Fresh breeze","6 - Strong breeze","7 - Near gale","8+ - Gale"];
 const PG=["A - Very unstable","B - Unstable","C - Slightly unstable","D - Neutral","E - Slightly stable","F - Stable"];
 const RO=["None","Drizzle","Light rain","Moderate rain","Heavy rain"];
 
 function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function pad2(n){return String(n).padStart(2,"0")}
+function fmtDateCSV(d){return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())}
+function fmtTimeCSV(d){return pad2(d.getHours())+":"+pad2(d.getMinutes())}
+function fmtFileStamp(d){return fmtDateCSV(d)+" "+pad2(d.getHours())+"-"+pad2(d.getMinutes())}
 function tbi(t){return t<=10?0:t<=20?1:t<=30?2:t<=40?3:4}
 function gExp(i,t){if(i===0)return"Negligible";if(i===1&&t===0)return"Negligible";var r=EM[i];return r?r[tbi(t)]:"N/A"}
 function gEff(e,s){if(e==="Negligible")return"Negligible";if(e==="N/A")return"N/A";return FM[e]?FM[e][s]||"N/A":"N/A"}
@@ -124,7 +132,7 @@ function pip(){tone(1000,0.08,0.5,"square")}
 function beep(){tone(1500,0.4,0.7,"square")}
 
 var app=document.getElementById("app"),sc=1;
-var S={loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:null,descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};
+var S={loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};
 
 function show(phase){
   app.innerHTML="";
@@ -297,25 +305,45 @@ function show(phase){
 
   else if(phase==="descriptor"){
     var filt=HD.filter(function(h){return h.d.toLowerCase().indexOf(S.descSearch.toLowerCase())>=0});
-    var selHtml=S.desc?'<div class="card" style="margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center"><span style="font-size:.92rem;color:var(--accent);font-weight:500">'+esc(S.desc.d)+'</span><span style="font-size:.75rem;color:'+(S.desc.s>=0?"var(--success)":"var(--danger-light)")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</span></div>':'';
-    var listHtml=filt.map(function(h){var isSel=S.desc&&S.desc.d===h.d;return'<div class="descrow'+(isSel?" sel":"")+'" data-d="'+esc(h.d)+'"><span style="font-size:.82rem;color:'+(isSel?"var(--accent)":"var(--text-strong)")+'">'+esc(h.d)+'</span><span style="font-size:.72rem;color:'+(h.s>=0?"var(--success)":"var(--danger-light)")+';min-width:36px;text-align:right">'+(h.s>0?"+":"")+h.s.toFixed(2)+'</span></div>'}).join("");
+    var selHtml=S.desc.length?S.desc.map(function(d,idx){
+      return '<div class="card chip" style="margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">'
+        +'<span style="font-size:.92rem;color:var(--accent);font-weight:500;flex:1;text-align:left">'+esc(d.d)+'</span>'
+        +'<span style="font-size:.75rem;color:'+(d.s>=0?"var(--success)":"var(--danger-light)")+';font-weight:500">'+(d.s>0?"+":"")+d.s.toFixed(2)+'</span>'
+        +'<button class="chip-rm" data-idx="'+idx+'" aria-label="Remove">\u00d7</button>'
+      +'</div>';
+    }).join(""):'';
+    var listHtml=filt.map(function(h){
+      var isSel=S.desc.some(function(d){return d.d===h.d});
+      return '<div class="descrow'+(isSel?" sel":"")+'" data-d="'+esc(h.d)+'"><span style="font-size:.82rem;color:'+(isSel?"var(--accent)":"var(--text-strong)")+'">'+esc(h.d)+'</span><span style="font-size:.72rem;color:'+(h.s>=0?"var(--success)":"var(--danger-light)")+';min-width:42px;text-align:right">'+(h.s>0?"+":"")+h.s.toFixed(2)+'</span></div>';
+    }).join("");
     if(!filt.length)listHtml='<div style="padding:1.5rem;color:var(--text-faint);font-size:.82rem">No matches</div>';
-    var canGo=S.desc||S.otherDesc.trim();
+    var canGo=S.desc.length||S.otherDesc.trim();
     d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Odour Descriptor</div>'
     +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.hedonic+'</div>'
-    +'<label class="lbl" style="text-align:center;margin-bottom:.75rem">Select the closest odour description</label>'
-    +'<input class="inp" id="dsrch" value="'+esc(S.descSearch)+'" placeholder="Search descriptors..." style="margin-bottom:.5rem;text-align:center;font-size:.72rem">'
+    +'<label class="lbl" style="text-align:center;margin-bottom:.75rem">Select one or more descriptors</label>'
+    +'<input class="inp" id="dsrch" value="'+esc(S.descSearch)+'" placeholder="Search descriptors..." style="margin-bottom:.6rem;text-align:center;font-size:.82rem">'
     +selHtml
-    +'<div style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;margin-bottom:.75rem" id="dlist">'+listHtml+'</div>'
+    +'<div style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;margin-bottom:.75rem;background:var(--bg-alt)" id="dlist">'+listHtml+'</div>'
     +'<div style="margin-bottom:1.25rem"><label class="lbl" style="text-align:center;margin-bottom:.4rem">Additional / alternative description</label>'
-    +'<input class="inp" id="othd" value="'+esc(S.otherDesc)+'" placeholder="Enter odour description..." style="text-align:center;font-size:.72rem"></div>'
+    +'<input class="inp" id="othd" value="'+esc(S.otherDesc)+'" placeholder="Enter odour description..." style="text-align:center;font-size:.82rem"></div>'
     +'<div style="display:flex;gap:.5rem"><button class="btn-ghost" id="bk" style="width:auto;padding:.85rem 1.5rem">Back</button><button class="btn" id="go" style="flex:1"'+(canGo?'':' disabled')+'>View Results</button></div>';
     app.appendChild(d);
     document.getElementById("dsrch").oninput=function(e){S.descSearch=e.target.value;show("descriptor")};
-    document.getElementById("othd").oninput=function(e){S.otherDesc=e.target.value;var b=document.getElementById("go");b.disabled=!(S.desc||e.target.value.trim())};
-    document.getElementById("dlist").querySelectorAll(".descrow").forEach(function(el){el.onclick=function(){var dn=el.dataset.d;S.desc=HD.find(function(h){return h.d===dn})||null;show("descriptor")}});
+    document.getElementById("othd").oninput=function(e){S.otherDesc=e.target.value;var b=document.getElementById("go");b.disabled=!(S.desc.length||e.target.value.trim())};
+    document.getElementById("dlist").querySelectorAll(".descrow").forEach(function(el){
+      el.onclick=function(){
+        var dn=el.dataset.d;
+        var idx=S.desc.findIndex(function(d){return d.d===dn});
+        if(idx>=0){S.desc.splice(idx,1)}
+        else{var item=HD.find(function(h){return h.d===dn});if(item)S.desc.push(item)}
+        show("descriptor");
+      };
+    });
+    d.querySelectorAll(".chip-rm").forEach(function(btn){
+      btn.onclick=function(e){e.stopPropagation();S.desc.splice(parseInt(btn.dataset.idx,10),1);show("descriptor")};
+    });
     document.getElementById("bk").onclick=function(){show("classify")};
-    document.getElementById("go").onclick=function(){if(S.desc||S.otherDesc.trim())show("results")};
+    document.getElementById("go").onclick=function(){if(S.desc.length||S.otherDesc.trim())show("results")};
   }
 
   else if(phase==="results"){
@@ -331,8 +359,9 @@ function show(phase){
     if(m.pressure)metHtml+='P: '+m.pressure+'hPa &nbsp;';
     if(m.rainfall&&m.rainfall!=="None")metHtml+='Rain: '+m.rainfall+' &nbsp;';
     if(m.stability)metHtml+='Stability: '+m.stability.split(" - ")[0];
-    var descDisp=S.desc?esc(S.desc.d):'\u2014';
-    var descScore=S.desc?'<div style="font-size:.62rem;color:'+(S.desc.s>=0?"var(--success)":"var(--danger-light)")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</div>':'';
+    var descDisp=S.desc.length?esc(S.desc.map(function(d){return d.d}).join(", ")):'\u2014';
+    var descMean=S.desc.length?(S.desc.reduce(function(a,d){return a+d.s},0)/S.desc.length):null;
+    var descScore=S.desc.length?'<div style="font-size:.62rem;color:'+(descMean>=0?"var(--success)":"var(--danger-light)")+'">'+(descMean>0?"+":"")+descMean.toFixed(2)+(S.desc.length>1?' mean':'')+'</div>':'';
     var otherDisp=S.otherDesc?'<div style="font-size:.7rem;color:var(--text-mute);margin-top:.2rem;font-style:italic">'+esc(S.otherDesc)+'</div>':'';
     var trows=S.recs.map(function(r){return'<tr><td style="color:var(--text-mute)">'+r.time+'</td><td style="text-align:center;color:'+(r.value>=4?"#f59e0b":"var(--text)")+';font-weight:500">'+r.value+'</td><td style="text-align:right;color:var(--text-dim);font-size:.62rem">'+OL[r.value]+'</td></tr>'}).join("");
     d.innerHTML='<div class="tag" style="margin-bottom:.2rem">Session Complete</div>'
@@ -353,9 +382,39 @@ function show(phase){
     document.getElementById("fn").oninput=function(e){S.fileName=e.target.value};
     document.getElementById("dl").onclick=function(){
       S.fileName=document.getElementById("fn").value;
+      // Quote any value containing a comma, quote, or newline (RFC 4180)
+      function q(v){if(v==null)return"";v=String(v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+      function row(label,value){return label+","+q(value)+"\n"}
+      var descriptorList=S.desc.map(function(d){return d.d}).join(", ");
+      var scoreList=S.desc.map(function(d){return d.s.toFixed(2)}).join(", ");
+      var meanScore=S.desc.length?(S.desc.reduce(function(a,d){return a+d.s},0)/S.desc.length).toFixed(2):"";
       var h="Time,Seconds,Intensity,Odour Strength\n";
-      var rows=S.recs.map(function(r){return r.time+","+r.seconds+","+r.value+","+OL[r.value]}).join("\n");
-      var sm="\n\nSummary\nLocation,"+S.loc+"\nReceptor Sensitivity,"+S.sens+"\nAverage Intensity (Imean),"+im+"\nPercentage Odour Time (t>=4),"+tp+"%\nOdour Exposure,"+exp+"\nOdour Effect,"+eff+"\nHedonic Tone,"+S.hedonic+"\nOdour Descriptor,"+(S.desc?S.desc.d:"")+"\nHedonic Score,"+(S.desc?S.desc.s:"")+'\nAdditional Description,"'+(S.otherDesc||"").replace(/"/g,'""')+'"\n\nMeteorological Conditions\nWind Direction,'+m.windDir+"\nWind Strength,"+m.windStr+"\nAtmospheric Stability,"+m.stability+"\nBarometric Pressure (hPa),"+m.pressure+"\nRainfall,"+m.rainfall+"\nTemperature (C),"+m.temp+"\nHumidity (%),"+m.humidity+'\n\nSite Operations\nOn-site activities,"'+S.siteOps.replace(/"/g,'""')+'"\nSurrounding area,"'+S.surroundOps.replace(/"/g,'""')+'"';
+      var rows=S.recs.map(function(r){return r.time+","+r.seconds+","+r.value+","+q(OL[r.value])}).join("\n");
+      var sm="\n\nSummary\n"
+        +row("Date",S.startedAt?fmtDateCSV(S.startedAt):"")
+        +row("Time",S.startedAt?fmtTimeCSV(S.startedAt):"")
+        +row("Location",S.loc)
+        +row("Receptor Sensitivity",S.sens)
+        +row("Average Intensity (Imean)",im)
+        +row("Percentage Odour Time (t>=4)",tp+"%")
+        +row("Odour Exposure",exp)
+        +row("Odour Effect",eff)
+        +row("Hedonic Tone",S.hedonic)
+        +row("Odour Descriptors",descriptorList)
+        +row("Hedonic Scores",scoreList)
+        +row("Mean Hedonic Score",meanScore)
+        +row("Additional Description",S.otherDesc||"")
+        +"\nMeteorological Conditions\n"
+        +row("Wind Direction",m.windDir)
+        +row("Wind Strength",m.windStr)
+        +row("Atmospheric Stability",m.stability)
+        +row("Barometric Pressure (hPa)",m.pressure)
+        +row("Rainfall",m.rainfall)
+        +row("Temperature (C)",m.temp)
+        +row("Humidity (%)",m.humidity)
+        +"\nSite Operations\n"
+        +row("On-site activities",S.siteOps)
+        +row("Surrounding area",S.surroundOps);
       var csv=h+rows+sm;
       var fname=(S.fileName||"session")+".csv";
       // Web Share API only on mobile (iOS / Android). On desktop we want the standard download dialog.
@@ -387,12 +446,14 @@ function show(phase){
     +'<p style="color:var(--text-dim);font-size:.92rem;margin-bottom:2rem">'+esc(S.fileName)+'.csv saved</p>'
     +'<button class="btn-ghost" id="rst">New Session</button>';
     app.appendChild(d);
-    document.getElementById("rst").onclick=function(){sc++;S={loc:"Location "+sc,sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:null,descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};show("setup")};
+    document.getElementById("rst").onclick=function(){sc++;S={loc:"Location "+sc,sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};show("setup")};
   }
 }
 
 function startRec(){
-  S.recs=[{time:"0:00",seconds:0,value:0}];S.slider=0;S.secsLeft=TOTAL;S.sub=INTV;S.tick=0;S.fileName=S.loc;
+  S.startedAt=new Date();
+  S.recs=[{time:"0:00",seconds:0,value:0}];S.slider=0;S.secsLeft=TOTAL;S.sub=INTV;S.tick=0;
+  S.fileName=S.loc+" "+fmtFileStamp(S.startedAt);
   show("recording");
   S.timer=setInterval(function(){
     S.tick++;S.secsLeft=TOTAL-S.tick;
