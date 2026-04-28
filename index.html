@@ -8,11 +8,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Odour Recorder">
 <meta name="theme-color" content="#f1f5f9">
+<meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no">
 <title>Odour Intensity Recorder</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
+  color-scheme:light;
   --bg:#f1f5f9;
   --bg-alt:#ffffff;
   --text:#0f172a;
@@ -47,6 +49,10 @@ input[type=number]{-moz-appearance:textfield}
 .ta{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text);padding:.75rem .85rem;font-size:.85rem;font-family:inherit;border-radius:3px;width:100%;outline:none;resize:vertical;min-height:64px;box-sizing:border-box;box-shadow:var(--shadow-card)}
 .btn{background:var(--accent);border:none;color:#ffffff;padding:.95rem 2.5rem;font-size:.95rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:3px;font-family:inherit;width:100%;transition:opacity .2s;box-shadow:0 1px 2px rgba(2,132,199,.2),0 2px 4px rgba(2,132,199,.15)}
 .btn:disabled{background:#e2e8f0;color:#64748b;cursor:default;opacity:1;box-shadow:none}
+.req:invalid{border-color:var(--danger)}
+.req:valid{border-color:var(--success)}
+.req:focus{border-color:var(--accent)}
+select.req:invalid{color:var(--text-faint)}
 .btn-ghost{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text-mute);padding:.85rem 2.5rem;font-size:.92rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;border-radius:3px;font-family:inherit;font-weight:500;transition:all .3s;box-shadow:var(--shadow-card)}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
 .card{background:var(--bg-alt);border:1px solid var(--border);border-radius:5px;padding:.85rem;box-shadow:var(--shadow-card)}
@@ -65,6 +71,12 @@ input[type=number]{-moz-appearance:textfield}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th{padding:.45rem .65rem;color:var(--text-dim);font-weight:600;font-size:.7rem;background:var(--bg-alt);position:sticky;top:0}
 td{padding:.35rem .65rem;border-top:1px solid var(--border)}
+/* Mandatory fields: red border when empty, green when filled */
+.inp.req:invalid,.sel.req:invalid{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
+.inp.req:valid,.sel.req:valid{border-color:var(--success);box-shadow:0 0 0 1px var(--success)}
+.opt.req-empty{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
+.opt.req-filled{border-color:var(--success)!important;background:rgba(22,163,74,.08)!important;box-shadow:0 0 0 1px var(--success)}
+.opt.req-filled .t{color:var(--success)!important}
 .info-tip{margin:-.4rem 0 .9rem 0;background:var(--bg-alt);border:1px solid var(--border);border-radius:5px;box-shadow:var(--shadow-card);overflow:hidden}
 .info-tip summary{padding:.65rem .8rem;cursor:pointer;font-size:.78rem;color:var(--accent);font-weight:500;list-style:none;display:flex;align-items:center;gap:.55rem;user-select:none;-webkit-tap-highlight-color:transparent}
 .info-tip summary::-webkit-details-marker{display:none}
@@ -81,6 +93,10 @@ td{padding:.35rem .65rem;border-top:1px solid var(--border)}
 .chip{position:relative}
 .chip-rm{background:transparent;border:none;color:var(--text-faint);font-size:1.3rem;cursor:pointer;padding:0;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:all .15s}
 .chip-rm:hover,.chip-rm:active{color:var(--danger);background:rgba(220,38,38,.1)}
+.req-empty{border-color:var(--danger) !important;box-shadow:0 0 0 1px var(--danger),var(--shadow-card)}
+.req-filled{border-color:var(--success) !important;box-shadow:0 0 0 1px var(--success),var(--shadow-card)}
+@keyframes flagFlash{0%{opacity:1}30%{opacity:1}100%{opacity:0}}
+.flag-flash-overlay{position:fixed;inset:0;background:rgba(220,38,38,.4);z-index:9999;pointer-events:none;animation:flagFlash .4s ease-out forwards}
 </style>
 </head>
 <body>
@@ -99,7 +115,7 @@ const WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WN
 const BF=["0 - Calm","1 - Light air","2 - Light breeze","3 - Gentle breeze","4 - Moderate breeze","5 - Fresh breeze","6 - Strong breeze","7 - Near gale","8+ - Gale"];
 const PG=["A - Very unstable","B - Unstable","C - Slightly unstable","D - Neutral","E - Slightly stable","F - Stable"];
 const RO=["None","Drizzle","Light rain","Moderate rain","Heavy rain"];
-const CC=["Clear (0-2 oktas)","Partly cloudy (3-5 oktas)","Mostly cloudy (6-7 oktas)","Overcast (8 oktas)"];
+const CC=["Clear \u2014 mostly clear sky","Partly cloudy \u2014 broken cloud, sun in and out","Mostly cloudy \u2014 sun mostly obscured","Overcast \u2014 full cloud cover"];
 // Beaufort band → mid-band wind speed in m/s (for PG derivation)
 const BF_MS={"0":0,"1":1,"2":2,"3":4,"4":7,"5":10,"6":12,"7":16,"8":20};
 function bfToMs(b){if(!b)return null;var n=b.charAt(0);return BF_MS[n]!=null?BF_MS[n]:null}
@@ -197,6 +213,34 @@ function tone(freq,dur,vol,type){
 }
 function pip(){tone(1000,0.08,0.5,"square")}
 function beep(){tone(1500,0.4,0.7,"square")}
+// Full-screen red flash — visual confirmation of flag tap, fades over ~400ms
+function flashScreen(){
+  var ov=document.createElement("div");
+  ov.style.cssText="position:fixed;inset:0;background:rgba(220,38,38,.28);pointer-events:none;z-index:9999;opacity:1;transition:opacity .35s ease-out";
+  document.body.appendChild(ov);
+  requestAnimationFrame(function(){ov.style.opacity="0"});
+  setTimeout(function(){ov.remove()},400);
+}
+
+// Toggle .req-empty / .req-filled on a single input/select based on its current value
+function updateReqState(el){
+  if(!el)return;
+  var v=el.value;
+  var filled=v!=null&&String(v).trim().length>0;
+  el.classList.toggle("req-empty",!filled);
+  el.classList.toggle("req-filled",filled);
+}
+// Walk all .req fields in a scope, set initial state, and wire live updates.
+// Skip .opt cards — they have their own click-driven re-render.
+function wireReqFields(scope){
+  scope.querySelectorAll(".req").forEach(function(el){
+    if(el.classList.contains("opt"))return;
+    updateReqState(el);
+    var fn=function(){updateReqState(el)};
+    el.addEventListener("input",fn);
+    el.addEventListener("change",fn);
+  });
+}
 
 var app=document.getElementById("app"),sc=1;
 var APP_VERSION="1.1.0";
@@ -211,14 +255,15 @@ function show(phase){
 
   if(phase==="setup"){
     d.innerHTML='<div class="tag" style="margin-bottom:2rem">Odour Intensity Recorder</div>'
-    +'<div style="margin-bottom:1.5rem"><label class="lbl">Surveyor Name</label><input class="inp" id="surv" value="'+esc(S.surveyor)+'" placeholder="Your name" autocomplete="name"></div>'
-    +'<div style="margin-bottom:1.5rem"><label class="lbl">Location Name</label><input class="inp" id="loc" value="'+esc(S.loc)+'"></div>'
+    +'<div style="margin-bottom:1.5rem"><label class="lbl">Surveyor Name</label><input class="inp req" id="surv" value="'+esc(S.surveyor)+'" placeholder="Your name" autocomplete="name" required></div>'
+    +'<div style="margin-bottom:1.5rem"><label class="lbl">Location Name</label><input class="inp req" id="loc" value="'+esc(S.loc)+'" required></div>'
     +'<div style="margin-bottom:2rem"><label class="lbl">Receptor Sensitivity</label>'
-    +'<div class="opt'+(S.sens==="High"?" sel":"")+'" data-v="High"><div class="t">High</div><div class="d">'+RI.High+'</div></div>'
-    +'<div class="opt'+(S.sens==="Medium"?" sel":"")+'" data-v="Medium"><div class="t">Medium</div><div class="d">'+RI.Medium+'</div></div>'
-    +'<div class="opt'+(S.sens==="Low"?" sel":"")+'" data-v="Low"><div class="t">Low</div><div class="d">'+RI.Low+'</div></div></div>'
+    +'<div class="opt'+(S.sens==="High"?" req-filled":(!S.sens?" req-empty":""))+'" data-v="High"><div class="t">High</div><div class="d">'+RI.High+'</div></div>'
+    +'<div class="opt'+(S.sens==="Medium"?" req-filled":(!S.sens?" req-empty":""))+'" data-v="Medium"><div class="t">Medium</div><div class="d">'+RI.Medium+'</div></div>'
+    +'<div class="opt'+(S.sens==="Low"?" req-filled":(!S.sens?" req-empty":""))+'" data-v="Low"><div class="t">Low</div><div class="d">'+RI.Low+'</div></div></div>'
     +'<button class="btn" id="nxt"'+((S.sens&&S.surveyor.trim()&&S.loc.trim())?'':' disabled')+'>Next</button>';
     app.appendChild(d);
+    wireReqFields(d);
     function updNxt(){var b=document.getElementById("nxt");b.disabled=!(S.sens&&S.surveyor.trim()&&S.loc.trim())}
     document.getElementById("surv").oninput=function(e){S.surveyor=e.target.value;saveSurveyor(S.surveyor);updNxt()};
     document.getElementById("loc").oninput=function(e){S.loc=e.target.value;updNxt()};
@@ -230,9 +275,7 @@ function show(phase){
     var m=S.met;
     d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Conditions</div>'
     +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
-    +'<div class="grid2"><div><label class="lbl">Wind Direction</label><select class="sel" id="wd">'+opts(WD,m.windDir)+'</select></div>'
-    +'<div><label class="lbl">Wind Strength</label><select class="sel" id="ws">'+opts(BF,m.windStr)+'</select></div></div>'
-    +'<details class="info-tip"><summary>Wind strength &mdash; how to determine by observation</summary><div class="info-content">'
+    +'<details class="info-tip" style="margin-top:0;margin-bottom:.95rem"><summary>Wind strength &mdash; how to determine by observation</summary><div class="info-content">'
       +'<strong>Beaufort scale &mdash; visible signs on land:</strong>'
       +'<ul>'
         +'<li><strong>0</strong> &mdash; smoke rises vertically</li>'
@@ -246,31 +289,35 @@ function show(phase){
         +'<li><strong>8+</strong> &mdash; twigs break from trees; impedes progress</li>'
       +'</ul>'
     +'</div></details>'
-    +'<div class="grid2"><div><label class="lbl">Cloud Cover</label><select class="sel" id="cc">'+opts(CC,m.cloud)+'</select></div>'
-    +'<div><label class="lbl">Rainfall</label><select class="sel" id="rf">'+opts(RO,m.rainfall)+'</select></div></div>'
-    +'<div style="margin-bottom:.85rem"><label class="lbl">Stability Category</label><select class="sel" id="st">'+opts(PG,m.stability)+'</select>'
-      +'<button class="btn-ghost" id="pgsg" type="button" style="width:100%;margin-top:.4rem;padding:.6rem;font-size:.7rem">\u2728 Suggest from sun + wind + cloud</button>'
-      +'<div id="pgsgmsg" style="font-size:.7rem;color:var(--text-faint);margin-top:.4rem;text-align:center;min-height:.9rem"></div>'
+    +'<div class="grid2"><div><label class="lbl">Wind Direction</label><select class="sel req" id="wd" required>'+opts(WD,m.windDir)+'</select></div>'
+    +'<div><label class="lbl">Wind Strength</label><select class="sel req" id="ws" required>'+opts(BF,m.windStr)+'</select></div></div>'
+    +'<div class="grid2"><div><label class="lbl">Cloud Cover</label><select class="sel req" id="cc" required>'+opts(CC,m.cloud)+'</select></div>'
+    +'<div><label class="lbl">Rainfall</label><select class="sel req" id="rf" required>'+opts(RO,m.rainfall)+'</select></div></div>'
+    +'<div style="margin-bottom:.85rem"><label class="lbl">Stability Category</label>'
+      +'<details class="info-tip" style="margin-top:0;margin-bottom:.55rem"><summary>Stability category &mdash; how to determine by observation</summary><div class="info-content">'
+        +'<strong>Pasquill-Gifford categories:</strong>'
+        +'<ul>'
+          +'<li><strong>A</strong> &mdash; strong sun, light wind (&lt;2 m/s); heat shimmer; plume loops &amp; disperses fast</li>'
+          +'<li><strong>B</strong> &mdash; strong sun + moderate wind, or moderate sun + light wind; cumulus develops</li>'
+          +'<li><strong>C</strong> &mdash; weak sun, or strong sun with strong wind</li>'
+          +'<li><strong>D</strong> &mdash; overcast (day or night) or any strong wind (&gt;5 m/s); plume travels straight. Most common UK condition.</li>'
+          +'<li><strong>E</strong> &mdash; clear or partly cloudy night, light to moderate wind; plume fans slightly</li>'
+          +'<li><strong>F</strong> &mdash; clear night, light wind (&lt;2 m/s); mist or fog often forming; plume hugs ground</li>'
+        +'</ul>'
+        +'<div class="rot"><strong>Quick rule of thumb:</strong><br>Day + sun + light wind &rarr; A or B &nbsp;&middot;&nbsp; Day + cloudy or windy &rarr; D &nbsp;&middot;&nbsp; Night + clear + calm &rarr; F &nbsp;&middot;&nbsp; Night + cloudy or windy &rarr; D</div>'
+      +'</div></details>'
+      +'<button class="btn-ghost" id="pgsg" type="button" style="width:100%;padding:.6rem;font-size:.7rem;margin-bottom:.4rem">\u2728 Suggest from sun + wind + cloud</button>'
+      +'<div id="pgsgmsg" style="font-size:.72rem;color:var(--text-faint);margin-bottom:.4rem;text-align:center;min-height:0;line-height:1.5"></div>'
+      +'<select class="sel req" id="st" required>'+opts(PG,m.stability)+'</select>'
     +'</div>'
-    +'<details class="info-tip"><summary>Stability category &mdash; how to determine by observation</summary><div class="info-content">'
-      +'<strong>Pasquill-Gifford categories:</strong>'
-      +'<ul>'
-        +'<li><strong>A</strong> &mdash; strong sun, light wind (&lt;2 m/s); heat shimmer; plume loops &amp; disperses fast</li>'
-        +'<li><strong>B</strong> &mdash; strong sun + moderate wind, or moderate sun + light wind; cumulus develops</li>'
-        +'<li><strong>C</strong> &mdash; weak sun, or strong sun with strong wind</li>'
-        +'<li><strong>D</strong> &mdash; overcast (day or night) or any strong wind (&gt;5 m/s); plume travels straight. Most common UK condition.</li>'
-        +'<li><strong>E</strong> &mdash; clear or partly cloudy night, light to moderate wind; plume fans slightly</li>'
-        +'<li><strong>F</strong> &mdash; clear night, light wind (&lt;2 m/s); mist or fog often forming; plume hugs ground</li>'
-      +'</ul>'
-      +'<div class="rot"><strong>Quick rule of thumb:</strong><br>Day + sun + light wind &rarr; A or B &nbsp;&middot;&nbsp; Day + cloudy or windy &rarr; D &nbsp;&middot;&nbsp; Night + clear + calm &rarr; F &nbsp;&middot;&nbsp; Night + cloudy or windy &rarr; D</div>'
-    +'</div></details>'
-    +'<div class="grid2"><div><label class="lbl">Temperature (&deg;C)</label><input type="number" step="0.1" class="inp" id="tp" value="'+esc(m.temp)+'" placeholder="e.g. 18.5"></div>'
+    +'<div class="grid2"><div><label class="lbl">Temperature (&deg;C)</label><input type="number" step="0.1" class="inp req" id="tp" value="'+esc(m.temp)+'" placeholder="e.g. 18.5" required></div>'
     +'<div><label class="lbl">Humidity (%) <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="number" step="1" class="inp" id="hu" value="'+esc(m.humidity)+'" placeholder="e.g. 65"></div></div>'
     +'<div style="margin-bottom:.85rem"><label class="lbl">Barometric Pressure (hPa) <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="number" step="1" class="inp" id="pr" value="'+esc(m.pressure)+'" placeholder="e.g. 1013"></div>'
     +'<div style="margin-bottom:.85rem"><label class="lbl">On-site Operations &amp; Activities</label><textarea class="ta" id="so" placeholder="Describe current site activities...">'+esc(S.siteOps)+'</textarea></div>'
     +'<div style="margin-bottom:1.5rem"><label class="lbl">Surrounding Area Activities</label><textarea class="ta" id="su" placeholder="Describe activities in the surrounding area...">'+esc(S.surroundOps)+'</textarea></div>'
     +'<div style="display:flex;gap:.5rem"><button class="btn-ghost" id="bk" style="width:auto;padding:.85rem 1.5rem">Back</button><button class="btn" id="go" style="flex:1">Start Recording</button></div>';
     app.appendChild(d);
+    wireReqFields(d);
     var save=function(){S.met={windDir:gi("wd"),windStr:gi("ws"),stability:gi("st"),pressure:gi("pr"),rainfall:gi("rf"),temp:gi("tp"),humidity:gi("hu"),cloud:gi("cc")};S.siteOps=gi("so");S.surroundOps=gi("su")};
     document.getElementById("pgsg").onclick=function(){
       save();
@@ -279,14 +326,22 @@ function show(phase){
       var missing=[];
       if(!ws)missing.push("Wind Strength");
       if(!cc)missing.push("Cloud Cover");
-      if(missing.length){msg.textContent="Need: "+missing.join(", ");msg.style.color="var(--warning)";return}
+      if(missing.length){msg.innerHTML="Need: "+missing.join(", ");msg.style.color="var(--warning)";return}
       var lat=S.gps?S.gps.lat:54.0,lng=S.gps?S.gps.lng:-2.0;  // UK centre fallback
-      var pg=derivePG(new Date(),lat,lng,ws,cc);
-      if(!pg){msg.textContent="Could not derive";msg.style.color="var(--warning)";return}
+      var when=new Date();
+      var pg=derivePG(when,lat,lng,ws,cc);
+      if(!pg){msg.innerHTML="Could not derive";msg.style.color="var(--warning)";return}
       S.met.stability=pg;
-      msg.textContent=(S.gps?"From GPS + ":"From UK avg + ")+ws.charAt(0)+" + "+cc.replace(/\s*\([^)]*\)/,"").toLowerCase()+" \u2192 "+pg;
-      msg.style.color="var(--success)";
-      show("conditions");
+      // Update the dropdown directly so the rationale message persists (show() would wipe it)
+      var stSel=document.getElementById("st");
+      if(stSel){stSel.value=pg;updateReqState(stSel)}
+      var el=solarElevation(when,lat,lng);
+      var dayNight=el>3?"Day":"Night";
+      var elNote=el>3?" (sun "+Math.round(el)+"\u00b0)":" (sun below horizon)";
+      var ms=bfToMs(ws);
+      var cloudShort=cc.split(" \u2014 ")[0];  // "Partly cloudy", "Clear", etc.
+      msg.innerHTML='<strong style="color:var(--success)">\u2192 '+pg+'</strong><br>'
+        +'<span style="color:var(--text-mute)">'+dayNight+elNote+' &middot; B'+ws.charAt(0)+' (~'+ms+' m/s) &middot; '+cloudShort+(S.gps?'':' &middot; UK centre fallback')+'</span>';
     };
     document.getElementById("bk").onclick=function(){save();show("setup")};
     document.getElementById("go").onclick=function(){
@@ -333,10 +388,10 @@ function show(phase){
           +'</div>'
           +'<div style="display:flex;flex-direction:column;justify-content:space-between;padding:3px 0;width:10px">'+[6,5,4,3,2,1,0].map(function(v){return'<div style="width:7px;height:1px;background:'+(v===4?"rgba(217,119,6,.5)":"var(--border-strong)")+'"></div>'}).join("")+'</div>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:center"><div id="flagcol" role="button" aria-label="Flag anomaly" style="width:56px;height:230px;border:2px dashed var(--border-strong);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--bg-alt);transition:all .15s;-webkit-tap-highlight-color:transparent;padding:.6rem .3rem">'
-          +'<div id="flagicon" style="font-size:1.6rem;line-height:1">\u2691</div>'
-          +'<div id="flagcount" style="font-size:.85rem;font-weight:600;margin-top:.3rem;color:var(--text-mute)"></div>'
-          +'<div style="font-size:.5rem;color:var(--text-faint);letter-spacing:.1em;margin-top:.15rem;text-transform:uppercase">FLAG</div>'
+        +'<div style="display:flex;align-items:center;justify-content:center"><div id="flagcol" role="button" aria-label="Flag anomaly" style="width:110px;height:110px;border:2px dashed var(--border-strong);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--bg-alt);transition:all .15s;-webkit-tap-highlight-color:transparent">'
+          +'<div id="flagicon" style="font-size:2.2rem;line-height:1">\u2691</div>'
+          +'<div id="flagcount" style="font-size:1rem;font-weight:600;margin-top:.2rem;color:var(--text-mute);line-height:1"></div>'
+          +'<div style="font-size:.55rem;color:var(--text-faint);letter-spacing:.12em;margin-top:.15rem;text-transform:uppercase">FLAG</div>'
         +'</div></div>'
       +'</div>'
       +'<p id="rcnt" style="color:var(--text-faint);font-size:.65rem;margin-top:.8rem;letter-spacing:.1em"></p>';
@@ -351,10 +406,12 @@ function show(phase){
       lastFlagAt=now;
       var sec=S.tick;
       S.anomalies.push({tick:sec,time:fmt(sec),value:Math.round(S.slider),note:""});
-      // Visual pulse confirmation
-      flagBtn.style.background="rgba(220,38,38,.15)";
+      // Full-screen flash for unmistakable confirmation in field conditions
+      flashScreen();
+      // Brief border highlight on the button itself
       flagBtn.style.borderColor="var(--danger)";
-      setTimeout(function(){flagBtn.style.background="var(--bg-alt)";flagBtn.style.borderColor="var(--border-strong)"},300);
+      flagBtn.style.background="rgba(220,38,38,.08)";
+      setTimeout(function(){flagBtn.style.borderColor="var(--border-strong)";flagBtn.style.background="var(--bg-alt)"},350);
       if(S._paint)S._paint();
     }
     flagBtn.onclick=flag;
