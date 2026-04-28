@@ -294,18 +294,6 @@ function show(phase){
     +'<div class="grid2"><div><label class="lbl">Cloud Cover</label><select class="sel req" id="cc" required>'+opts(CC,m.cloud)+'</select></div>'
     +'<div><label class="lbl">Rainfall</label><select class="sel req" id="rf" required>'+opts(RO,m.rainfall)+'</select></div></div>'
     +'<div style="margin-bottom:.85rem"><label class="lbl">Stability Category</label>'
-      +'<details class="info-tip" style="margin-top:0;margin-bottom:.55rem"><summary>Stability category &mdash; how to determine by observation</summary><div class="info-content">'
-        +'<strong>Pasquill-Gifford categories:</strong>'
-        +'<ul>'
-          +'<li><strong>A</strong> &mdash; strong sun, light wind (&lt;2 m/s); heat shimmer; plume loops &amp; disperses fast</li>'
-          +'<li><strong>B</strong> &mdash; strong sun + moderate wind, or moderate sun + light wind; cumulus develops</li>'
-          +'<li><strong>C</strong> &mdash; weak sun, or strong sun with strong wind</li>'
-          +'<li><strong>D</strong> &mdash; overcast (day or night) or any strong wind (&gt;5 m/s); plume travels straight. Most common UK condition.</li>'
-          +'<li><strong>E</strong> &mdash; clear or partly cloudy night, light to moderate wind; plume fans slightly</li>'
-          +'<li><strong>F</strong> &mdash; clear night, light wind (&lt;2 m/s); mist or fog often forming; plume hugs ground</li>'
-        +'</ul>'
-        +'<div class="rot"><strong>Quick rule of thumb:</strong><br>Day + sun + light wind &rarr; A or B &nbsp;&middot;&nbsp; Day + cloudy or windy &rarr; D &nbsp;&middot;&nbsp; Night + clear + calm &rarr; F &nbsp;&middot;&nbsp; Night + cloudy or windy &rarr; D</div>'
-      +'</div></details>'
       +'<button class="btn-ghost" id="pgsg" type="button" style="width:100%;padding:.6rem;font-size:.7rem;margin-bottom:.4rem">\u2728 Suggest from sun + wind + cloud</button>'
       +'<div id="pgsgmsg" style="font-size:.72rem;color:var(--text-faint);margin-bottom:.4rem;text-align:center;min-height:0;line-height:1.5"></div>'
       +'<select class="sel req" id="st" required>'+opts(PG,m.stability)+'</select>'
@@ -340,8 +328,9 @@ function show(phase){
       var elNote=el>3?" (sun "+Math.round(el)+"\u00b0)":" (sun below horizon)";
       var ms=bfToMs(ws);
       var cloudShort=cc.split(" \u2014 ")[0];  // "Partly cloudy", "Clear", etc.
+      var bfName=ws.split(" - ")[1]||ws;  // "Gentle breeze" from "3 - Gentle breeze"
       msg.innerHTML='<strong style="color:var(--success)">\u2192 '+pg+'</strong><br>'
-        +'<span style="color:var(--text-mute)">'+dayNight+elNote+' &middot; B'+ws.charAt(0)+' (~'+ms+' m/s) &middot; '+cloudShort+(S.gps?'':' &middot; UK centre fallback')+'</span>';
+        +'<span style="color:var(--text-mute)">'+dayNight+elNote+' &middot; '+bfName+' (~'+ms+' m/s) &middot; '+cloudShort+(S.gps?' &middot; GPS':' &middot; approx UK location (GPS captured at Recording Start)')+'</span>';
     };
     document.getElementById("bk").onclick=function(){save();show("setup")};
     document.getElementById("go").onclick=function(){
