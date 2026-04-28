@@ -7,14 +7,14 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Odour Recorder">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#f1f5f9">
 <meta name="format-detection" content="telephone=no">
 <title>Odour Intensity Recorder</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#ffffff;
-  --bg-alt:#f8fafc;
+  --bg:#f1f5f9;
+  --bg-alt:#ffffff;
   --text:#0f172a;
   --text-strong:#1e293b;
   --text-mute:#334155;
@@ -29,41 +29,55 @@
   --danger:#dc2626;
   --danger-light:#ef4444;
   --success:#16a34a;
+  --shadow-card:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.06);
 }
-body{background:var(--bg);color:var(--text);font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:1.5rem;overflow-x:hidden;-webkit-text-size-adjust:100%}
-body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(15,23,42,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:1.5rem;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg-alt)}::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 input[type=number]{-moz-appearance:textfield}
 #app{position:relative;z-index:1;width:100%;max-width:500px;text-align:center}
 .screen{animation:fadeIn .6s ease}
-.tag{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--accent)}
-.lbl{font-size:.6rem;color:var(--text-dim);letter-spacing:.15em;display:block;margin-bottom:.5rem;text-transform:uppercase;text-align:left}
-.inp{background:var(--bg);border:1px solid var(--border-strong);color:var(--text);padding:.65rem .75rem;font-size:.78rem;font-family:inherit;border-radius:2px;width:100%;outline:none;box-sizing:border-box}
+.tag{font-size:.75rem;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--accent)}
+.lbl{font-size:.82rem;font-weight:500;color:var(--text-dim);letter-spacing:.14em;display:block;margin-bottom:.55rem;text-transform:uppercase;text-align:left}
+.inp{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text);padding:.75rem .85rem;font-size:.92rem;font-family:inherit;border-radius:3px;width:100%;outline:none;box-sizing:border-box;box-shadow:var(--shadow-card)}
 .inp:focus,.sel:focus,.ta:focus{border-color:var(--accent)}
-.sel{background:var(--bg);border:1px solid var(--border-strong);color:var(--text);padding:.65rem .75rem;font-size:.72rem;font-family:inherit;border-radius:2px;width:100%;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center}
-.ta{background:var(--bg);border:1px solid var(--border-strong);color:var(--text);padding:.65rem .75rem;font-size:.72rem;font-family:inherit;border-radius:2px;width:100%;outline:none;resize:vertical;min-height:60px;box-sizing:border-box}
-.btn{background:var(--accent);border:none;color:#ffffff;padding:.85rem 2.5rem;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;font-family:inherit;width:100%;transition:opacity .2s}
-.btn:disabled{background:#e2e8f0;color:#64748b;cursor:default;opacity:1}
-.btn-ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text-mute);padding:.85rem 2.5rem;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:inherit;transition:all .3s}
+.sel{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text);padding:.75rem .85rem;font-size:.85rem;font-family:inherit;border-radius:3px;width:100%;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;box-shadow:var(--shadow-card)}
+.ta{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text);padding:.75rem .85rem;font-size:.85rem;font-family:inherit;border-radius:3px;width:100%;outline:none;resize:vertical;min-height:64px;box-sizing:border-box;box-shadow:var(--shadow-card)}
+.btn{background:var(--accent);border:none;color:#ffffff;padding:.95rem 2.5rem;font-size:.95rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:3px;font-family:inherit;width:100%;transition:opacity .2s;box-shadow:0 1px 2px rgba(2,132,199,.2),0 2px 4px rgba(2,132,199,.15)}
+.btn:disabled{background:#e2e8f0;color:#64748b;cursor:default;opacity:1;box-shadow:none}
+.btn-ghost{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text-mute);padding:.85rem 2.5rem;font-size:.92rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;border-radius:3px;font-family:inherit;font-weight:500;transition:all .3s;box-shadow:var(--shadow-card)}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
-.card{background:var(--bg-alt);border:1px solid var(--border);border-radius:4px;padding:.7rem}
-.card-lbl{font-size:.48rem;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.15rem}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.85rem}
-.opt{padding:.75rem .85rem;margin-bottom:.4rem;border:1px solid var(--border);border-radius:3px;cursor:pointer;background:var(--bg-alt);transition:all .2s;text-align:left}
+.card{background:var(--bg-alt);border:1px solid var(--border);border-radius:5px;padding:.85rem;box-shadow:var(--shadow-card)}
+.card-lbl{font-size:.7rem;font-weight:500;color:var(--text-dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.2rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.95rem}
+.opt{padding:.95rem 1rem;margin-bottom:.55rem;border:1px solid var(--border);border-radius:5px;cursor:pointer;background:var(--bg-alt);transition:all .2s;text-align:left;box-shadow:var(--shadow-card)}
 .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
-.opt .t{font-size:.78rem;font-weight:500;color:var(--text);margin-bottom:.15rem}
+.opt .t{font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:.2rem}
 .opt.sel .t{color:var(--accent)}
-.opt .d{font-size:.6rem;color:var(--text-dim);line-height:1.5}
-.hedopt{padding:.9rem 1rem;margin-bottom:.45rem;border:1px solid var(--border);border-radius:3px;cursor:pointer;background:var(--bg-alt);transition:all .2s;text-align:left;display:flex;align-items:center;gap:.85rem}
+.opt .d{font-size:.72rem;color:var(--text-dim);line-height:1.5}
+.hedopt{padding:1rem 1.1rem;margin-bottom:.55rem;border:1px solid var(--border);border-radius:5px;cursor:pointer;background:var(--bg-alt);transition:all .2s;text-align:left;display:flex;align-items:center;gap:.95rem;box-shadow:var(--shadow-card)}
 .hedopt.sel{border-color:var(--accent);background:var(--accent-soft)}
-.descrow{padding:.5rem .75rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.descrow{padding:.6rem .8rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
 .descrow:not(:first-child){border-top:1px solid var(--border)}
 .descrow.sel{background:var(--accent-soft)}
-table{width:100%;border-collapse:collapse;font-size:.62rem}
-th{padding:.4rem .6rem;color:var(--text-dim);font-weight:500;font-size:.52rem;background:var(--bg-alt);position:sticky;top:0}
-td{padding:.3rem .6rem;border-top:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{padding:.45rem .65rem;color:var(--text-dim);font-weight:600;font-size:.7rem;background:var(--bg-alt);position:sticky;top:0}
+td{padding:.35rem .65rem;border-top:1px solid var(--border)}
+.info-tip{margin:-.4rem 0 .9rem 0;background:var(--bg-alt);border:1px solid var(--border);border-radius:5px;box-shadow:var(--shadow-card);overflow:hidden}
+.info-tip summary{padding:.65rem .8rem;cursor:pointer;font-size:.78rem;color:var(--accent);font-weight:500;list-style:none;display:flex;align-items:center;gap:.55rem;user-select:none;-webkit-tap-highlight-color:transparent}
+.info-tip summary::-webkit-details-marker{display:none}
+.info-tip summary::before{content:"?";display:inline-flex;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;line-height:1}
+.info-tip summary::after{content:"\203A";margin-left:auto;color:var(--text-faint);font-size:1rem;transition:transform .2s}
+.info-tip[open] summary::after{transform:rotate(90deg)}
+.info-tip[open] summary{border-bottom:1px solid var(--border)}
+.info-tip .info-content{padding:.85rem;font-size:.8rem;line-height:1.6;color:var(--text-mute);text-align:left}
+.info-tip .info-content strong{color:var(--text);font-weight:600}
+.info-tip .info-content ul{list-style:none;padding:0;margin:.4rem 0}
+.info-tip .info-content li{padding:.3rem 0;border-bottom:1px dashed var(--border)}
+.info-tip .info-content li:last-child{border-bottom:none}
+.info-tip .rot{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -99,15 +113,15 @@ function tone(freq,dur,vol,type){
     o.connect(g);g.connect(audioCtx.destination);
     var t=audioCtx.currentTime;
     g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(vol,t+0.005);                   // 5ms attack — avoids click
-    g.gain.setValueAtTime(vol,t+Math.max(0.01,dur-0.04));           // sustain at full vol
-    g.gain.exponentialRampToValueAtTime(0.001,t+dur);               // smooth tail
+    g.gain.linearRampToValueAtTime(vol,t+0.005);
+    g.gain.setValueAtTime(vol,t+Math.max(0.01,dur-0.04));
+    g.gain.exponentialRampToValueAtTime(0.001,t+dur);
     o.start(t);
     o.stop(t+dur+0.02);
   }catch(e){}
 }
-function pip(){tone(1000,0.08,0.5,"square")}                        // 80ms BBC-style countdown pip
-function beep(){tone(1500,0.4,0.7,"square")}                        // 400ms higher-pitched sample marker
+function pip(){tone(1000,0.08,0.5,"square")}
+function beep(){tone(1500,0.4,0.7,"square")}
 
 var app=document.getElementById("app"),sc=1;
 var S={loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:null,descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};
@@ -133,11 +147,37 @@ function show(phase){
   else if(phase==="conditions"){
     var m=S.met;
     d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Conditions</div>'
-    +'<div style="font-size:.58rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
+    +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
     +'<div class="grid2"><div><label class="lbl">Wind Direction</label><select class="sel" id="wd">'+opts(WD,m.windDir)+'</select></div>'
     +'<div><label class="lbl">Wind Strength</label><select class="sel" id="ws">'+opts(BF,m.windStr)+'</select></div></div>'
+    +'<details class="info-tip"><summary>Wind strength &mdash; how to determine by observation</summary><div class="info-content">'
+      +'<strong>Beaufort scale &mdash; visible signs on land:</strong>'
+      +'<ul>'
+        +'<li><strong>0 Calm</strong> &mdash; smoke rises vertically</li>'
+        +'<li><strong>1 Light air</strong> &mdash; smoke drifts; vanes still</li>'
+        +'<li><strong>2 Light breeze</strong> &mdash; wind felt on face; leaves rustle</li>'
+        +'<li><strong>3 Gentle breeze</strong> &mdash; leaves &amp; small twigs in constant motion; light flag extended</li>'
+        +'<li><strong>4 Moderate breeze</strong> &mdash; dust &amp; loose paper raised; small branches moved</li>'
+        +'<li><strong>5 Fresh breeze</strong> &mdash; small leafy trees begin to sway</li>'
+        +'<li><strong>6 Strong breeze</strong> &mdash; large branches in motion; whistling in wires</li>'
+        +'<li><strong>7 Near gale</strong> &mdash; whole trees in motion; difficulty walking into wind</li>'
+        +'<li><strong>8+ Gale</strong> &mdash; twigs break from trees; impedes progress</li>'
+      +'</ul>'
+    +'</div></details>'
     +'<div class="grid2"><div><label class="lbl">Stability Category</label><select class="sel" id="st">'+opts(PG,m.stability)+'</select></div>'
     +'<div><label class="lbl">Rainfall</label><select class="sel" id="rf">'+opts(RO,m.rainfall)+'</select></div></div>'
+    +'<details class="info-tip"><summary>Stability category &mdash; how to determine by observation</summary><div class="info-content">'
+      +'<strong>Pasquill-Gifford &mdash; from sun &amp; wind:</strong>'
+      +'<ul>'
+        +'<li><strong>A &mdash; Very unstable</strong> &mdash; strong sun, light wind (&lt;2 m/s); heat shimmer; plume loops &amp; disperses fast</li>'
+        +'<li><strong>B &mdash; Unstable</strong> &mdash; strong sun + moderate wind, or moderate sun + light wind; cumulus develops</li>'
+        +'<li><strong>C &mdash; Slightly unstable</strong> &mdash; weak sun, or strong sun with strong wind</li>'
+        +'<li><strong>D &mdash; Neutral</strong> &mdash; overcast (day or night) or any strong wind (&gt;5 m/s); plume travels straight. Most common UK condition.</li>'
+        +'<li><strong>E &mdash; Slightly stable</strong> &mdash; clear or partly cloudy night, light to moderate wind; plume fans slightly</li>'
+        +'<li><strong>F &mdash; Stable</strong> &mdash; clear night, light wind (&lt;2 m/s); mist or fog often forming; plume hugs ground</li>'
+      +'</ul>'
+      +'<div class="rot"><strong>Quick rule of thumb:</strong><br>Day + sun + light wind &rarr; A or B &nbsp;&middot;&nbsp; Day + cloudy or windy &rarr; D &nbsp;&middot;&nbsp; Night + clear + calm &rarr; F &nbsp;&middot;&nbsp; Night + cloudy or windy &rarr; D</div>'
+    +'</div></details>'
     +'<div class="grid2"><div><label class="lbl">Temperature (&deg;C)</label><input type="number" step="0.1" class="inp" id="tp" value="'+esc(m.temp)+'" placeholder="e.g. 18.5"></div>'
     +'<div><label class="lbl">Humidity (%)</label><input type="number" step="1" class="inp" id="hu" value="'+esc(m.humidity)+'" placeholder="e.g. 65"></div></div>'
     +'<div style="margin-bottom:.85rem"><label class="lbl">Barometric Pressure (hPa)</label><input type="number" step="1" class="inp" id="pr" value="'+esc(m.pressure)+'" placeholder="e.g. 1013"></div>'
@@ -154,14 +194,14 @@ function show(phase){
     // Build skeleton once; only the dynamic bits get painted on each tick / slider move.
     d.innerHTML=
       '<div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:.4rem;min-height:1.4rem"><button class="btn-ghost" id="skip" style="padding:.3rem .7rem;font-size:.5rem;width:auto;opacity:.45">\u23e9 Skip</button></div>'
-      +'<div style="font-size:.58rem;letter-spacing:.25em;color:var(--text-faint);text-transform:uppercase;margin-bottom:.6rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
+      +'<div style="font-size:.7rem;letter-spacing:.25em;color:var(--text-faint);text-transform:uppercase;margin-bottom:.6rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
       +'<div id="rt" style="font-size:3rem;font-weight:200;line-height:1"></div>'
       +'<div id="rs" style="font-size:1.05rem;font-weight:400;margin-top:.25rem;margin-bottom:.15rem"></div>'
-      +'<div id="beeptog" style="display:inline-flex;align-items:center;gap:.35rem;cursor:pointer;font-size:.55rem;color:var(--text-faint);letter-spacing:.1em;margin-bottom:.6rem;user-select:none">'
+      +'<div id="beeptog" style="display:inline-flex;align-items:center;gap:.35rem;cursor:pointer;font-size:.65rem;color:var(--text-faint);letter-spacing:.1em;margin-bottom:.6rem;user-select:none">'
         +'<span id="beepdot" style="width:9px;height:9px;border-radius:50%;display:inline-block;box-sizing:border-box"></span><span id="beeplbl"></span></div>'
       +'<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-bottom:1rem;overflow:hidden"><div id="rpf" style="height:100%;transition:width 1s linear"></div></div>'
-      +'<div id="rilbl" style="font-size:.82rem;font-weight:500;height:1.2rem"></div>'
-      +'<div id="ridesc" style="font-size:.55rem;color:var(--text-mute);line-height:1.5;margin-bottom:.8rem;height:2.8em;overflow:hidden;max-width:340px;margin-left:auto;margin-right:auto"></div>'
+      +'<div id="rilbl" style="font-size:.95rem;font-weight:500;height:1.2rem"></div>'
+      +'<div id="ridesc" style="font-size:.65rem;color:var(--text-mute);line-height:1.5;margin-bottom:.8rem;height:2.8em;overflow:hidden;max-width:340px;margin-left:auto;margin-right:auto"></div>'
       +'<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;height:290px;user-select:none;touch-action:none;max-width:400px;margin:0 auto">'
         +'<div style="display:flex;align-items:center;justify-content:center"><span id="rbig" style="font-size:7rem;font-weight:200;line-height:1;opacity:.9"></span></div>'
         +'<div style="display:flex;align-items:stretch;gap:4px">'
@@ -176,7 +216,7 @@ function show(phase){
         +'</div>'
         +'<div></div>'
       +'</div>'
-      +'<p id="rcnt" style="color:var(--text-faint);font-size:.55rem;margin-top:.8rem;letter-spacing:.1em"></p>';
+      +'<p id="rcnt" style="color:var(--text-faint);font-size:.65rem;margin-top:.8rem;letter-spacing:.1em"></p>';
     app.appendChild(d);
 
     // Static number column (text never changes; only colour/weight on paint)
@@ -191,12 +231,12 @@ function show(phase){
 
     function paint(){
       var iv=Math.round(S.slider);
-      var warn=iv>=4, crit30=S.secsLeft<=30, crit2=S.sub<=2;
+      var warn=iv>=4, crit30=S.secsLeft<=30, critCount=S.sub>=1&&S.sub<=3;
       var fillPct=(S.slider/6*100);
       rt.textContent=fmt(S.secsLeft);
       rt.style.color=crit30?"var(--danger)":"var(--text)";
       rs.textContent=S.sub+"s";
-      rs.style.color=crit2?"var(--danger)":"var(--text-faint)";
+      rs.style.color=critCount?"var(--danger)":"var(--text-faint)";
       rpf.style.width=((1-S.secsLeft/TOTAL)*100)+"%";
       rpf.style.background=crit30?"linear-gradient(90deg,var(--accent),var(--danger))":"var(--accent)";
       rilbl.textContent=OL[iv];
@@ -246,9 +286,9 @@ function show(phase){
 
   else if(phase==="classify"){
     d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Observation Complete</div>'
-    +'<div style="font-size:.58rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:2rem">'+esc(S.loc)+'</div>'
+    +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:2rem">'+esc(S.loc)+'</div>'
     +'<label class="lbl" style="text-align:center;margin-bottom:1rem">How would you classify the odour?</label>'
-    +[["Pleasant","\uD83D\uDE0A","Agreeable or appealing odour"],["Neutral","\uD83D\uDE10","Neither pleasant nor unpleasant"],["Unpleasant","\uD83D\uDE16","Disagreeable or offensive odour"]].map(function(o){return'<div class="hedopt'+(S.hedonic===o[0]?" sel":"")+'" data-v="'+o[0]+'"><span style="font-size:1.4rem">'+o[1]+'</span><div><div style="font-size:.82rem;font-weight:500;color:'+(S.hedonic===o[0]?"var(--accent)":"var(--text)")+';margin-bottom:.1rem">'+o[0]+'</div><div style="font-size:.6rem;color:var(--text-dim)">'+o[2]+'</div></div></div>'}).join("")
+    +[["Pleasant","\uD83D\uDE0A","Agreeable or appealing odour"],["Neutral","\uD83D\uDE10","Neither pleasant nor unpleasant"],["Unpleasant","\uD83D\uDE16","Disagreeable or offensive odour"]].map(function(o){return'<div class="hedopt'+(S.hedonic===o[0]?" sel":"")+'" data-v="'+o[0]+'"><span style="font-size:1.4rem">'+o[1]+'</span><div><div style="font-size:.95rem;font-weight:500;color:'+(S.hedonic===o[0]?"var(--accent)":"var(--text)")+';margin-bottom:.1rem">'+o[0]+'</div><div style="font-size:.72rem;color:var(--text-dim)">'+o[2]+'</div></div></div>'}).join("")
     +'<button class="btn" id="nxt" style="margin-top:1rem"'+(S.hedonic?'':' disabled')+'>Next</button>';
     app.appendChild(d);
     d.querySelectorAll(".hedopt").forEach(function(el){el.onclick=function(){S.hedonic=el.dataset.v;show("classify")}});
@@ -257,12 +297,12 @@ function show(phase){
 
   else if(phase==="descriptor"){
     var filt=HD.filter(function(h){return h.d.toLowerCase().indexOf(S.descSearch.toLowerCase())>=0});
-    var selHtml=S.desc?'<div class="card" style="margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center"><span style="font-size:.78rem;color:var(--accent);font-weight:500">'+esc(S.desc.d)+'</span><span style="font-size:.65rem;color:'+(S.desc.s>=0?"var(--success)":"var(--danger-light)")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</span></div>':'';
-    var listHtml=filt.map(function(h){var isSel=S.desc&&S.desc.d===h.d;return'<div class="descrow'+(isSel?" sel":"")+'" data-d="'+esc(h.d)+'"><span style="font-size:.7rem;color:'+(isSel?"var(--accent)":"var(--text-strong)")+'">'+esc(h.d)+'</span><span style="font-size:.6rem;color:'+(h.s>=0?"var(--success)":"var(--danger-light)")+';min-width:36px;text-align:right">'+(h.s>0?"+":"")+h.s.toFixed(2)+'</span></div>'}).join("");
-    if(!filt.length)listHtml='<div style="padding:1.5rem;color:var(--text-faint);font-size:.7rem">No matches</div>';
+    var selHtml=S.desc?'<div class="card" style="margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center"><span style="font-size:.92rem;color:var(--accent);font-weight:500">'+esc(S.desc.d)+'</span><span style="font-size:.75rem;color:'+(S.desc.s>=0?"var(--success)":"var(--danger-light)")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</span></div>':'';
+    var listHtml=filt.map(function(h){var isSel=S.desc&&S.desc.d===h.d;return'<div class="descrow'+(isSel?" sel":"")+'" data-d="'+esc(h.d)+'"><span style="font-size:.82rem;color:'+(isSel?"var(--accent)":"var(--text-strong)")+'">'+esc(h.d)+'</span><span style="font-size:.72rem;color:'+(h.s>=0?"var(--success)":"var(--danger-light)")+';min-width:36px;text-align:right">'+(h.s>0?"+":"")+h.s.toFixed(2)+'</span></div>'}).join("");
+    if(!filt.length)listHtml='<div style="padding:1.5rem;color:var(--text-faint);font-size:.82rem">No matches</div>';
     var canGo=S.desc||S.otherDesc.trim();
     d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Odour Descriptor</div>'
-    +'<div style="font-size:.58rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.hedonic+'</div>'
+    +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.hedonic+'</div>'
     +'<label class="lbl" style="text-align:center;margin-bottom:.75rem">Select the closest odour description</label>'
     +'<input class="inp" id="dsrch" value="'+esc(S.descSearch)+'" placeholder="Search descriptors..." style="margin-bottom:.5rem;text-align:center;font-size:.72rem">'
     +selHtml
@@ -292,20 +332,20 @@ function show(phase){
     if(m.rainfall&&m.rainfall!=="None")metHtml+='Rain: '+m.rainfall+' &nbsp;';
     if(m.stability)metHtml+='Stability: '+m.stability.split(" - ")[0];
     var descDisp=S.desc?esc(S.desc.d):'\u2014';
-    var descScore=S.desc?'<div style="font-size:.52rem;color:'+(S.desc.s>=0?"var(--success)":"var(--danger-light)")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</div>':'';
-    var otherDisp=S.otherDesc?'<div style="font-size:.58rem;color:var(--text-mute);margin-top:.2rem;font-style:italic">'+esc(S.otherDesc)+'</div>':'';
-    var trows=S.recs.map(function(r){return'<tr><td style="color:var(--text-mute)">'+r.time+'</td><td style="text-align:center;color:'+(r.value>=4?"#f59e0b":"var(--text)")+';font-weight:500">'+r.value+'</td><td style="text-align:right;color:var(--text-dim);font-size:.52rem">'+OL[r.value]+'</td></tr>'}).join("");
+    var descScore=S.desc?'<div style="font-size:.62rem;color:'+(S.desc.s>=0?"var(--success)":"var(--danger-light)")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</div>':'';
+    var otherDisp=S.otherDesc?'<div style="font-size:.7rem;color:var(--text-mute);margin-top:.2rem;font-style:italic">'+esc(S.otherDesc)+'</div>':'';
+    var trows=S.recs.map(function(r){return'<tr><td style="color:var(--text-mute)">'+r.time+'</td><td style="text-align:center;color:'+(r.value>=4?"#f59e0b":"var(--text)")+';font-weight:500">'+r.value+'</td><td style="text-align:right;color:var(--text-dim);font-size:.62rem">'+OL[r.value]+'</td></tr>'}).join("");
     d.innerHTML='<div class="tag" style="margin-bottom:.2rem">Session Complete</div>'
-    +'<div style="font-size:.58rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
+    +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem">'
-    +'<div class="card"><div class="card-lbl">Avg Intensity (I<sub style="font-size:.7em">mean</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+im+'</div><div style="font-size:.52rem;color:var(--text-dim)">'+(OL[im]||'\u2014')+'</div></div>'
-    +'<div class="card"><div class="card-lbl">Odour Time (t<sub style="font-size:.7em">\u22654</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+tp+'%</div><div style="font-size:.52rem;color:var(--text-dim)">'+c4+' of '+cnt+' samples</div></div>'
+    +'<div class="card"><div class="card-lbl">Avg Intensity (I<sub style="font-size:.7em">mean</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+im+'</div><div style="font-size:.62rem;color:var(--text-dim)">'+(OL[im]||'\u2014')+'</div></div>'
+    +'<div class="card"><div class="card-lbl">Odour Time (t<sub style="font-size:.7em">\u22654</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+tp+'%</div><div style="font-size:.62rem;color:var(--text-dim)">'+c4+' of '+cnt+' samples</div></div>'
     +'<div class="card"><div class="card-lbl">Odour Exposure</div><div style="font-size:.9rem;font-weight:500;color:var(--text);margin-top:.15rem">'+exp+'</div></div>'
-    +'<div class="card" style="background:'+ec+'15;border-color:'+ec+'44"><div class="card-lbl">Odour Effect</div><div style="font-size:.82rem;font-weight:600;color:'+ec+';margin-top:.15rem">'+eff+'</div></div></div>'
+    +'<div class="card" style="background:'+ec+'15;border-color:'+ec+'44"><div class="card-lbl">Odour Effect</div><div style="font-size:.95rem;font-weight:600;color:'+ec+';margin-top:.15rem">'+eff+'</div></div></div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem">'
-    +'<div class="card" style="display:flex;flex-direction:column;justify-content:center"><div class="card-lbl">Hedonic Tone</div><div style="font-size:.82rem;font-weight:500;color:var(--text)">'+(S.hedonic==="Pleasant"?"\uD83D\uDE0A":S.hedonic==="Neutral"?"\uD83D\uDE10":"\uD83D\uDE16")+' '+S.hedonic+'</div></div>'
+    +'<div class="card" style="display:flex;flex-direction:column;justify-content:center"><div class="card-lbl">Hedonic Tone</div><div style="font-size:.95rem;font-weight:500;color:var(--text)">'+(S.hedonic==="Pleasant"?"\uD83D\uDE0A":S.hedonic==="Neutral"?"\uD83D\uDE10":"\uD83D\uDE16")+' '+S.hedonic+'</div></div>'
     +'<div class="card" style="display:flex;flex-direction:column;justify-content:center"><div class="card-lbl">Descriptor</div><div style="font-size:.72rem;font-weight:500;color:var(--text)">'+descDisp+'</div>'+descScore+otherDisp+'</div></div>'
-    +'<div class="card" style="margin-bottom:.5rem;font-size:.55rem;color:var(--text-mute);text-align:left;line-height:1.8"><div class="card-lbl" style="margin-bottom:.3rem">Conditions</div>'+metHtml+'</div>'
+    +'<div class="card" style="margin-bottom:.5rem;font-size:.65rem;color:var(--text-mute);text-align:left;line-height:1.8"><div class="card-lbl" style="margin-bottom:.3rem">Conditions</div>'+metHtml+'</div>'
     +'<div style="max-height:150px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;margin-bottom:.75rem"><table><thead><tr><th style="text-align:left">TIME</th><th style="text-align:center">INT.</th><th style="text-align:right">STRENGTH</th></tr></thead><tbody>'+trows+'</tbody></table></div>'
     +'<div style="margin-bottom:.75rem"><label class="lbl">File Name</label><input class="inp" id="fn" value="'+esc(S.fileName)+'"></div>'
     +'<button class="btn" id="dl">Download CSV</button>';
@@ -343,8 +383,8 @@ function show(phase){
   else if(phase==="done"){
     d.innerHTML='<div style="width:52px;height:52px;border-radius:50%;border:2px solid var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem">'
     +'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--success)"><polyline points="20 6 9 17 4 12"/></svg></div>'
-    +'<div style="font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--success);margin-bottom:.4rem">Saved</div>'
-    +'<p style="color:var(--text-dim);font-size:.78rem;margin-bottom:2rem">'+esc(S.fileName)+'.csv saved</p>'
+    +'<div style="font-size:.75rem;letter-spacing:.35em;text-transform:uppercase;color:var(--success);margin-bottom:.4rem">Saved</div>'
+    +'<p style="color:var(--text-dim);font-size:.92rem;margin-bottom:2rem">'+esc(S.fileName)+'.csv saved</p>'
     +'<button class="btn-ghost" id="rst">New Session</button>';
     app.appendChild(d);
     document.getElementById("rst").onclick=function(){sc++;S={loc:"Location "+sc,sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:null,descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};show("setup")};
