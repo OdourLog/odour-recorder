@@ -99,6 +99,73 @@ const WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WN
 const BF=["0 - Calm","1 - Light air","2 - Light breeze","3 - Gentle breeze","4 - Moderate breeze","5 - Fresh breeze","6 - Strong breeze","7 - Near gale","8+ - Gale"];
 const PG=["A - Very unstable","B - Unstable","C - Slightly unstable","D - Neutral","E - Slightly stable","F - Stable"];
 const RO=["None","Drizzle","Light rain","Moderate rain","Heavy rain"];
+const CC=["Clear (0-2 oktas)","Partly cloudy (3-5 oktas)","Mostly cloudy (6-7 oktas)","Overcast (8 oktas)"];
+// Beaufort band → mid-band wind speed in m/s (for PG derivation)
+const BF_MS={"0":0,"1":1,"2":2,"3":4,"4":7,"5":10,"6":12,"7":16,"8":20};
+function bfToMs(b){if(!b)return null;var n=b.charAt(0);return BF_MS[n]!=null?BF_MS[n]:null}
+// Solar elevation in degrees from date + lat/lng (NOAA-style approximation, accurate to within ~0.5°)
+function solarElevation(date,lat,lng){
+  var rad=Math.PI/180;
+  var start=new Date(date.getFullYear(),0,0);
+  var diff=(date-start)+(start.getTimezoneOffset()-date.getTimezoneOffset())*60*1000;
+  var doy=Math.floor(diff/86400000);
+  var frac=2*Math.PI/365*(doy-1+(date.getHours()-12)/24);
+  var decl=0.006918-0.399912*Math.cos(frac)+0.070257*Math.sin(frac)-0.006758*Math.cos(2*frac)+0.000907*Math.sin(2*frac);
+  var eot=229.18*(0.000075+0.001868*Math.cos(frac)-0.032077*Math.sin(frac)-0.014615*Math.cos(2*frac)-0.040849*Math.sin(2*frac));
+  var solarTime=date.getHours()*60+date.getMinutes()+date.getSeconds()/60+4*lng+eot-date.getTimezoneOffset();
+  var ha=(solarTime/4-180)*rad;
+  var sinEl=Math.sin(lat*rad)*Math.sin(decl)+Math.cos(lat*rad)*Math.cos(decl)*Math.cos(ha);
+  return Math.asin(Math.max(-1,Math.min(1,sinEl)))/rad;
+}
+// Pasquill-Gifford derivation. Falls back to UK-typical lat/lng if no GPS.
+function derivePG(when,lat,lng,bfBand,cloud){
+  var ms=bfToMs(bfBand);
+  if(ms==null||!cloud)return null;
+  var el=solarElevation(when,lat,lng);
+  var isDay=el>3;  // Twilight cutoff
+  if(isDay){
+    // Insolation: strong (>60°), moderate (35-60°), slight (<35°), with cloud reducing by one tier
+    var insolation;
+    if(cloud.indexOf("Overcast")>=0)return"D - Neutral";  // overcast day is always D per PG table
+    var elTier=el>60?2:el>35?1:0;  // 0=slight, 1=moderate, 2=strong
+    if(cloud.indexOf("Mostly cloudy")>=0)elTier=Math.max(0,elTier-2);
+    else if(cloud.indexOf("Partly cloudy")>=0)elTier=Math.max(0,elTier-1);
+    insolation=elTier;  // 0=slight, 1=moderate, 2=strong
+    // PG table lookup (day)
+    if(insolation>=2){  // strong
+      if(ms<2)return"A - Very unstable";
+      if(ms<3)return"A - Very unstable";  // A-B → choose A
+      if(ms<5)return"B - Unstable";
+      if(ms<6)return"C - Slightly unstable";
+      return"C - Slightly unstable";
+    }
+    if(insolation>=1){  // moderate
+      if(ms<2)return"B - Unstable";  // A-B → choose B
+      if(ms<3)return"B - Unstable";
+      if(ms<5)return"B - Unstable";  // B-C → choose B
+      if(ms<6)return"C - Slightly unstable";  // C-D → choose C
+      return"D - Neutral";
+    }
+    // slight
+    if(ms<2)return"B - Unstable";
+    if(ms<3)return"C - Slightly unstable";
+    if(ms<5)return"C - Slightly unstable";
+    if(ms<6)return"D - Neutral";
+    return"D - Neutral";
+  }
+  // Night: cloud > 4 oktas → cloudy night (E or D); otherwise clear night (F or E)
+  var clearNight=cloud.indexOf("Clear")>=0||cloud.indexOf("Partly cloudy")>=0;
+  if(clearNight){
+    if(ms<2)return"F - Stable";
+    if(ms<3)return"F - Stable";
+    if(ms<5)return"E - Slightly stable";
+    return"D - Neutral";
+  }
+  // Cloudy/overcast night
+  if(ms<2)return"E - Slightly stable";
+  if(ms<3)return"E - Slightly stable";
+  return"D - Neutral";
+}
 
 function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
 function pad2(n){return String(n).padStart(2,"0")}
@@ -132,7 +199,11 @@ function pip(){tone(1000,0.08,0.5,"square")}
 function beep(){tone(1500,0.4,0.7,"square")}
 
 var app=document.getElementById("app"),sc=1;
-var S={loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};
+var APP_VERSION="1.1.0";
+var SCHEMA_VERSION=2;
+function loadSurveyor(){try{return localStorage.getItem("orec_surveyor")||""}catch(e){return""}}
+function saveSurveyor(name){try{localStorage.setItem("orec_surveyor",name||"")}catch(e){}}
+var S={surveyor:loadSurveyor(),loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:"",cloud:""},siteOps:"",surroundOps:"",recs:[],anomalies:[],slider:0,hedonic:null,hedonicVaried:false,hedonicVariation:"",desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV,gps:null,wakeLock:null};
 
 function show(phase){
   app.innerHTML="";
@@ -140,16 +211,19 @@ function show(phase){
 
   if(phase==="setup"){
     d.innerHTML='<div class="tag" style="margin-bottom:2rem">Odour Intensity Recorder</div>'
+    +'<div style="margin-bottom:1.5rem"><label class="lbl">Surveyor Name</label><input class="inp" id="surv" value="'+esc(S.surveyor)+'" placeholder="Your name" autocomplete="name"></div>'
     +'<div style="margin-bottom:1.5rem"><label class="lbl">Location Name</label><input class="inp" id="loc" value="'+esc(S.loc)+'"></div>'
     +'<div style="margin-bottom:2rem"><label class="lbl">Receptor Sensitivity</label>'
     +'<div class="opt'+(S.sens==="High"?" sel":"")+'" data-v="High"><div class="t">High</div><div class="d">'+RI.High+'</div></div>'
     +'<div class="opt'+(S.sens==="Medium"?" sel":"")+'" data-v="Medium"><div class="t">Medium</div><div class="d">'+RI.Medium+'</div></div>'
     +'<div class="opt'+(S.sens==="Low"?" sel":"")+'" data-v="Low"><div class="t">Low</div><div class="d">'+RI.Low+'</div></div></div>'
-    +'<button class="btn" id="nxt"'+(S.sens?'':' disabled')+'>Next</button>';
+    +'<button class="btn" id="nxt"'+((S.sens&&S.surveyor.trim()&&S.loc.trim())?'':' disabled')+'>Next</button>';
     app.appendChild(d);
-    document.getElementById("loc").oninput=function(e){S.loc=e.target.value};
+    function updNxt(){var b=document.getElementById("nxt");b.disabled=!(S.sens&&S.surveyor.trim()&&S.loc.trim())}
+    document.getElementById("surv").oninput=function(e){S.surveyor=e.target.value;saveSurveyor(S.surveyor);updNxt()};
+    document.getElementById("loc").oninput=function(e){S.loc=e.target.value;updNxt()};
     d.querySelectorAll(".opt").forEach(function(el){el.onclick=function(){S.sens=el.dataset.v;show("setup")}});
-    document.getElementById("nxt").onclick=function(){if(S.sens)show("conditions")};
+    document.getElementById("nxt").onclick=function(){if(S.sens&&S.surveyor.trim()&&S.loc.trim())show("conditions")};
   }
 
   else if(phase==="conditions"){
@@ -161,41 +235,78 @@ function show(phase){
     +'<details class="info-tip"><summary>Wind strength &mdash; how to determine by observation</summary><div class="info-content">'
       +'<strong>Beaufort scale &mdash; visible signs on land:</strong>'
       +'<ul>'
-        +'<li><strong>0 Calm</strong> &mdash; smoke rises vertically</li>'
-        +'<li><strong>1 Light air</strong> &mdash; smoke drifts; vanes still</li>'
-        +'<li><strong>2 Light breeze</strong> &mdash; wind felt on face; leaves rustle</li>'
-        +'<li><strong>3 Gentle breeze</strong> &mdash; leaves &amp; small twigs in constant motion; light flag extended</li>'
-        +'<li><strong>4 Moderate breeze</strong> &mdash; dust &amp; loose paper raised; small branches moved</li>'
-        +'<li><strong>5 Fresh breeze</strong> &mdash; small leafy trees begin to sway</li>'
-        +'<li><strong>6 Strong breeze</strong> &mdash; large branches in motion; whistling in wires</li>'
-        +'<li><strong>7 Near gale</strong> &mdash; whole trees in motion; difficulty walking into wind</li>'
-        +'<li><strong>8+ Gale</strong> &mdash; twigs break from trees; impedes progress</li>'
+        +'<li><strong>0</strong> &mdash; smoke rises vertically</li>'
+        +'<li><strong>1</strong> &mdash; smoke drifts; vanes still</li>'
+        +'<li><strong>2</strong> &mdash; wind felt on face; leaves rustle</li>'
+        +'<li><strong>3</strong> &mdash; leaves &amp; small twigs in constant motion; light flag extended</li>'
+        +'<li><strong>4</strong> &mdash; dust &amp; loose paper raised; small branches moved</li>'
+        +'<li><strong>5</strong> &mdash; small leafy trees begin to sway</li>'
+        +'<li><strong>6</strong> &mdash; large branches in motion; whistling in wires</li>'
+        +'<li><strong>7</strong> &mdash; whole trees in motion; difficulty walking into wind</li>'
+        +'<li><strong>8+</strong> &mdash; twigs break from trees; impedes progress</li>'
       +'</ul>'
     +'</div></details>'
-    +'<div class="grid2"><div><label class="lbl">Stability Category</label><select class="sel" id="st">'+opts(PG,m.stability)+'</select></div>'
+    +'<div class="grid2"><div><label class="lbl">Cloud Cover</label><select class="sel" id="cc">'+opts(CC,m.cloud)+'</select></div>'
     +'<div><label class="lbl">Rainfall</label><select class="sel" id="rf">'+opts(RO,m.rainfall)+'</select></div></div>'
+    +'<div style="margin-bottom:.85rem"><label class="lbl">Stability Category</label><select class="sel" id="st">'+opts(PG,m.stability)+'</select>'
+      +'<button class="btn-ghost" id="pgsg" type="button" style="width:100%;margin-top:.4rem;padding:.6rem;font-size:.7rem">\u2728 Suggest from sun + wind + cloud</button>'
+      +'<div id="pgsgmsg" style="font-size:.7rem;color:var(--text-faint);margin-top:.4rem;text-align:center;min-height:.9rem"></div>'
+    +'</div>'
     +'<details class="info-tip"><summary>Stability category &mdash; how to determine by observation</summary><div class="info-content">'
-      +'<strong>Pasquill-Gifford &mdash; from sun &amp; wind:</strong>'
+      +'<strong>Pasquill-Gifford categories:</strong>'
       +'<ul>'
-        +'<li><strong>A &mdash; Very unstable</strong> &mdash; strong sun, light wind (&lt;2 m/s); heat shimmer; plume loops &amp; disperses fast</li>'
-        +'<li><strong>B &mdash; Unstable</strong> &mdash; strong sun + moderate wind, or moderate sun + light wind; cumulus develops</li>'
-        +'<li><strong>C &mdash; Slightly unstable</strong> &mdash; weak sun, or strong sun with strong wind</li>'
-        +'<li><strong>D &mdash; Neutral</strong> &mdash; overcast (day or night) or any strong wind (&gt;5 m/s); plume travels straight. Most common UK condition.</li>'
-        +'<li><strong>E &mdash; Slightly stable</strong> &mdash; clear or partly cloudy night, light to moderate wind; plume fans slightly</li>'
-        +'<li><strong>F &mdash; Stable</strong> &mdash; clear night, light wind (&lt;2 m/s); mist or fog often forming; plume hugs ground</li>'
+        +'<li><strong>A</strong> &mdash; strong sun, light wind (&lt;2 m/s); heat shimmer; plume loops &amp; disperses fast</li>'
+        +'<li><strong>B</strong> &mdash; strong sun + moderate wind, or moderate sun + light wind; cumulus develops</li>'
+        +'<li><strong>C</strong> &mdash; weak sun, or strong sun with strong wind</li>'
+        +'<li><strong>D</strong> &mdash; overcast (day or night) or any strong wind (&gt;5 m/s); plume travels straight. Most common UK condition.</li>'
+        +'<li><strong>E</strong> &mdash; clear or partly cloudy night, light to moderate wind; plume fans slightly</li>'
+        +'<li><strong>F</strong> &mdash; clear night, light wind (&lt;2 m/s); mist or fog often forming; plume hugs ground</li>'
       +'</ul>'
       +'<div class="rot"><strong>Quick rule of thumb:</strong><br>Day + sun + light wind &rarr; A or B &nbsp;&middot;&nbsp; Day + cloudy or windy &rarr; D &nbsp;&middot;&nbsp; Night + clear + calm &rarr; F &nbsp;&middot;&nbsp; Night + cloudy or windy &rarr; D</div>'
     +'</div></details>'
     +'<div class="grid2"><div><label class="lbl">Temperature (&deg;C)</label><input type="number" step="0.1" class="inp" id="tp" value="'+esc(m.temp)+'" placeholder="e.g. 18.5"></div>'
-    +'<div><label class="lbl">Humidity (%)</label><input type="number" step="1" class="inp" id="hu" value="'+esc(m.humidity)+'" placeholder="e.g. 65"></div></div>'
-    +'<div style="margin-bottom:.85rem"><label class="lbl">Barometric Pressure (hPa)</label><input type="number" step="1" class="inp" id="pr" value="'+esc(m.pressure)+'" placeholder="e.g. 1013"></div>'
+    +'<div><label class="lbl">Humidity (%) <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="number" step="1" class="inp" id="hu" value="'+esc(m.humidity)+'" placeholder="e.g. 65"></div></div>'
+    +'<div style="margin-bottom:.85rem"><label class="lbl">Barometric Pressure (hPa) <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="number" step="1" class="inp" id="pr" value="'+esc(m.pressure)+'" placeholder="e.g. 1013"></div>'
     +'<div style="margin-bottom:.85rem"><label class="lbl">On-site Operations &amp; Activities</label><textarea class="ta" id="so" placeholder="Describe current site activities...">'+esc(S.siteOps)+'</textarea></div>'
     +'<div style="margin-bottom:1.5rem"><label class="lbl">Surrounding Area Activities</label><textarea class="ta" id="su" placeholder="Describe activities in the surrounding area...">'+esc(S.surroundOps)+'</textarea></div>'
     +'<div style="display:flex;gap:.5rem"><button class="btn-ghost" id="bk" style="width:auto;padding:.85rem 1.5rem">Back</button><button class="btn" id="go" style="flex:1">Start Recording</button></div>';
     app.appendChild(d);
-    var save=function(){S.met={windDir:gi("wd"),windStr:gi("ws"),stability:gi("st"),pressure:gi("pr"),rainfall:gi("rf"),temp:gi("tp"),humidity:gi("hu")};S.siteOps=gi("so");S.surroundOps=gi("su")};
+    var save=function(){S.met={windDir:gi("wd"),windStr:gi("ws"),stability:gi("st"),pressure:gi("pr"),rainfall:gi("rf"),temp:gi("tp"),humidity:gi("hu"),cloud:gi("cc")};S.siteOps=gi("so");S.surroundOps=gi("su")};
+    document.getElementById("pgsg").onclick=function(){
+      save();
+      var msg=document.getElementById("pgsgmsg");
+      var ws=S.met.windStr,cc=S.met.cloud;
+      var missing=[];
+      if(!ws)missing.push("Wind Strength");
+      if(!cc)missing.push("Cloud Cover");
+      if(missing.length){msg.textContent="Need: "+missing.join(", ");msg.style.color="var(--warning)";return}
+      var lat=S.gps?S.gps.lat:54.0,lng=S.gps?S.gps.lng:-2.0;  // UK centre fallback
+      var pg=derivePG(new Date(),lat,lng,ws,cc);
+      if(!pg){msg.textContent="Could not derive";msg.style.color="var(--warning)";return}
+      S.met.stability=pg;
+      msg.textContent=(S.gps?"From GPS + ":"From UK avg + ")+ws.charAt(0)+" + "+cc.replace(/\s*\([^)]*\)/,"").toLowerCase()+" \u2192 "+pg;
+      msg.style.color="var(--success)";
+      show("conditions");
+    };
     document.getElementById("bk").onclick=function(){save();show("setup")};
-    document.getElementById("go").onclick=function(){save();unlockAudio();startRec()};
+    document.getElementById("go").onclick=function(){
+      save();
+      // Mandatory: windDir, windStr, stability, rainfall, temp, cloud
+      var missing=[];
+      if(!S.met.windDir)missing.push("Wind Direction");
+      if(!S.met.windStr)missing.push("Wind Strength");
+      if(!S.met.cloud)missing.push("Cloud Cover");
+      if(!S.met.stability)missing.push("Stability Category");
+      if(!S.met.rainfall)missing.push("Rainfall");
+      if(!String(S.met.temp).trim())missing.push("Temperature");
+      if(missing.length){
+        alert("Please complete the following before starting:\n\n\u2022 "+missing.join("\n\u2022 "));
+        return;
+      }
+      unlockAudio();
+      // GPS request — informed-choice flow (handled in startRec)
+      startRec();
+    };
   }
 
   else if(phase==="recording"){
@@ -222,10 +333,32 @@ function show(phase){
           +'</div>'
           +'<div style="display:flex;flex-direction:column;justify-content:space-between;padding:3px 0;width:10px">'+[6,5,4,3,2,1,0].map(function(v){return'<div style="width:7px;height:1px;background:'+(v===4?"rgba(217,119,6,.5)":"var(--border-strong)")+'"></div>'}).join("")+'</div>'
         +'</div>'
-        +'<div></div>'
+        +'<div style="display:flex;align-items:center;justify-content:center"><div id="flagcol" role="button" aria-label="Flag anomaly" style="width:56px;height:230px;border:2px dashed var(--border-strong);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--bg-alt);transition:all .15s;-webkit-tap-highlight-color:transparent;padding:.6rem .3rem">'
+          +'<div id="flagicon" style="font-size:1.6rem;line-height:1">\u2691</div>'
+          +'<div id="flagcount" style="font-size:.85rem;font-weight:600;margin-top:.3rem;color:var(--text-mute)"></div>'
+          +'<div style="font-size:.5rem;color:var(--text-faint);letter-spacing:.1em;margin-top:.15rem;text-transform:uppercase">FLAG</div>'
+        +'</div></div>'
       +'</div>'
       +'<p id="rcnt" style="color:var(--text-faint);font-size:.65rem;margin-top:.8rem;letter-spacing:.1em"></p>';
     app.appendChild(d);
+
+    // Anomaly flag handler — debounce so a double-tap counts as 1
+    var flagBtn=document.getElementById("flagcol");
+    var lastFlagAt=0;
+    function flag(){
+      var now=Date.now();
+      if(now-lastFlagAt<400)return;  // debounce double-taps within 400ms
+      lastFlagAt=now;
+      var sec=S.tick;
+      S.anomalies.push({tick:sec,time:fmt(sec),value:Math.round(S.slider),note:""});
+      // Visual pulse confirmation
+      flagBtn.style.background="rgba(220,38,38,.15)";
+      flagBtn.style.borderColor="var(--danger)";
+      setTimeout(function(){flagBtn.style.background="var(--bg-alt)";flagBtn.style.borderColor="var(--border-strong)"},300);
+      if(S._paint)S._paint();
+    }
+    flagBtn.onclick=flag;
+    flagBtn.ontouchstart=function(e){e.preventDefault();flag()};
 
     // Static number column (text never changes; only colour/weight on paint)
     var nc=document.getElementById("rnumcol");
@@ -265,7 +398,13 @@ function show(phase){
       beepdot.style.background=S.beep?"var(--accent)":"transparent";
       beepdot.style.border="1px solid "+(S.beep?"var(--accent)":"var(--border-strong)");
       beeplbl.textContent="BEEP "+(S.beep?"ON":"OFF");
-      rcnt.textContent="SAMPLING EVERY 10s \u00b7 "+S.recs.length+" RECORDED";
+      var fc=document.getElementById("flagcount");
+      if(fc)fc.textContent=S.anomalies.length;
+      if(S.recs.length===0){
+        rcnt.innerHTML='<span style="color:var(--accent);font-weight:600">GET READY</span> &middot; FIRST SAMPLE AT 00:10';
+      } else {
+        rcnt.textContent='SAMPLING EVERY 10s \u00b7 '+S.recs.length+' RECORDED';
+      }
     }
     paint();
     S._paint=paint;
@@ -285,21 +424,62 @@ function show(phase){
     document.getElementById("skip").onclick=function(){
       if(!confirm("Skip to end? Remaining samples will be filled with the current intensity."))return;
       clearInterval(S.timer);
-      var tot=TOTAL/INTV+1;
-      while(S.recs.length<tot){var sec=S.recs.length*INTV;S.recs.push({time:fmt(sec),seconds:sec,value:Math.round(S.slider)})}
+      releaseWakeLock();
+      var tot=TOTAL/INTV;
+      while(S.recs.length<tot){var sec=(S.recs.length+1)*INTV;S.recs.push({time:fmt(sec),seconds:sec,value:Math.round(S.slider)})}
       S.secsLeft=0;
-      show("classify");
+      show(S.anomalies.length?"anomalies":"classify");
     };
+  }
+
+  else if(phase==="anomalies"){
+    d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Anomaly Review</div>'
+    +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+'</div>'
+    +'<p style="font-size:.85rem;color:var(--text-mute);line-height:1.55;margin-bottom:1.5rem">You flagged '+S.anomalies.length+' anomal'+(S.anomalies.length===1?"y":"ies")+' during recording. Add a brief note for each (optional). Notes are saved with the survey for QA review.</p>'
+    +S.anomalies.map(function(a,i){
+      return '<div class="card" style="margin-bottom:.7rem;text-align:left">'
+        +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.45rem">'
+          +'<span style="font-size:.85rem;font-weight:600;color:var(--text)">Flag '+(i+1)+' &middot; '+a.time+'</span>'
+          +'<span style="font-size:.7rem;color:var(--text-faint)">Intensity '+a.value+'</span>'
+        +'</div>'
+        +'<input class="inp" data-anom="'+i+'" value="'+esc(a.note||"")+'" placeholder="e.g. Tractor passing, kitchen extractor cycled on..." style="font-size:.82rem">'
+      +'</div>';
+    }).join("")
+    +'<div style="display:flex;gap:.5rem;margin-top:1.5rem"><button class="btn-ghost" id="rmall" style="width:auto;padding:.85rem 1.2rem">Remove All</button><button class="btn" id="nxt" style="flex:1">Continue</button></div>';
+    app.appendChild(d);
+    d.querySelectorAll("input[data-anom]").forEach(function(inp){
+      inp.oninput=function(e){var i=parseInt(inp.dataset.anom,10);S.anomalies[i].note=e.target.value};
+    });
+    document.getElementById("rmall").onclick=function(){if(confirm("Remove all anomaly flags?")){S.anomalies=[];show("classify")}};
+    document.getElementById("nxt").onclick=function(){show("classify")};
   }
 
   else if(phase==="classify"){
     d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Observation Complete</div>'
     +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:2rem">'+esc(S.loc)+'</div>'
-    +'<label class="lbl" style="text-align:center;margin-bottom:1rem">How would you classify the odour?</label>'
+    +'<label class="lbl" style="text-align:center;margin-bottom:1rem">Dominant hedonic tone</label>'
     +[["Pleasant","\uD83D\uDE0A","Agreeable or appealing odour"],["Neutral","\uD83D\uDE10","Neither pleasant nor unpleasant"],["Unpleasant","\uD83D\uDE16","Disagreeable or offensive odour"]].map(function(o){return'<div class="hedopt'+(S.hedonic===o[0]?" sel":"")+'" data-v="'+o[0]+'"><span style="font-size:1.4rem">'+o[1]+'</span><div><div style="font-size:.95rem;font-weight:500;color:'+(S.hedonic===o[0]?"var(--accent)":"var(--text)")+';margin-bottom:.1rem">'+o[0]+'</div><div style="font-size:.72rem;color:var(--text-dim)">'+o[2]+'</div></div></div>'}).join("")
-    +'<button class="btn" id="nxt" style="margin-top:1rem"'+(S.hedonic?'':' disabled')+'>Next</button>';
+    +'<div class="card" style="margin-top:1.25rem;text-align:left;padding:.95rem 1rem">'
+      +'<label style="display:flex;align-items:center;gap:.65rem;cursor:pointer;user-select:none">'
+        +'<input type="checkbox" id="hvary"'+(S.hedonicVaried?" checked":"")+' style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer">'
+        +'<span style="font-size:.85rem;color:var(--text);font-weight:500">Tone varied during session</span>'
+      +'</label>'
+      +'<div id="hvarwrap" style="margin-top:'+(S.hedonicVaried?".7rem":"0")+';overflow:hidden;max-height:'+(S.hedonicVaried?"160px":"0")+';transition:max-height .25s,margin-top .25s">'
+        +'<label class="lbl" style="margin-bottom:.4rem">Describe the variation (optional)</label>'
+        +'<textarea class="ta" id="hvardesc" placeholder="e.g. Started pleasant floral, became chemical after 3 minutes...">'+esc(S.hedonicVariation)+'</textarea>'
+      +'</div>'
+    +'</div>'
+    +'<button class="btn" id="nxt" style="margin-top:1.25rem"'+(S.hedonic?'':' disabled')+'>Next</button>';
     app.appendChild(d);
     d.querySelectorAll(".hedopt").forEach(function(el){el.onclick=function(){S.hedonic=el.dataset.v;show("classify")}});
+    document.getElementById("hvary").onchange=function(e){
+      S.hedonicVaried=e.target.checked;
+      var wrap=document.getElementById("hvarwrap");
+      wrap.style.maxHeight=S.hedonicVaried?"160px":"0";
+      wrap.style.marginTop=S.hedonicVaried?".7rem":"0";
+      if(!S.hedonicVaried)S.hedonicVariation="";
+    };
+    document.getElementById("hvardesc").oninput=function(e){S.hedonicVariation=e.target.value};
     document.getElementById("nxt").onclick=function(){if(S.hedonic)show("descriptor")};
   }
 
@@ -388,18 +568,34 @@ function show(phase){
       var descriptorList=S.desc.map(function(d){return d.d}).join(", ");
       var scoreList=S.desc.map(function(d){return d.s.toFixed(2)}).join(", ");
       var meanScore=S.desc.length?(S.desc.reduce(function(a,d){return a+d.s},0)/S.desc.length).toFixed(2):"";
-      var h="Time,Seconds,Intensity,Odour Strength\n";
-      var rows=S.recs.map(function(r){return r.time+","+r.seconds+","+r.value+","+q(OL[r.value])}).join("\n");
+      // Build set of seconds that were flagged for the per-sample Anomaly column
+      var flaggedSecs={};
+      S.anomalies.forEach(function(a){
+        // Tag the sample whose 10s window contains the flag
+        var sampleSec=Math.ceil(a.tick/INTV)*INTV;
+        if(sampleSec===0)sampleSec=INTV;
+        flaggedSecs[sampleSec]=true;
+      });
+      var h="Time,Seconds,Intensity,Odour Strength,Anomaly\n";
+      var rows=S.recs.map(function(r){return r.time+","+r.seconds+","+r.value+","+q(OL[r.value])+","+(flaggedSecs[r.seconds]?"true":"")}).join("\n");
       var sm="\n\nSummary\n"
+        +row("App Version",APP_VERSION)
+        +row("Schema",SCHEMA_VERSION)
         +row("Date",S.startedAt?fmtDateCSV(S.startedAt):"")
         +row("Time",S.startedAt?fmtTimeCSV(S.startedAt):"")
+        +row("Surveyor",S.surveyor)
         +row("Location",S.loc)
+        +row("Latitude",S.gps?S.gps.lat.toFixed(6):"")
+        +row("Longitude",S.gps?S.gps.lng.toFixed(6):"")
+        +row("GPS Accuracy (m)",S.gps?Math.round(S.gps.acc):"")
         +row("Receptor Sensitivity",S.sens)
         +row("Average Intensity (Imean)",im)
         +row("Percentage Odour Time (t>=4)",tp+"%")
         +row("Odour Exposure",exp)
         +row("Odour Effect",eff)
-        +row("Hedonic Tone",S.hedonic)
+        +row("Dominant Hedonic Tone",S.hedonic)
+        +row("Hedonic Tone Varied",S.hedonicVaried?"Yes":"No")
+        +row("Variation Description",S.hedonicVariation||"")
         +row("Odour Descriptors",descriptorList)
         +row("Hedonic Scores",scoreList)
         +row("Mean Hedonic Score",meanScore)
@@ -407,14 +603,20 @@ function show(phase){
         +"\nMeteorological Conditions\n"
         +row("Wind Direction",m.windDir)
         +row("Wind Strength",m.windStr)
+        +row("Cloud Cover",m.cloud)
         +row("Atmospheric Stability",m.stability)
-        +row("Barometric Pressure (hPa)",m.pressure)
         +row("Rainfall",m.rainfall)
         +row("Temperature (C)",m.temp)
         +row("Humidity (%)",m.humidity)
+        +row("Barometric Pressure (hPa)",m.pressure)
         +"\nSite Operations\n"
         +row("On-site activities",S.siteOps)
         +row("Surrounding area",S.surroundOps);
+      if(S.anomalies.length){
+        sm+="\nAnomalies\nFlag,Time,Intensity,Note\n"
+          +S.anomalies.map(function(a,i){return(i+1)+","+a.time+","+a.value+","+q(a.note||"")}).join("\n")
+          +"\n";
+      }
       var csv=h+rows+sm;
       var fname=(S.fileName||"session")+".csv";
       // Web Share API only on mobile (iOS / Android). On desktop we want the standard download dialog.
@@ -446,23 +648,58 @@ function show(phase){
     +'<p style="color:var(--text-dim);font-size:.92rem;margin-bottom:2rem">'+esc(S.fileName)+'.csv saved</p>'
     +'<button class="btn-ghost" id="rst">New Session</button>';
     app.appendChild(d);
-    document.getElementById("rst").onclick=function(){sc++;S={loc:"Location "+sc,sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};show("setup")};
+    document.getElementById("rst").onclick=function(){sc++;S={surveyor:loadSurveyor(),loc:"Location "+sc,sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:"",cloud:""},siteOps:"",surroundOps:"",recs:[],anomalies:[],slider:0,hedonic:null,hedonicVaried:false,hedonicVariation:"",desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV,gps:null,wakeLock:null};show("setup")};
   }
 }
 
+function acquireWakeLock(){
+  try{
+    if("wakeLock" in navigator){
+      navigator.wakeLock.request("screen").then(function(wl){
+        S.wakeLock=wl;
+        wl.addEventListener("release",function(){});
+      }).catch(function(){});
+    }
+  }catch(e){}
+}
+function releaseWakeLock(){try{if(S.wakeLock){S.wakeLock.release();S.wakeLock=null}}catch(e){}}
+
 function startRec(){
-  S.startedAt=new Date();
-  S.recs=[{time:"0:00",seconds:0,value:0}];S.slider=0;S.secsLeft=TOTAL;S.sub=INTV;S.tick=0;
-  S.fileName=S.loc+" "+fmtFileStamp(S.startedAt);
-  show("recording");
-  S.timer=setInterval(function(){
-    S.tick++;S.secsLeft=TOTAL-S.tick;
-    S.sub=INTV-(S.tick%INTV);if(S.sub===INTV&&S.tick%INTV!==0){}else if(S.sub===INTV){S.sub=0}
-    if(S.beep&&(S.sub===3||S.sub===2||S.sub===1))pip();
-    if(S.tick%INTV===0){S.recs.push({time:fmt(S.tick),seconds:S.tick,value:Math.round(S.slider)});S.sub=INTV;if(S.beep)beep()}
-    if(S.secsLeft<=0){clearInterval(S.timer);show("classify")}
-    else if(S._paint)S._paint();
-  },1000);
+  // GPS first (informed choice). Proceed regardless of outcome but record what happened.
+  function go(){
+    S.startedAt=new Date();
+    S.recs=[];S.anomalies=[];S.slider=0;S.secsLeft=TOTAL;S.sub=INTV;S.tick=0;
+    S.fileName=S.loc+" "+fmtFileStamp(S.startedAt);
+    acquireWakeLock();
+    show("recording");
+    S.timer=setInterval(function(){
+      S.tick++;S.secsLeft=TOTAL-S.tick;
+      S.sub=INTV-(S.tick%INTV);if(S.sub===INTV&&S.tick%INTV!==0){}else if(S.sub===INTV){S.sub=0}
+      if(S.beep&&(S.sub===3||S.sub===2||S.sub===1))pip();
+      if(S.tick%INTV===0){S.recs.push({time:fmt(S.tick),seconds:S.tick,value:Math.round(S.slider)});S.sub=INTV;if(S.beep)beep()}
+      if(S.secsLeft<=0){clearInterval(S.timer);releaseWakeLock();show(S.anomalies.length?"anomalies":"classify")}
+      else if(S._paint)S._paint();
+    },1000);
+  }
+  if(!navigator.geolocation){
+    if(confirm("GPS not available on this device. Continue without coordinates?"))go();
+    return;
+  }
+  // Show a brief "acquiring GPS" state by replacing button text. We're still on conditions screen.
+  var btn=document.getElementById("go");
+  if(btn){btn.disabled=true;btn.textContent="Acquiring GPS\u2026"}
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      S.gps={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy};
+      go();
+    },
+    function(err){
+      var reason=err.code===err.PERMISSION_DENIED?"Location permission denied.":err.code===err.TIMEOUT?"GPS timed out (no fix in 8s).":"GPS unavailable.";
+      if(btn){btn.disabled=false;btn.textContent="Start Recording"}
+      if(confirm(reason+"\n\nContinue without GPS coordinates?"))go();
+    },
+    {timeout:8000,enableHighAccuracy:true,maximumAge:60000}
+  );
 }
 
 function opts(arr,sel){return'<option value="">Select...</option>'+arr.map(function(v){return'<option value="'+esc(v)+'"'+(v===sel?' selected':'')+'>'+esc(v)+'</option>'}).join("")}
