@@ -90,7 +90,24 @@ function gEC(e){return e.indexOf("Substantial")>=0?"#dc2626":e.indexOf("Moderate
 
 var audioCtx=null;
 function unlockAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch(e){}}
-function beep(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext);var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=880;o.type="sine";g.gain.setValueAtTime(.3,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.2);o.start(audioCtx.currentTime);o.stop(audioCtx.currentTime+.2)}catch(e){}}
+function tone(freq,dur,vol,type){
+  try{
+    if(!audioCtx)return;
+    var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type||"square";
+    o.frequency.value=freq;
+    o.connect(g);g.connect(audioCtx.destination);
+    var t=audioCtx.currentTime;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.005);                   // 5ms attack — avoids click
+    g.gain.setValueAtTime(vol,t+Math.max(0.01,dur-0.04));           // sustain at full vol
+    g.gain.exponentialRampToValueAtTime(0.001,t+dur);               // smooth tail
+    o.start(t);
+    o.stop(t+dur+0.02);
+  }catch(e){}
+}
+function pip(){tone(1000,0.08,0.5,"square")}                        // 80ms BBC-style countdown pip
+function beep(){tone(1500,0.4,0.7,"square")}                        // 400ms higher-pitched sample marker
 
 var app=document.getElementById("app"),sc=1;
 var S={loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:null,descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};
@@ -301,16 +318,19 @@ function show(phase){
       var sm="\n\nSummary\nLocation,"+S.loc+"\nReceptor Sensitivity,"+S.sens+"\nAverage Intensity (Imean),"+im+"\nPercentage Odour Time (t>=4),"+tp+"%\nOdour Exposure,"+exp+"\nOdour Effect,"+eff+"\nHedonic Tone,"+S.hedonic+"\nOdour Descriptor,"+(S.desc?S.desc.d:"")+"\nHedonic Score,"+(S.desc?S.desc.s:"")+'\nAdditional Description,"'+(S.otherDesc||"").replace(/"/g,'""')+'"\n\nMeteorological Conditions\nWind Direction,'+m.windDir+"\nWind Strength,"+m.windStr+"\nAtmospheric Stability,"+m.stability+"\nBarometric Pressure (hPa),"+m.pressure+"\nRainfall,"+m.rainfall+"\nTemperature (C),"+m.temp+"\nHumidity (%),"+m.humidity+'\n\nSite Operations\nOn-site activities,"'+S.siteOps.replace(/"/g,'""')+'"\nSurrounding area,"'+S.surroundOps.replace(/"/g,'""')+'"';
       var csv=h+rows+sm;
       var fname=(S.fileName||"session")+".csv";
-      // Prefer Web Share API on iOS — opens the share sheet so user can Save to Files, Mail, AirDrop, etc.
-      try{
-        if(typeof File!=="undefined"&&navigator.canShare){
-          var file=new File([csv],fname,{type:"text/csv"});
-          if(navigator.canShare({files:[file]})){
-            navigator.share({files:[file],title:fname}).then(function(){show("done")}).catch(function(){});
-            return;
+      // Web Share API only on mobile (iOS / Android). On desktop we want the standard download dialog.
+      var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+      if(isMobile){
+        try{
+          if(typeof File!=="undefined"&&navigator.canShare){
+            var file=new File([csv],fname,{type:"text/csv"});
+            if(navigator.canShare({files:[file]})){
+              navigator.share({files:[file],title:fname}).then(function(){show("done")}).catch(function(){});
+              return;
+            }
           }
-        }
-      }catch(e){}
+        }catch(e){}
+      }
       // Fallback for desktop / Android / older iOS
       var blob=new Blob([csv],{type:"text/csv"});
       var u=URL.createObjectURL(blob),a=document.createElement("a");
@@ -337,6 +357,7 @@ function startRec(){
   S.timer=setInterval(function(){
     S.tick++;S.secsLeft=TOTAL-S.tick;
     S.sub=INTV-(S.tick%INTV);if(S.sub===INTV&&S.tick%INTV!==0){}else if(S.sub===INTV){S.sub=0}
+    if(S.beep&&(S.sub===3||S.sub===2||S.sub===1))pip();
     if(S.tick%INTV===0){S.recs.push({time:fmt(S.tick),seconds:S.tick,value:Math.round(S.slider)});S.sub=INTV;if(S.beep)beep()}
     if(S.secsLeft<=0){clearInterval(S.timer);show("classify")}
     else if(S._paint)S._paint();
