@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Understanding Odour Surveys</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#ffffff;
+  --bg-soft:#f8fafc;
+  --bg-alt:#f1f5f9;
+  --text:#0f172a;
+  --text-mute:#334155;
+  --text-dim:#475569;
+  --text-faint:#64748b;
+  --border:#cbd5e1;
+  --border-soft:#e2e8f0;
+  --accent:#0284c7;
+  --accent-soft:#e0f2fe;
+  --accent-deep:#075985;
+  --warning:#d97706;
+  --danger:#dc2626;
+  --success:#16a34a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.wrap{max-width:680px;margin:0 auto;padding:3rem 1.5rem 6rem}
+
+header.cover{
+  border-bottom:1px solid var(--border-soft);
+  padding-bottom:1.75rem;
+  margin-bottom:2.5rem;
+}
+.eyebrow{
+  font-size:.72rem;
+  font-weight:600;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:.6rem;
+}
+h1{
+  font-size:2.1rem;
+  font-weight:700;
+  letter-spacing:-.02em;
+  margin:0 0 .8rem;
+  line-height:1.15;
+  color:var(--text);
+}
+.lede{
+  font-size:1.1rem;
+  color:var(--text-mute);
+  line-height:1.55;
+  margin:0;
+}
+
+section{margin-bottom:2.75rem}
+h2{
+  font-size:1.4rem;
+  font-weight:700;
+  letter-spacing:-.01em;
+  margin:0 0 1rem;
+  color:var(--text);
+}
+h3{
+  font-size:1.05rem;
+  font-weight:600;
+  margin:1.5rem 0 .6rem;
+  color:var(--text-mute);
+}
+p{margin:0 0 1rem}
+strong{font-weight:600;color:var(--text)}
+em{color:var(--text-mute);font-style:italic}
+
+ul,ol{margin:0 0 1.2rem;padding-left:1.4rem}
+li{margin-bottom:.5rem}
+
+/* The intensity ladder — keep it visually distinct but simple */
+.scale{
+  list-style:none;
+  padding:0;
+  margin:1.25rem 0;
+  border-left:3px solid var(--border-soft);
+}
+.scale li{
+  position:relative;
+  padding:.55rem 0 .55rem 3rem;
+  margin:0;
+  border-bottom:1px solid var(--border-soft);
+}
+.scale li:last-child{border-bottom:none}
+.scale .num{
+  position:absolute;
+  left:-1.1rem;
+  top:.55rem;
+  width:1.9rem;
+  height:1.9rem;
+  border-radius:50%;
+  background:var(--bg);
+  border:2px solid var(--accent);
+  color:var(--accent);
+  font-weight:700;
+  font-size:.85rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-feature-settings:"tnum";
+}
+.scale li.lvl-0 .num{border-color:#94a3b8;color:#475569}
+.scale li.lvl-1 .num,.scale li.lvl-2 .num{border-color:#0ea5e9;color:#0369a1}
+.scale li.lvl-3 .num,.scale li.lvl-4 .num{border-color:#f59e0b;color:#b45309}
+.scale li.lvl-5 .num,.scale li.lvl-6 .num{border-color:#dc2626;color:#991b1b}
+.scale .label{font-weight:600;color:var(--text)}
+.scale .desc{display:block;color:var(--text-mute);font-size:.95rem;margin-top:.1rem}
+.scale .desc em{color:var(--text-faint);font-style:italic}
+
+/* Category cards for the four effect levels */
+.cats{
+  display:grid;
+  gap:.8rem;
+  margin:1.25rem 0;
+}
+.cat{
+  padding:.9rem 1.1rem;
+  border-radius:5px;
+  border-left:4px solid;
+  background:var(--bg-soft);
+}
+.cat.negligible{border-left-color:#16a34a;background:#f0fdf4}
+.cat.slight{border-left-color:#eab308;background:#fefce8}
+.cat.moderate{border-left-color:#ea580c;background:#fff7ed}
+.cat.substantial{border-left-color:#dc2626;background:#fef2f2}
+.cat .name{
+  font-weight:700;
+  font-size:.95rem;
+  margin-bottom:.2rem;
+  color:var(--text);
+}
+.cat .meaning{font-size:.95rem;color:var(--text-mute);line-height:1.55}
+
+/* Side-by-side audience boxes for the closing section */
+.audiences{
+  display:grid;
+  gap:1.25rem;
+  margin:1.25rem 0;
+}
+@media(min-width:600px){
+  .audiences{grid-template-columns:1fr 1fr}
+}
+.aud{
+  padding:1rem 1.2rem;
+  border:1px solid var(--border-soft);
+  border-radius:6px;
+  background:var(--bg-soft);
+}
+.aud h4{
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 .5rem;
+}
+.aud p{margin:0;font-size:.95rem;color:var(--text-mute);line-height:1.55}
+.aud p+p{margin-top:.6rem}
+
+/* Pull-quote / takeaway */
+.takeaway{
+  margin:1.5rem 0;
+  padding:1rem 1.25rem;
+  border-left:3px solid var(--accent);
+  background:var(--bg-soft);
+  border-radius:0 4px 4px 0;
+  font-size:.97rem;
+  color:var(--text-mute);
+}
+.takeaway strong{color:var(--accent-deep)}
+
+footer.foot{
+  margin-top:5rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--border-soft);
+  font-size:.78rem;
+  color:var(--text-faint);
+  text-align:center;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="cover">
+  <div class="eyebrow">Plain-English Guide</div>
+  <h1>Understanding Odour Surveys</h1>
+  <p class="lede">A short guide to what an odour survey is, what the result means, and what it can and can't tell you. Written for anyone affected by a survey near them, or anyone thinking about commissioning one.</p>
+</header>
+
+<section>
+  <h2>What an odour survey is</h2>
+  <p>An odour survey is a structured way of measuring how strong a smell is at a particular spot. A trained surveyor stands at the location for five minutes and rates the smell on a scale from 0 to 6, every ten seconds. They also note the weather, what they can hear and see at nearby sites, and pick words to describe what the smell is like.</p>
+  <p>By the end of five minutes the surveyor has thirty separate ratings, plus all the supporting information. This gets combined into a single overall result — a category that summarises how much of an issue the smell is at that place at that time.</p>
+  <p>This guide explains the scale, the result categories, and what the survey can and can't tell you. It's deliberately short. If you want the technical detail, ask whoever shared this guide for the technical paper that goes with it.</p>
+</section>
+
+<section>
+  <h2>The 0 to 6 intensity scale</h2>
+  <p>The scale is a bit like rating brightness in a room. Each level has a specific meaning that surveyors are trained to apply consistently, so different surveyors at the same spot should give similar ratings.</p>
+
+  <ul class="scale">
+    <li class="lvl-0"><span class="num">0</span><span class="label">No odour</span><span class="desc">Nothing there. <em>Like an unlit room at night.</em></span></li>
+    <li class="lvl-1"><span class="num">1</span><span class="label">Very weak</span><span class="desc">You think there might be a smell but you're not sure. <em>Like a faint glow you can only just see.</em></span></li>
+    <li class="lvl-2"><span class="num">2</span><span class="label">Weak</span><span class="desc">Something is definitely there but you can't quite name it. <em>Like a soft nightlight.</em></span></li>
+    <li class="lvl-3"><span class="num">3</span><span class="label">Distinct</span><span class="desc">You can name what it is, just about. <em>Like a desk lamp on low.</em></span></li>
+    <li class="lvl-4"><span class="num">4</span><span class="label">Strong</span><span class="desc">You'd recognise the smell easily from across the room. <em>Like proper room lighting.</em></span></li>
+    <li class="lvl-5"><span class="num">5</span><span class="label">Very strong</span><span class="desc">Unpleasant enough that you'd want to move away. <em>Like a bright spotlight.</em></span></li>
+    <li class="lvl-6"><span class="num">6</span><span class="label">Extremely strong</span><span class="desc">So strong your instinct is to leave. <em>Like a floodlight in your face.</em></span></li>
+  </ul>
+
+  <p>Level 4 is the important one. It's the point at which the smell isn't just present but is clearly recognisable as a particular thing — a particular factory, a particular farm activity, a particular chemical. The survey records how often the smell hit level 4 or above during the five minutes, and that has a big influence on the final result.</p>
+</section>
+
+<section>
+  <h2>What the result means</h2>
+  <p>The thirty ratings get combined with the receptor sensitivity — how sensitive the location is — into one of four overall categories. These are the standard categories used in UK planning and environmental decisions.</p>
+
+  <p>"Sensitivity" is a planning term for how much people at a location reasonably expect clean air. A home or a school is treated as more sensitive than a factory or a road, because people at home expect to be able to enjoy their garden, open their windows, and so on. The same smell at the same intensity will produce a more serious result at a sensitive location than at an industrial one.</p>
+
+  <div class="cats">
+    <div class="cat negligible">
+      <div class="name">Negligible</div>
+      <div class="meaning">The smell isn't really an issue at this location. It might be there occasionally and faintly, but it's not causing real problems for the people there.</div>
+    </div>
+    <div class="cat slight">
+      <div class="name">Slight adverse</div>
+      <div class="meaning">The smell is noticeable and a bit annoying. People might notice it from time to time but it isn't seriously affecting their daily lives.</div>
+    </div>
+    <div class="cat moderate">
+      <div class="name">Moderate adverse</div>
+      <div class="meaning">The smell is a real problem. It's strong enough or frequent enough to affect people's enjoyment of the place — opening windows, sitting in the garden, that kind of thing.</div>
+    </div>
+    <div class="cat substantial">
+      <div class="name">Substantial adverse</div>
+      <div class="meaning">The smell is a serious problem. It's so strong or so frequent that it significantly affects people's quality of life at this location.</div>
+    </div>
+  </div>
+
+  <p>The dividing lines between categories are deliberately broad, so a single survey result doesn't depend on tiny differences in rating. A "Moderate adverse" result is genuinely different from a "Slight adverse" result; you can be confident the surveyor wasn't borderline between the two.</p>
+</section>
+
+<section>
+  <h2>What a survey can tell you</h2>
+  <p>A survey gives you a clear, structured record of what the smell was like at one place for five minutes on one day. That record follows a UK standard, which means anyone qualified can read it and understand exactly what was observed and under what conditions. The result is comparable with surveys done at other sites or other times by other people, so long as they followed the same method.</p>
+  <p>For a planning or environmental decision, that comparability is the point. The categories — Negligible through Substantial adverse — line up directly with how planners and regulators are trained to weigh odour evidence.</p>
+</section>
+
+<section>
+  <h2>What a survey can't tell you</h2>
+  <p>A single survey is a snapshot. It has real limits, and being honest about them matters more than overstating what one survey can do.</p>
+
+  <h3>It doesn't tell you what the smell will be like at other times</h3>
+  <p>Wind direction changes. Factories run different processes at different times. Farm activities are seasonal. A survey done on a still warm afternoon might give a very different result from one done on a windy morning. To characterise a site properly you usually need several surveys covering different conditions.</p>
+
+  <h3>It doesn't tell you exactly where the smell is coming from</h3>
+  <p>The survey records what's experienced at one location. Working out the source needs other techniques — sometimes following the wind back to a likely culprit, sometimes computer modelling, sometimes air sampling and chemical analysis. The survey is one input into that wider detective work, not a substitute for it.</p>
+
+  <h3>It doesn't tell you how much chemical is in the air</h3>
+  <p>The intensity scale is about human perception, not chemical concentration. Two different smells with the same intensity rating can have very different concentrations. If you need to know concentrations — for example to compare against a regulatory limit — that needs sampling and laboratory analysis, which is a separate exercise.</p>
+
+  <h3>It doesn't decide whether anyone is at fault</h3>
+  <p>A survey is evidence. What's done with that evidence — whether anyone is required to change anything, whether a planning application succeeds, whether enforcement action is taken — is a decision for planners, regulators, or sometimes the courts. The survey informs the decision; it doesn't make it.</p>
+
+  <div class="takeaway">
+    <strong>The honest summary:</strong> a single survey gives you a fair, structured, defensible record of what one trained person experienced over five minutes at one place. That's a useful piece of evidence, but it's a piece of the picture rather than the whole picture. Robust assessments combine several surveys with other evidence such as complaints history, emissions data, and modelling.
+  </div>
+</section>
+
+<section>
+  <h2>What happens with the result</h2>
+
+  <div class="audiences">
+    <div class="aud">
+      <h4>If a survey was done near you</h4>
+      <p>The result goes into a report alongside any other evidence — complaints history, modelling, emissions data from the source. The report goes to whoever is making the decision. Depending on the situation, that might be a council planner, an environmental health officer, the Environment Agency, or another body.</p>
+      <p>If you have concerns about smells in your area, your local council's environmental health team is the usual first point of contact. They can advise on whether to log a complaint and what evidence will help.</p>
+    </div>
+    <div class="aud">
+      <h4>If you're commissioning a survey</h4>
+      <p>The result feeds into your wider case. For a planning application, it'll normally appear in the air quality chapter of the Environmental Statement. For a permit application, it'll feed into the odour management plan. The category — Negligible through Substantial adverse — directly maps to how the determining authority will weigh the odour element.</p>
+      <p>Your consultant will advise on whether further surveys, modelling, or other evidence are needed to support the case alongside the survey result.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>A word on subjectivity</h2>
+  <p>Odour rating depends on a person's nose and their judgement. Trained surveyors are good at this, and the structured method cuts down on differences between individuals. But it's not a chemical sensor reading. Two well-trained surveyors at the same spot might disagree by one level on individual samples.</p>
+  <p>This is a known feature of the method, and the method is designed around it. The categories are broad enough that a small difference in individual ratings doesn't change the overall result. What you should expect from a survey is a fair, structured, defensible record of what a competent person experienced over five minutes — not millimetre-precise measurement. That's what the standard is designed to deliver, and that's what regulators and planners are looking for.</p>
+</section>
+
+<footer class="foot">
+  Plain-English guide to odour surveys carried out using the IAQM 2018 methodology.
+</footer>
+
+</div>
+</body>
+</html>
