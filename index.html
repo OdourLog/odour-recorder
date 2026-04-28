@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Odour Recorder">
+<meta name="theme-color" content="#0a0e17">
+<meta name="format-detection" content="telephone=no">
+<title>Odour Intensity Recorder</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e17;color:#e8ecf4;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:1.5rem;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(56,189,248,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#0a0e17}::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+#app{position:relative;z-index:1;width:100%;max-width:500px;text-align:center}
+.screen{animation:fadeIn .6s ease}
+.tag{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:#38bdf8}
+.lbl{font-size:.6rem;color:#64748b;letter-spacing:.15em;display:block;margin-bottom:.5rem;text-transform:uppercase;text-align:left}
+.inp{background:#111827;border:1px solid #1e293b;color:#e2e8f0;padding:.65rem .75rem;font-size:.78rem;font-family:inherit;border-radius:2px;width:100%;outline:none;box-sizing:border-box}
+.inp:focus,.sel:focus,.ta:focus{border-color:#38bdf8}
+.sel{background:#111827;border:1px solid #1e293b;color:#e2e8f0;padding:.65rem .75rem;font-size:.72rem;font-family:inherit;border-radius:2px;width:100%;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center}
+.ta{background:#111827;border:1px solid #1e293b;color:#e2e8f0;padding:.65rem .75rem;font-size:.72rem;font-family:inherit;border-radius:2px;width:100%;outline:none;resize:vertical;min-height:60px;box-sizing:border-box}
+.btn{background:#38bdf8;border:none;color:#0a0e17;padding:.85rem 2.5rem;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;font-family:inherit;width:100%;transition:opacity .2s}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-ghost{background:transparent;border:1px solid #334155;color:#94a3b8;padding:.85rem 2.5rem;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:inherit;transition:all .3s}
+.btn-ghost:hover{border-color:#38bdf8;color:#38bdf8}
+.card{background:#111827;border:1px solid #1e293b;border-radius:4px;padding:.7rem}
+.card-lbl{font-size:.48rem;color:#64748b;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.15rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.85rem}
+.opt{padding:.75rem .85rem;margin-bottom:.4rem;border:1px solid #1e293b;border-radius:3px;cursor:pointer;background:#111827;transition:all .2s;text-align:left}
+.opt.sel{border-color:#38bdf8;background:rgba(56,189,248,.08)}
+.opt .t{font-size:.78rem;font-weight:500;color:#e2e8f0;margin-bottom:.15rem}
+.opt.sel .t{color:#38bdf8}
+.opt .d{font-size:.6rem;color:#64748b;line-height:1.5}
+.hedopt{padding:.9rem 1rem;margin-bottom:.45rem;border:1px solid #1e293b;border-radius:3px;cursor:pointer;background:#111827;transition:all .2s;text-align:left;display:flex;align-items:center;gap:.85rem}
+.hedopt.sel{border-color:#38bdf8;background:rgba(56,189,248,.08)}
+.descrow{padding:.5rem .75rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.descrow:not(:first-child){border-top:1px solid #1e293b}
+.descrow.sel{background:rgba(56,189,248,.1)}
+table{width:100%;border-collapse:collapse;font-size:.62rem}
+th{padding:.4rem .6rem;color:#64748b;font-weight:500;font-size:.52rem;background:#111827;position:sticky;top:0}
+td{padding:.3rem .6rem;border-top:1px solid #1e293b}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+const TOTAL=300,INTV=10;
+const OL=["No odour","Slight/very weak","Slight/weak","Distinct","Strong","Very strong","Extremely strong"];
+const OC=["No odour when compared to the clean site","Probably some doubt as to whether the odour is actually present","Odour is present but cannot be described using precise words or terms","Odour character is barely recognisable","Odour character is easily recognisable","Odour is offensive \u2014 exposure would be considered undesirable","Odour is offensive \u2014 instinctive reaction would be to mitigate against further exposure"];
+const RI={High:"Residential, hospitals, schools, tourist/cultural",Medium:"Workplaces, commercial/retail, recreation fields",Low:"Industrial, farms, footpaths, roads"};
+const EM={6:["Large","Very Large","Very Large","Very Large","Very Large"],5:["Medium","Large","Large","Very Large","Very Large"],4:["Small","Medium","Medium","Large","Large"],3:["Small","Medium","Medium","Medium","Medium"],2:["Small","Small","Medium","Medium","Medium"],1:["Small","Small","Small","N/A","N/A"]};
+const FM={"Very Large":{Low:"Substantial adverse",Medium:"Substantial adverse",High:"Substantial adverse"},Large:{Low:"Moderate adverse",Medium:"Moderate adverse",High:"Substantial adverse"},Medium:{Low:"Slight adverse",Medium:"Slight adverse",High:"Moderate adverse"},Small:{Low:"Negligible",Medium:"Negligible",High:"Slight adverse"}};
+const HD=[{d:"Bakery (fresh bread)",s:3.53},{d:"Rose",s:3.08},{d:"Strawberry",s:2.93},{d:"Orange",s:2.86},{d:"Floral",s:2.79},{d:"Chocolate",s:2.78},{d:"Fruity, citrus",s:2.72},{d:"Violets",s:2.68},{d:"Peach",s:2.67},{d:"Apple",s:2.61},{d:"Pineapple",s:2.59},{d:"Vanilla",s:2.57},{d:"Cherry",s:2.55},{d:"Cinnamon",s:2.54},{d:"Fried chicken",s:2.53},{d:"Fragrant",s:2.52},{d:"Lemon",s:2.50},{d:"Minty, peppermint",s:2.50},{d:"Popcorn",s:2.47},{d:"Melon",s:2.41},{d:"Meaty (cooked, good)",s:2.34},{d:"Coffee",s:2.33},{d:"Caramel",s:2.32},{d:"Pear",s:2.26},{d:"Maple syrup",s:2.26},{d:"Lavender",s:2.25},{d:"Fruity, other than citrus",s:2.23},{d:"Fresh green vegetables",s:2.19},{d:"Cologne",s:2.16},{d:"Herbal, green, cut grass",s:2.14},{d:"Cedarwood",s:2.11},{d:"Honey",s:2.08},{d:"Grape juice",s:2.07},{d:"Buttery, fresh butter",s:2.04},{d:"Sweet",s:2.03},{d:"Almond",s:2.01},{d:"Banana",s:2.00},{d:"Spicy",s:1.99},{d:"Peanut butter",s:1.99},{d:"Perfumery",s:1.96},{d:"Grapefruit",s:1.95},{d:"Coconut",s:1.93},{d:"Nutty",s:1.92},{d:"Clove",s:1.67},{d:"Cooked vegetables",s:1.58},{d:"Raisins",s:1.56},{d:"Aromatic",s:1.41},{d:"Tea leaves",s:1.40},{d:"Green pepper",s:1.39},{d:"Celery",s:1.36},{d:"Crushed grass",s:1.34},{d:"Hay",s:1.31},{d:"Raw cucumber",s:1.30},{d:"Leather",s:1.30},{d:"Seasoning (for meat)",s:1.27},{d:"Oak wood, cognac",s:1.23},{d:"Anise (liquorice)",s:1.21},{d:"Bark, birch bark",s:1.18},{d:"Soupy",s:1.13},{d:"Caraway",s:1.06},{d:"Malty",s:1.05},{d:"Incense",s:1.01},{d:"Molasses",s:1.00},{d:"Eucalyptus",s:0.99},{d:"Laurel leaves",s:0.97},{d:"Soapy",s:0.96},{d:"Woody, resinous",s:0.94},{d:"Dill",s:0.87},{d:"Grainy (as grain)",s:0.63},{d:"Geranium leaves",s:0.57},{d:"Beany",s:0.54},{d:"Mushroom",s:0.52},{d:"Eggy (fresh eggs)",s:0.45},{d:"Raw potato",s:0.26},{d:"Musky",s:0.21},{d:"Black pepper",s:0.19},{d:"Cork",s:0.19},{d:"Dry, powdery",s:-0.07},{d:"Yeasty",s:-0.07},{d:"Burnt candle",s:-0.08},{d:"Beery",s:-0.14},{d:"Rope",s:-0.16},{d:"Garlic, onion",s:-0.17},{d:"Crushed weeds",s:-0.21},{d:"Alcoholic",s:-0.47},{d:"Cardboard",s:-0.54},{d:"Camphor",s:-0.55},{d:"Sauerkraut",s:-0.60},{d:"Fresh tobacco smoke",s:-0.66},{d:"Kippery-smoked fish",s:-0.69},{d:"Turpentine (pine oil)",s:-0.73},{d:"Paint",s:-0.75},{d:"Nail polish remover",s:-0.81},{d:"Varnish",s:-0.85},{d:"Chalky",s:-0.85},{d:"Medicinal",s:-0.89},{d:"Wet paper",s:-0.94},{d:"Metallic",s:-0.94},{d:"New rubber",s:-0.96},{d:"Seminal, sperm-like",s:-1.04},{d:"Animal",s:-1.13},{d:"Gasoline, solvent",s:-1.16},{d:"Mothballs",s:-1.25},{d:"Sour, vinegar",s:-1.26},{d:"Creosote",s:-1.35},{d:"Bitter",s:-1.38},{d:"Oily, fatty",s:-1.41},{d:"Burnt paper",s:-1.47},{d:"Burn, smoky",s:-1.53},{d:"Ether, anaesthetic",s:-1.54},{d:"Disinfectant, carbolic",s:-1.60},{d:"Tar",s:-1.63},{d:"Chemical",s:-1.64},{d:"Blood, raw meat",s:-1.64},{d:"Kerosene",s:-1.67},{d:"Cleaning fluid",s:-1.69},{d:"Sooty",s:-1.69},{d:"Musty, earthy, mouldy",s:-1.94},{d:"Fishy",s:-1.98},{d:"Stale",s:-2.04},{d:"Burnt milk",s:-2.19},{d:"Mouse-like",s:-2.20},{d:"Wet wool, wet dog",s:-2.28},{d:"Household gas",s:-2.30},{d:"Sharp, pungent, acid",s:-2.34},{d:"Sulphurous",s:-2.45},{d:"Ammonia",s:-2.47},{d:"Sweaty",s:-2.53},{d:"Dirty linen",s:-2.55},{d:"Fermented (rotten fruit)",s:-2.76},{d:"Stale tobacco smoke",s:-2.83},{d:"Sour milk",s:-2.91},{d:"Burnt rubber",s:-3.01},{d:"Rancid",s:-3.15},{d:"Urine",s:-3.34},{d:"Sickening (vomit)",s:-3.34},{d:"Faecal (like manure)",s:-3.36},{d:"Cat urine",s:-3.64},{d:"Sewer odour",s:-3.68},{d:"Putrid, foul, decayed",s:-3.74},{d:"Cadaverous (dead animal)",s:-3.75}];
+const WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","Variable","Calm"];
+const BF=["0 - Calm","1 - Light air","2 - Light breeze","3 - Gentle breeze","4 - Moderate breeze","5 - Fresh breeze","6 - Strong breeze","7 - Near gale","8+ - Gale"];
+const PG=["A - Very unstable","B - Unstable","C - Slightly unstable","D - Neutral","E - Slightly stable","F - Stable"];
+const RO=["None","Drizzle","Light rain","Moderate rain","Heavy rain"];
+
+function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function tbi(t){return t<=10?0:t<=20?1:t<=30?2:t<=40?3:4}
+function gExp(i,t){if(i===0)return"Negligible";if(i===1&&t===0)return"Negligible";var r=EM[i];return r?r[tbi(t)]:"N/A"}
+function gEff(e,s){if(e==="Negligible")return"Negligible";if(e==="N/A")return"N/A";return FM[e]?FM[e][s]||"N/A":"N/A"}
+function gEC(e){return e.indexOf("Substantial")>=0?"#dc2626":e.indexOf("Moderate")>=0?"#ea580c":e.indexOf("Slight adverse")>=0?"#eab308":"#34d399"}
+
+var audioCtx=null;
+function unlockAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch(e){}}
+function beep(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext);var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=880;o.type="sine";g.gain.setValueAtTime(.3,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.2);o.start(audioCtx.currentTime);o.stop(audioCtx.currentTime+.2)}catch(e){}}
+
+var app=document.getElementById("app"),sc=1;
+var S={loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:null,descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};
+
+function show(phase){
+  app.innerHTML="";
+  var d=document.createElement("div");d.className="screen";
+
+  if(phase==="setup"){
+    d.innerHTML='<div class="tag" style="margin-bottom:2rem">Odour Intensity Recorder</div>'
+    +'<div style="margin-bottom:1.5rem"><label class="lbl">Location Name</label><input class="inp" id="loc" value="'+esc(S.loc)+'"></div>'
+    +'<div style="margin-bottom:2rem"><label class="lbl">Receptor Sensitivity</label>'
+    +'<div class="opt'+(S.sens==="High"?" sel":"")+'" data-v="High"><div class="t">High</div><div class="d">'+RI.High+'</div></div>'
+    +'<div class="opt'+(S.sens==="Medium"?" sel":"")+'" data-v="Medium"><div class="t">Medium</div><div class="d">'+RI.Medium+'</div></div>'
+    +'<div class="opt'+(S.sens==="Low"?" sel":"")+'" data-v="Low"><div class="t">Low</div><div class="d">'+RI.Low+'</div></div></div>'
+    +'<button class="btn" id="nxt"'+(S.sens?'':' disabled')+'>Next</button>';
+    app.appendChild(d);
+    document.getElementById("loc").oninput=function(e){S.loc=e.target.value};
+    d.querySelectorAll(".opt").forEach(function(el){el.onclick=function(){S.sens=el.dataset.v;show("setup")}});
+    document.getElementById("nxt").onclick=function(){if(S.sens)show("conditions")};
+  }
+
+  else if(phase==="conditions"){
+    var m=S.met;
+    d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Conditions</div>'
+    +'<div style="font-size:.58rem;color:#475569;letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
+    +'<div class="grid2"><div><label class="lbl">Wind Direction</label><select class="sel" id="wd">'+opts(WD,m.windDir)+'</select></div>'
+    +'<div><label class="lbl">Wind Strength</label><select class="sel" id="ws">'+opts(BF,m.windStr)+'</select></div></div>'
+    +'<div class="grid2"><div><label class="lbl">Stability Category</label><select class="sel" id="st">'+opts(PG,m.stability)+'</select></div>'
+    +'<div><label class="lbl">Rainfall</label><select class="sel" id="rf">'+opts(RO,m.rainfall)+'</select></div></div>'
+    +'<div class="grid2"><div><label class="lbl">Temperature (&deg;C)</label><input type="number" step="0.1" class="inp" id="tp" value="'+esc(m.temp)+'" placeholder="e.g. 18.5"></div>'
+    +'<div><label class="lbl">Humidity (%)</label><input type="number" step="1" class="inp" id="hu" value="'+esc(m.humidity)+'" placeholder="e.g. 65"></div></div>'
+    +'<div style="margin-bottom:.85rem"><label class="lbl">Barometric Pressure (hPa)</label><input type="number" step="1" class="inp" id="pr" value="'+esc(m.pressure)+'" placeholder="e.g. 1013"></div>'
+    +'<div style="margin-bottom:.85rem"><label class="lbl">On-site Operations &amp; Activities</label><textarea class="ta" id="so" placeholder="Describe current site activities...">'+esc(S.siteOps)+'</textarea></div>'
+    +'<div style="margin-bottom:1.5rem"><label class="lbl">Surrounding Area Activities</label><textarea class="ta" id="su" placeholder="Describe activities in the surrounding area...">'+esc(S.surroundOps)+'</textarea></div>'
+    +'<div style="display:flex;gap:.5rem"><button class="btn-ghost" id="bk" style="width:auto;padding:.85rem 1.5rem">Back</button><button class="btn" id="go" style="flex:1">Start Recording</button></div>';
+    app.appendChild(d);
+    var save=function(){S.met={windDir:gi("wd"),windStr:gi("ws"),stability:gi("st"),pressure:gi("pr"),rainfall:gi("rf"),temp:gi("tp"),humidity:gi("hu")};S.siteOps=gi("so");S.surroundOps=gi("su")};
+    document.getElementById("bk").onclick=function(){save();show("setup")};
+    document.getElementById("go").onclick=function(){save();unlockAudio();startRec()};
+  }
+
+  else if(phase==="recording"){
+    var iv=Math.round(S.slider),col=iv>=4?"#f59e0b":"#38bdf8",tcol=S.secsLeft<=30?"#f87171":"#f1f5f9";
+    d.innerHTML='<div style="font-size:.58rem;letter-spacing:.25em;color:#475569;text-transform:uppercase;margin-bottom:.6rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
+    +'<div style="font-size:3rem;font-weight:200;color:'+tcol+';line-height:1">'+fmt(S.secsLeft)+'</div>'
+    +'<div style="font-size:1.05rem;font-weight:400;color:'+(S.sub<=2?"#f87171":"#475569")+';margin-top:.25rem;margin-bottom:.15rem">'+S.sub+'s</div>'
+    +'<div id="beeptog" style="display:inline-flex;align-items:center;gap:.35rem;cursor:pointer;font-size:.55rem;color:#475569;letter-spacing:.1em;margin-bottom:.6rem;user-select:none">'
+    +'<span style="width:9px;height:9px;border-radius:50%;border:1px solid '+(S.beep?"#38bdf8":"#334155")+';background:'+(S.beep?"#38bdf8":"transparent")+';display:inline-block"></span>BEEP '+(S.beep?"ON":"OFF")+'</div>'
+    +'<div style="width:100%;height:2px;background:#1e293b;border-radius:1px;margin-bottom:1rem;overflow:hidden"><div style="height:100%;width:'+((1-S.secsLeft/TOTAL)*100)+'%;background:'+(S.secsLeft<=30?"linear-gradient(90deg,#38bdf8,#f87171)":"#38bdf8")+';transition:width 1s linear"></div></div>'
+    +'<div style="font-size:.82rem;font-weight:500;height:1.2rem;color:'+(iv>=4?"#f59e0b":"#94a3b8")+'">'+OL[iv]+'</div>'
+    +'<div style="font-size:.55rem;color:#475569;line-height:1.5;margin-bottom:.8rem;height:2.8em;overflow:hidden;max-width:340px;margin-left:auto;margin-right:auto">'+OC[iv]+'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;height:290px;user-select:none;touch-action:none;max-width:400px;margin:0 auto">'
+    +'<div style="display:flex;align-items:center;justify-content:center"><span style="font-size:7rem;font-weight:200;line-height:1;color:'+col+';opacity:.85">'+iv+'</span></div>'
+    +'<div style="display:flex;align-items:stretch;gap:4px">'
+    +'<div style="display:flex;flex-direction:column;justify-content:space-between;font-size:.72rem;padding:3px 0;width:18px;text-align:right">'+[6,5,4,3,2,1,0].map(function(v){return'<span style="color:'+(v===iv?"#38bdf8":"#475569")+';font-weight:'+(v===iv?700:400)+'">'+v+'</span>'}).join("")+'</div>'
+    +'<div id="track" style="width:52px;background:#111827;border-radius:26px;position:relative;cursor:pointer;border:1px solid #1e293b;overflow:hidden">'
+    +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+(S.slider/6*100)+'%;background:'+(iv>=4?"linear-gradient(to top,rgba(245,158,11,.18),rgba(245,158,11,.04))":"linear-gradient(to top,rgba(56,189,248,.14),rgba(56,189,248,.04))")+';border-radius:0 0 26px 26px"></div>'
+    +[1,2,3,4,5].map(function(v){return'<div style="position:absolute;left:22%;right:22%;bottom:'+(v/6*100)+'%;height:1px;background:'+(v===4?"rgba(245,158,11,.25)":"#1e293b")+'"></div>'}).join("")
+    +'<div style="position:absolute;left:0;right:0;bottom:'+(4/6*100)+'%;height:1px;background:rgba(245,158,11,.35)"></div>'
+    +'<div id="thumb" style="position:absolute;bottom:calc('+(S.slider/6*100)+'% - 13px);left:50%;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;background:'+col+';box-shadow:0 0 18px '+(iv>=4?"rgba(245,158,11,.4)":"rgba(56,189,248,.4)")+',0 0 5px '+(iv>=4?"rgba(245,158,11,.6)":"rgba(56,189,248,.6)")+'"></div></div>'
+    +'<div style="display:flex;flex-direction:column;justify-content:space-between;padding:3px 0;width:10px">'+[6,5,4,3,2,1,0].map(function(v){return'<div style="width:7px;height:1px;background:'+(v===4?"rgba(245,158,11,.4)":"#334155")+'"></div>'}).join("")+'</div></div>'
+    +'<div></div></div>'
+    +'<p style="color:#475569;font-size:.55rem;margin-top:.8rem;letter-spacing:.1em">SAMPLING EVERY 10s &middot; '+S.recs.length+' RECORDED</p>'
+    +'<button class="btn-ghost" id="skip" style="padding:.4rem 1rem;font-size:.55rem;margin-top:.5rem;opacity:.6">\u23e9 Skip to end</button>';
+    app.appendChild(d);
+    document.getElementById("beeptog").onclick=function(){S.beep=!S.beep;if(S.beep)unlockAudio();show("recording")};
+    document.getElementById("skip").onclick=function(){clearInterval(S.timer);var tot=TOTAL/INTV+1;while(S.recs.length<tot){var sec=S.recs.length*INTV;S.recs.push({time:fmt(sec),seconds:sec,value:Math.round(S.slider)})}S.secsLeft=0;show("classify")};
+    var track=document.getElementById("track");
+    function ptr(cy){var r=track.getBoundingClientRect(),y=Math.max(0,Math.min(1,1-(cy-r.top)/r.height));S.slider=y*6;show("recording")}
+    track.onmousedown=function(e){ptr(e.clientY);var mv=function(ev){ptr(ev.clientY)};var up=function(){window.removeEventListener("mousemove",mv);window.removeEventListener("mouseup",up)};window.addEventListener("mousemove",mv);window.addEventListener("mouseup",up)};
+    track.ontouchstart=function(e){e.preventDefault();ptr(e.touches[0].clientY)};
+    track.ontouchmove=function(e){e.preventDefault();ptr(e.touches[0].clientY)};
+  }
+
+  else if(phase==="classify"){
+    d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Observation Complete</div>'
+    +'<div style="font-size:.58rem;color:#475569;letter-spacing:.2em;margin-bottom:2rem">'+esc(S.loc)+'</div>'
+    +'<label class="lbl" style="text-align:center;margin-bottom:1rem">How would you classify the odour?</label>'
+    +[["Pleasant","\uD83D\uDE0A","Agreeable or appealing odour"],["Neutral","\uD83D\uDE10","Neither pleasant nor unpleasant"],["Unpleasant","\uD83D\uDE16","Disagreeable or offensive odour"]].map(function(o){return'<div class="hedopt'+(S.hedonic===o[0]?" sel":"")+'" data-v="'+o[0]+'"><span style="font-size:1.4rem">'+o[1]+'</span><div><div style="font-size:.82rem;font-weight:500;color:'+(S.hedonic===o[0]?"#38bdf8":"#e2e8f0")+';margin-bottom:.1rem">'+o[0]+'</div><div style="font-size:.6rem;color:#64748b">'+o[2]+'</div></div></div>'}).join("")
+    +'<button class="btn" id="nxt" style="margin-top:1rem"'+(S.hedonic?'':' disabled')+'>Next</button>';
+    app.appendChild(d);
+    d.querySelectorAll(".hedopt").forEach(function(el){el.onclick=function(){S.hedonic=el.dataset.v;show("classify")}});
+    document.getElementById("nxt").onclick=function(){if(S.hedonic)show("descriptor")};
+  }
+
+  else if(phase==="descriptor"){
+    var filt=HD.filter(function(h){return h.d.toLowerCase().indexOf(S.descSearch.toLowerCase())>=0});
+    var selHtml=S.desc?'<div class="card" style="margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center"><span style="font-size:.78rem;color:#38bdf8;font-weight:500">'+esc(S.desc.d)+'</span><span style="font-size:.65rem;color:'+(S.desc.s>=0?"#34d399":"#f87171")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</span></div>':'';
+    var listHtml=filt.map(function(h){var isSel=S.desc&&S.desc.d===h.d;return'<div class="descrow'+(isSel?" sel":"")+'" data-d="'+esc(h.d)+'"><span style="font-size:.7rem;color:'+(isSel?"#38bdf8":"#cbd5e1")+'">'+esc(h.d)+'</span><span style="font-size:.6rem;color:'+(h.s>=0?"#34d399":"#f87171")+';min-width:36px;text-align:right">'+(h.s>0?"+":"")+h.s.toFixed(2)+'</span></div>'}).join("");
+    if(!filt.length)listHtml='<div style="padding:1.5rem;color:#475569;font-size:.7rem">No matches</div>';
+    var canGo=S.desc||S.otherDesc.trim();
+    d.innerHTML='<div class="tag" style="margin-bottom:.3rem">Odour Descriptor</div>'
+    +'<div style="font-size:.58rem;color:#475569;letter-spacing:.2em;margin-bottom:1.5rem">'+esc(S.loc)+' &middot; '+S.hedonic+'</div>'
+    +'<label class="lbl" style="text-align:center;margin-bottom:.75rem">Select the closest odour description</label>'
+    +'<input class="inp" id="dsrch" value="'+esc(S.descSearch)+'" placeholder="Search descriptors..." style="margin-bottom:.5rem;text-align:center;font-size:.72rem">'
+    +selHtml
+    +'<div style="max-height:220px;overflow-y:auto;border:1px solid #1e293b;border-radius:4px;margin-bottom:.75rem" id="dlist">'+listHtml+'</div>'
+    +'<div style="margin-bottom:1.25rem"><label class="lbl" style="text-align:center;margin-bottom:.4rem">Additional / alternative description</label>'
+    +'<input class="inp" id="othd" value="'+esc(S.otherDesc)+'" placeholder="Enter odour description..." style="text-align:center;font-size:.72rem"></div>'
+    +'<div style="display:flex;gap:.5rem"><button class="btn-ghost" id="bk" style="width:auto;padding:.85rem 1.5rem">Back</button><button class="btn" id="go" style="flex:1"'+(canGo?'':' disabled')+'>View Results</button></div>';
+    app.appendChild(d);
+    document.getElementById("dsrch").oninput=function(e){S.descSearch=e.target.value;show("descriptor")};
+    document.getElementById("othd").oninput=function(e){S.otherDesc=e.target.value;var b=document.getElementById("go");b.disabled=!(S.desc||e.target.value.trim())};
+    document.getElementById("dlist").querySelectorAll(".descrow").forEach(function(el){el.onclick=function(){var dn=el.dataset.d;S.desc=HD.find(function(h){return h.d===dn})||null;show("descriptor")}});
+    document.getElementById("bk").onclick=function(){show("classify")};
+    document.getElementById("go").onclick=function(){if(S.desc||S.otherDesc.trim())show("results")};
+  }
+
+  else if(phase==="results"){
+    var im=0,cnt=S.recs.length;if(cnt){im=Math.round(S.recs.reduce(function(a,r){return a+r.value},0)/cnt)}
+    var c4=S.recs.filter(function(r){return r.value>=4}).length;
+    var tp=cnt?Math.round(c4/cnt*100):0;
+    var exp=gExp(im,tp),eff=gEff(exp,S.sens),ec=gEC(eff);
+    var m=S.met;
+    var metHtml='';
+    if(m.windDir)metHtml+='Wind: '+m.windDir+' '+m.windStr+' &nbsp;';
+    if(m.temp)metHtml+='Temp: '+m.temp+'&deg;C &nbsp;';
+    if(m.humidity)metHtml+='RH: '+m.humidity+'% &nbsp;';
+    if(m.pressure)metHtml+='P: '+m.pressure+'hPa &nbsp;';
+    if(m.rainfall&&m.rainfall!=="None")metHtml+='Rain: '+m.rainfall+' &nbsp;';
+    if(m.stability)metHtml+='Stability: '+m.stability.split(" - ")[0];
+    var descDisp=S.desc?esc(S.desc.d):'\u2014';
+    var descScore=S.desc?'<div style="font-size:.52rem;color:'+(S.desc.s>=0?"#34d399":"#f87171")+'">'+(S.desc.s>0?"+":"")+S.desc.s+'</div>':'';
+    var otherDisp=S.otherDesc?'<div style="font-size:.58rem;color:#94a3b8;margin-top:.2rem;font-style:italic">'+esc(S.otherDesc)+'</div>':'';
+    var trows=S.recs.map(function(r){return'<tr><td style="color:#94a3b8">'+r.time+'</td><td style="text-align:center;color:'+(r.value>=4?"#f59e0b":"#e2e8f0")+';font-weight:500">'+r.value+'</td><td style="text-align:right;color:#64748b;font-size:.52rem">'+OL[r.value]+'</td></tr>'}).join("");
+    d.innerHTML='<div class="tag" style="margin-bottom:.2rem">Session Complete</div>'
+    +'<div style="font-size:.58rem;color:#475569;letter-spacing:.2em;margin-bottom:1rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem">'
+    +'<div class="card"><div class="card-lbl">Avg Intensity (I<sub style="font-size:.7em">mean</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:#e2e8f0">'+im+'</div><div style="font-size:.52rem;color:#64748b">'+(OL[im]||'\u2014')+'</div></div>'
+    +'<div class="card"><div class="card-lbl">Odour Time (t<sub style="font-size:.7em">\u22654</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:#e2e8f0">'+tp+'%</div><div style="font-size:.52rem;color:#64748b">'+c4+' of '+cnt+' samples</div></div>'
+    +'<div class="card"><div class="card-lbl">Odour Exposure</div><div style="font-size:.9rem;font-weight:500;color:#e2e8f0;margin-top:.15rem">'+exp+'</div></div>'
+    +'<div class="card" style="background:'+ec+'15;border-color:'+ec+'44"><div class="card-lbl">Odour Effect</div><div style="font-size:.82rem;font-weight:600;color:'+ec+';margin-top:.15rem">'+eff+'</div></div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem">'
+    +'<div class="card" style="display:flex;flex-direction:column;justify-content:center"><div class="card-lbl">Hedonic Tone</div><div style="font-size:.82rem;font-weight:500;color:#e2e8f0">'+(S.hedonic==="Pleasant"?"\uD83D\uDE0A":S.hedonic==="Neutral"?"\uD83D\uDE10":"\uD83D\uDE16")+' '+S.hedonic+'</div></div>'
+    +'<div class="card" style="display:flex;flex-direction:column;justify-content:center"><div class="card-lbl">Descriptor</div><div style="font-size:.72rem;font-weight:500;color:#e2e8f0">'+descDisp+'</div>'+descScore+otherDisp+'</div></div>'
+    +'<div class="card" style="margin-bottom:.5rem;font-size:.55rem;color:#94a3b8;text-align:left;line-height:1.8"><div class="card-lbl" style="margin-bottom:.3rem">Conditions</div>'+metHtml+'</div>'
+    +'<div style="max-height:150px;overflow-y:auto;border:1px solid #1e293b;border-radius:4px;margin-bottom:.75rem"><table><thead><tr><th style="text-align:left">TIME</th><th style="text-align:center">INT.</th><th style="text-align:right">STRENGTH</th></tr></thead><tbody>'+trows+'</tbody></table></div>'
+    +'<div style="margin-bottom:.75rem"><label class="lbl">File Name</label><input class="inp" id="fn" value="'+esc(S.fileName)+'"></div>'
+    +'<button class="btn" id="dl">Download CSV</button>';
+    app.appendChild(d);
+    document.getElementById("fn").oninput=function(e){S.fileName=e.target.value};
+    document.getElementById("dl").onclick=function(){
+      S.fileName=document.getElementById("fn").value;
+      var h="Time,Seconds,Intensity,Odour Strength\n";
+      var rows=S.recs.map(function(r){return r.time+","+r.seconds+","+r.value+","+OL[r.value]}).join("\n");
+      var sm="\n\nSummary\nLocation,"+S.loc+"\nReceptor Sensitivity,"+S.sens+"\nAverage Intensity (Imean),"+im+"\nPercentage Odour Time (t>=4),"+tp+"%\nOdour Exposure,"+exp+"\nOdour Effect,"+eff+"\nHedonic Tone,"+S.hedonic+"\nOdour Descriptor,"+(S.desc?S.desc.d:"")+"\nHedonic Score,"+(S.desc?S.desc.s:"")+'\nAdditional Description,"'+(S.otherDesc||"").replace(/"/g,'""')+'"\n\nMeteorological Conditions\nWind Direction,'+m.windDir+"\nWind Strength,"+m.windStr+"\nAtmospheric Stability,"+m.stability+"\nBarometric Pressure (hPa),"+m.pressure+"\nRainfall,"+m.rainfall+"\nTemperature (C),"+m.temp+"\nHumidity (%),"+m.humidity+'\n\nSite Operations\nOn-site activities,"'+S.siteOps.replace(/"/g,'""')+'"\nSurrounding area,"'+S.surroundOps.replace(/"/g,'""')+'"';
+      var csv=h+rows+sm;
+      var fname=(S.fileName||"session")+".csv";
+      // Prefer Web Share API on iOS — opens the share sheet so user can Save to Files, Mail, AirDrop, etc.
+      try{
+        if(typeof File!=="undefined"&&navigator.canShare){
+          var file=new File([csv],fname,{type:"text/csv"});
+          if(navigator.canShare({files:[file]})){
+            navigator.share({files:[file],title:fname}).then(function(){show("done")}).catch(function(){});
+            return;
+          }
+        }
+      }catch(e){}
+      // Fallback for desktop / Android / older iOS
+      var blob=new Blob([csv],{type:"text/csv"});
+      var u=URL.createObjectURL(blob),a=document.createElement("a");
+      a.href=u;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(u)},100);
+      show("done");
+    };
+  }
+
+  else if(phase==="done"){
+    d.innerHTML='<div style="width:52px;height:52px;border-radius:50%;border:2px solid #34d399;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem">'
+    +'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'
+    +'<div style="font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:#34d399;margin-bottom:.4rem">Saved</div>'
+    +'<p style="color:#64748b;font-size:.78rem;margin-bottom:2rem">'+esc(S.fileName)+'.csv saved</p>'
+    +'<button class="btn-ghost" id="rst">New Session</button>';
+    app.appendChild(d);
+    document.getElementById("rst").onclick=function(){sc++;S={loc:"Location "+sc,sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:""},siteOps:"",surroundOps:"",recs:[],slider:0,hedonic:null,desc:null,descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV};show("setup")};
+  }
+}
+
+function startRec(){
+  S.recs=[{time:"0:00",seconds:0,value:0}];S.slider=0;S.secsLeft=TOTAL;S.sub=INTV;S.tick=0;S.fileName=S.loc;
+  show("recording");
+  S.timer=setInterval(function(){
+    S.tick++;S.secsLeft=TOTAL-S.tick;
+    S.sub=INTV-(S.tick%INTV);if(S.sub===INTV&&S.tick%INTV!==0){}else if(S.sub===INTV){S.sub=0}
+    if(S.tick%INTV===0){S.recs.push({time:fmt(S.tick),seconds:S.tick,value:Math.round(S.slider)});S.sub=INTV;if(S.beep)beep()}
+    if(S.secsLeft<=0){clearInterval(S.timer);show("classify")}
+    else show("recording");
+  },1000);
+}
+
+function opts(arr,sel){return'<option value="">Select...</option>'+arr.map(function(v){return'<option value="'+esc(v)+'"'+(v===sel?' selected':'')+'>'+esc(v)+'</option>'}).join("")}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function gi(id){var el=document.getElementById(id);return el?el.value:""}
+
+show("setup");
+</script>
+</body>
+</html>
