@@ -71,7 +71,6 @@ select.req:invalid{color:var(--text-faint)}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th{padding:.45rem .65rem;color:var(--text-dim);font-weight:600;font-size:.7rem;background:var(--bg-alt);position:sticky;top:0}
 td{padding:.35rem .65rem;border-top:1px solid var(--border)}
-/* Mandatory fields: red border when empty, green when filled */
 .inp.req:invalid,.sel.req:invalid{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
 .inp.req:valid,.sel.req:valid{border-color:var(--success);box-shadow:0 0 0 1px var(--success)}
 .opt.req-empty{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
@@ -97,79 +96,128 @@ td{padding:.35rem .65rem;border-top:1px solid var(--border)}
 .req-filled{border-color:var(--success) !important;box-shadow:0 0 0 1px var(--success),var(--shadow-card)}
 @keyframes flagFlash{0%{opacity:1}30%{opacity:1}100%{opacity:0}}
 .flag-flash-overlay{position:fixed;inset:0;background:rgba(220,38,38,.4);z-index:9999;pointer-events:none;animation:flagFlash .4s ease-out forwards}
+
+/* Schema 3 additions */
+.btn-pause{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text-mute);padding:.3rem .7rem;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:3px;font-family:inherit;width:auto;display:inline-flex;align-items:center;gap:.4rem;-webkit-tap-highlight-color:transparent}
+.btn-pause:active{background:var(--accent-soft)}
+.btn-pause-icon{display:inline-block;width:8px;height:10px;border-left:2px solid var(--text-mute);border-right:2px solid var(--text-mute)}
+.btn-skip-invisible{background:transparent;border:none;color:transparent;padding:.3rem .7rem;font-size:.5rem;width:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}
+.btn-skip-invisible:focus{outline:none}
+
+/* Modal infrastructure */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn .25s ease}
+.modal{background:var(--bg-alt);border-radius:6px;max-width:440px;width:100%;padding:1.4rem 1.5rem;box-shadow:0 20px 50px rgba(0,0,0,.3);text-align:left}
+.modal h3{font-size:1.1rem;font-weight:700;margin:0 0 .8rem;color:var(--text)}
+.modal h3.danger{color:var(--danger)}
+.modal h3.warn{color:var(--warning)}
+.modal p{font-size:.9rem;line-height:1.55;color:var(--text-mute);margin:0 0 .8rem}
+.modal p strong{color:var(--text);font-weight:600}
+.modal ul{margin:.4rem 0 .9rem;padding-left:1.4rem;font-size:.88rem;color:var(--text-mute)}
+.modal ul li{margin-bottom:.2rem}
+.modal .cause{padding:.6rem .8rem;background:var(--bg);border-left:3px solid var(--warning);border-radius:0 4px 4px 0;font-size:.85rem;margin:.5rem 0;color:var(--text-mute)}
+.modal .pause-note{padding:.6rem .8rem;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;font-size:.85rem;margin:.5rem 0;color:var(--text-mute);font-style:italic}
+.modal .opts{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap}
+.modal .opts .btn,.modal .opts .btn-ghost{width:auto;padding:.65rem 1.1rem;font-size:.78rem;letter-spacing:.14em;flex:0 1 auto}
+.modal .opts .btn-secondary{background:var(--bg-alt);border:1px solid var(--border-strong);color:var(--text-mute);padding:.65rem 1.1rem;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:3px;font-family:inherit;font-weight:500}
+.modal .opts .btn-danger{background:var(--danger);color:#fff;border:none;padding:.65rem 1.1rem;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:3px;font-family:inherit;font-weight:600}
+
+/* Pause overlay (manual pause) */
+.pause-overlay{position:fixed;inset:0;background:rgba(15,23,42,.78);z-index:9998;display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fadeIn .25s ease}
+.pause-card{background:var(--bg-alt);border-radius:8px;padding:2rem 1.75rem;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.pause-card h3{font-size:1rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 .4rem}
+.pause-card .pause-time{font-size:2.5rem;font-weight:200;color:var(--text);font-variant-numeric:tabular-nums;margin:.5rem 0 1rem}
+.pause-card p{font-size:.82rem;color:var(--text-mute);margin:0 0 1.25rem;line-height:1.5}
+.pause-card .opts{display:flex;flex-direction:column;gap:.5rem}
+
+/* Drift banner on results */
+.drift-banner{background:#fef3c7;border:1px solid #fde68a;color:#854d0e;padding:.6rem .85rem;border-radius:4px;font-size:.8rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;text-align:left;line-height:1.4}
+.drift-banner::before{content:"\26A0";font-size:1rem;flex-shrink:0}
+
+/* Footer doc links */
+.doc-links{margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--border);font-size:.7rem;color:var(--text-faint);letter-spacing:.05em}
+.doc-links a{color:var(--text-mute);text-decoration:none;border-bottom:1px solid transparent;padding:.15rem 0;transition:border-color .15s}
+.doc-links a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+.doc-links span{color:var(--border-strong);margin:0 .5rem}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
 "use strict";
-const TOTAL=300,INTV=10;
-const OL=["No odour","Slight/very weak","Slight/weak","Distinct","Strong","Very strong","Extremely strong"];
-const OC=["No odour when compared to the clean site","Probably some doubt as to whether the odour is actually present","Odour is present but cannot be described using precise words or terms","Odour character is barely recognisable","Odour character is easily recognisable","Odour is offensive \u2014 exposure would be considered undesirable","Odour is offensive \u2014 instinctive reaction would be to mitigate against further exposure"];
-const RI={High:"Residential, hospitals, schools, tourist/cultural",Medium:"Workplaces, commercial/retail, recreation fields",Low:"Industrial, farms, footpaths, roads"};
-const EM={6:["Large","Very Large","Very Large","Very Large","Very Large"],5:["Medium","Large","Large","Very Large","Very Large"],4:["Small","Medium","Medium","Large","Large"],3:["Small","Medium","Medium","Medium","Medium"],2:["Small","Small","Medium","Medium","Medium"],1:["Small","Small","Small","N/A","N/A"]};
-const FM={"Very Large":{Low:"Substantial adverse",Medium:"Substantial adverse",High:"Substantial adverse"},Large:{Low:"Moderate adverse",Medium:"Moderate adverse",High:"Substantial adverse"},Medium:{Low:"Slight adverse",Medium:"Slight adverse",High:"Moderate adverse"},Small:{Low:"Negligible",Medium:"Negligible",High:"Slight adverse"}};
-const HD=[{d:"Bakery (fresh bread)",s:3.53},{d:"Rose",s:3.08},{d:"Strawberry",s:2.93},{d:"Orange",s:2.86},{d:"Floral",s:2.79},{d:"Chocolate",s:2.78},{d:"Fruity - citrus",s:2.72},{d:"Violets",s:2.68},{d:"Peach",s:2.67},{d:"Apple",s:2.61},{d:"Pineapple",s:2.59},{d:"Vanilla",s:2.57},{d:"Cherry",s:2.55},{d:"Cinnamon",s:2.54},{d:"Fried chicken",s:2.53},{d:"Fragrant",s:2.52},{d:"Lemon",s:2.50},{d:"Minty - peppermint",s:2.50},{d:"Popcorn",s:2.47},{d:"Melon",s:2.41},{d:"Meaty (cooked - good)",s:2.34},{d:"Coffee",s:2.33},{d:"Caramel",s:2.32},{d:"Pear",s:2.26},{d:"Maple syrup",s:2.26},{d:"Lavender",s:2.25},{d:"Fruity - other than citrus",s:2.23},{d:"Fresh green vegetables",s:2.19},{d:"Cologne",s:2.16},{d:"Herbal - green - cut grass",s:2.14},{d:"Cedarwood",s:2.11},{d:"Honey",s:2.08},{d:"Grape juice",s:2.07},{d:"Buttery - fresh butter",s:2.04},{d:"Sweet",s:2.03},{d:"Almond",s:2.01},{d:"Banana",s:2.00},{d:"Spicy",s:1.99},{d:"Peanut butter",s:1.99},{d:"Perfumery",s:1.96},{d:"Grapefruit",s:1.95},{d:"Coconut",s:1.93},{d:"Nutty",s:1.92},{d:"Clove",s:1.67},{d:"Cooked vegetables",s:1.58},{d:"Raisins",s:1.56},{d:"Aromatic",s:1.41},{d:"Tea leaves",s:1.40},{d:"Green pepper",s:1.39},{d:"Celery",s:1.36},{d:"Crushed grass",s:1.34},{d:"Hay",s:1.31},{d:"Raw cucumber",s:1.30},{d:"Leather",s:1.30},{d:"Seasoning (for meat)",s:1.27},{d:"Oak wood - cognac",s:1.23},{d:"Anise (liquorice)",s:1.21},{d:"Bark - birch bark",s:1.18},{d:"Soupy",s:1.13},{d:"Caraway",s:1.06},{d:"Malty",s:1.05},{d:"Incense",s:1.01},{d:"Molasses",s:1.00},{d:"Eucalyptus",s:0.99},{d:"Laurel leaves",s:0.97},{d:"Soapy",s:0.96},{d:"Woody - resinous",s:0.94},{d:"Dill",s:0.87},{d:"Grainy (as grain)",s:0.63},{d:"Geranium leaves",s:0.57},{d:"Beany",s:0.54},{d:"Mushroom",s:0.52},{d:"Eggy (fresh eggs)",s:0.45},{d:"Raw potato",s:0.26},{d:"Musky",s:0.21},{d:"Black pepper",s:0.19},{d:"Cork",s:0.19},{d:"Dry - powdery",s:-0.07},{d:"Yeasty",s:-0.07},{d:"Burnt candle",s:-0.08},{d:"Beery",s:-0.14},{d:"Rope",s:-0.16},{d:"Garlic - onion",s:-0.17},{d:"Crushed weeds",s:-0.21},{d:"Alcoholic",s:-0.47},{d:"Cardboard",s:-0.54},{d:"Camphor",s:-0.55},{d:"Sauerkraut",s:-0.60},{d:"Fresh tobacco smoke",s:-0.66},{d:"Kippery-smoked fish",s:-0.69},{d:"Turpentine (pine oil)",s:-0.73},{d:"Paint",s:-0.75},{d:"Nail polish remover",s:-0.81},{d:"Varnish",s:-0.85},{d:"Chalky",s:-0.85},{d:"Medicinal",s:-0.89},{d:"Wet paper",s:-0.94},{d:"Metallic",s:-0.94},{d:"New rubber",s:-0.96},{d:"Seminal - sperm-like",s:-1.04},{d:"Animal",s:-1.13},{d:"Gasoline - solvent",s:-1.16},{d:"Mothballs",s:-1.25},{d:"Sour - vinegar",s:-1.26},{d:"Creosote",s:-1.35},{d:"Bitter",s:-1.38},{d:"Oily - fatty",s:-1.41},{d:"Burnt paper",s:-1.47},{d:"Burn - smoky",s:-1.53},{d:"Ether - anaesthetic",s:-1.54},{d:"Disinfectant - carbolic",s:-1.60},{d:"Tar",s:-1.63},{d:"Chemical",s:-1.64},{d:"Blood - raw meat",s:-1.64},{d:"Kerosene",s:-1.67},{d:"Cleaning fluid",s:-1.69},{d:"Sooty",s:-1.69},{d:"Musty - earthy - mouldy",s:-1.94},{d:"Fishy",s:-1.98},{d:"Stale",s:-2.04},{d:"Burnt milk",s:-2.19},{d:"Mouse-like",s:-2.20},{d:"Wet wool - wet dog",s:-2.28},{d:"Household gas",s:-2.30},{d:"Sharp - pungent - acid",s:-2.34},{d:"Sulphurous",s:-2.45},{d:"Ammonia",s:-2.47},{d:"Sweaty",s:-2.53},{d:"Dirty linen",s:-2.55},{d:"Fermented (rotten fruit)",s:-2.76},{d:"Stale tobacco smoke",s:-2.83},{d:"Sour milk",s:-2.91},{d:"Burnt rubber",s:-3.01},{d:"Rancid",s:-3.15},{d:"Urine",s:-3.34},{d:"Sickening (vomit)",s:-3.34},{d:"Faecal (like manure)",s:-3.36},{d:"Cat urine",s:-3.64},{d:"Sewer odour",s:-3.68},{d:"Putrid - foul - decayed",s:-3.74},{d:"Cadaverous (dead animal)",s:-3.75}];
-HD.sort(function(a,b){return a.s-b.s});  // most-negative first
-const WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","Variable","Calm"];
-const BF=["0 - Calm","1 - Light air","2 - Light breeze","3 - Gentle breeze","4 - Moderate breeze","5 - Fresh breeze","6 - Strong breeze","7 - Near gale","8+ - Gale"];
-const PG=["A - Very unstable","B - Unstable","C - Slightly unstable","D - Neutral","E - Slightly stable","F - Stable"];
-const RO=["None","Drizzle","Light rain","Moderate rain","Heavy rain"];
-const CC=["Clear \u2014 mostly clear sky","Partly cloudy \u2014 broken cloud, sun in and out","Mostly cloudy \u2014 sun mostly obscured","Overcast \u2014 full cloud cover"];
-// Beaufort band → mid-band wind speed in m/s (for PG derivation)
-const BF_MS={"0":0,"1":1,"2":2,"3":4,"4":7,"5":10,"6":12,"7":16,"8":20};
+
+// ===== CONSTANTS =====
+var APP_VERSION="1.2.0";
+var SCHEMA_VERSION=3;
+var TOTAL=300,INTV=10;
+
+var WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","Variable","Calm"];
+var OL=["No odour","Slight/very weak","Slight/weak","Distinct","Strong","Very strong","Extremely strong"];
+var OC=["No odour when compared to the clean site","Probably some doubt as to whether the odour is actually present","Odour is present but cannot be described using precise words or terms","Odour character is barely recognisable","Odour character is easily recognisable","Odour is offensive \u2014 exposure would be considered undesirable","Odour is offensive \u2014 instinctive reaction would be to mitigate against further exposure"];
+var RI={High:"Residential, hospitals, schools, tourist/cultural",Medium:"Workplaces, commercial/retail, recreation fields",Low:"Industrial, farms, footpaths, roads"};
+var EM={6:["Large","Very Large","Very Large","Very Large","Very Large"],5:["Medium","Large","Large","Very Large","Very Large"],4:["Small","Medium","Medium","Large","Large"],3:["Small","Medium","Medium","Medium","Medium"],2:["Small","Small","Medium","Medium","Medium"],1:["Small","Small","Small","N/A","N/A"]};
+var FM={"Very Large":{Low:"Substantial adverse",Medium:"Substantial adverse",High:"Substantial adverse"},Large:{Low:"Moderate adverse",Medium:"Moderate adverse",High:"Substantial adverse"},Medium:{Low:"Slight adverse",Medium:"Slight adverse",High:"Moderate adverse"},Small:{Low:"Negligible",Medium:"Negligible",High:"Slight adverse"}};
+var HD=[{d:"Bakery (fresh bread)",s:3.53},{d:"Rose",s:3.08},{d:"Strawberry",s:2.93},{d:"Orange",s:2.86},{d:"Floral",s:2.79},{d:"Chocolate",s:2.78},{d:"Fruity - citrus",s:2.72},{d:"Violets",s:2.68},{d:"Peach",s:2.67},{d:"Apple",s:2.61},{d:"Pineapple",s:2.59},{d:"Vanilla",s:2.57},{d:"Cherry",s:2.55},{d:"Cinnamon",s:2.54},{d:"Fried chicken",s:2.53},{d:"Fragrant",s:2.52},{d:"Lemon",s:2.50},{d:"Minty - peppermint",s:2.50},{d:"Popcorn",s:2.47},{d:"Melon",s:2.41},{d:"Meaty (cooked - good)",s:2.34},{d:"Coffee",s:2.33},{d:"Caramel",s:2.32},{d:"Pear",s:2.26},{d:"Maple syrup",s:2.26},{d:"Lavender",s:2.25},{d:"Fruity - other than citrus",s:2.23},{d:"Fresh green vegetables",s:2.19},{d:"Cologne",s:2.16},{d:"Herbal - green - cut grass",s:2.14},{d:"Cedarwood",s:2.11},{d:"Honey",s:2.08},{d:"Grape juice",s:2.07},{d:"Buttery - fresh butter",s:2.04},{d:"Sweet",s:2.03},{d:"Almond",s:2.01},{d:"Banana",s:2.00},{d:"Spicy",s:1.99},{d:"Peanut butter",s:1.99},{d:"Perfumery",s:1.96},{d:"Grapefruit",s:1.95},{d:"Coconut",s:1.93},{d:"Nutty",s:1.92},{d:"Clove",s:1.67},{d:"Cooked vegetables",s:1.58},{d:"Raisins",s:1.56},{d:"Aromatic",s:1.41},{d:"Tea leaves",s:1.40},{d:"Green pepper",s:1.39},{d:"Celery",s:1.36},{d:"Crushed grass",s:1.34},{d:"Hay",s:1.31},{d:"Raw cucumber",s:1.30},{d:"Leather",s:1.30},{d:"Seasoning (for meat)",s:1.27},{d:"Oak wood - cognac",s:1.23},{d:"Anise (liquorice)",s:1.21},{d:"Bark - birch bark",s:1.18},{d:"Soupy",s:1.13},{d:"Caraway",s:1.06},{d:"Malty",s:1.05},{d:"Incense",s:1.01},{d:"Molasses",s:1.00},{d:"Eucalyptus",s:0.99},{d:"Laurel leaves",s:0.97},{d:"Soapy",s:0.96},{d:"Woody - resinous",s:0.94},{d:"Dill",s:0.87},{d:"Grainy (as grain)",s:0.63},{d:"Geranium leaves",s:0.57},{d:"Beany",s:0.54},{d:"Mushroom",s:0.52},{d:"Eggy (fresh eggs)",s:0.45},{d:"Raw potato",s:0.26},{d:"Musky",s:0.21},{d:"Black pepper",s:0.19},{d:"Cork",s:0.19},{d:"Dry - powdery",s:-0.07},{d:"Yeasty",s:-0.07},{d:"Burnt candle",s:-0.08},{d:"Beery",s:-0.14},{d:"Rope",s:-0.16},{d:"Garlic - onion",s:-0.17},{d:"Crushed weeds",s:-0.21},{d:"Alcoholic",s:-0.47},{d:"Cardboard",s:-0.54},{d:"Camphor",s:-0.55},{d:"Sauerkraut",s:-0.60},{d:"Fresh tobacco smoke",s:-0.66},{d:"Kippery-smoked fish",s:-0.69},{d:"Turpentine (pine oil)",s:-0.73},{d:"Paint",s:-0.75},{d:"Nail polish remover",s:-0.81},{d:"Varnish",s:-0.85},{d:"Chalky",s:-0.85},{d:"Medicinal",s:-0.89},{d:"Wet paper",s:-0.94},{d:"Metallic",s:-0.94},{d:"New rubber",s:-0.96},{d:"Seminal - sperm-like",s:-1.04},{d:"Animal",s:-1.13},{d:"Gasoline - solvent",s:-1.16},{d:"Mothballs",s:-1.25},{d:"Sour - vinegar",s:-1.26},{d:"Creosote",s:-1.35},{d:"Bitter",s:-1.38},{d:"Oily - fatty",s:-1.41},{d:"Burnt paper",s:-1.47},{d:"Burn - smoky",s:-1.53},{d:"Ether - anaesthetic",s:-1.54},{d:"Disinfectant - carbolic",s:-1.60},{d:"Tar",s:-1.63},{d:"Chemical",s:-1.64},{d:"Blood - raw meat",s:-1.64},{d:"Kerosene",s:-1.67},{d:"Cleaning fluid",s:-1.69},{d:"Sooty",s:-1.69},{d:"Musty - earthy - mouldy",s:-1.94},{d:"Fishy",s:-1.98},{d:"Stale",s:-2.04},{d:"Burnt milk",s:-2.19},{d:"Mouse-like",s:-2.20},{d:"Wet wool - wet dog",s:-2.28},{d:"Household gas",s:-2.30},{d:"Sharp - pungent - acid",s:-2.34},{d:"Sulphurous",s:-2.45},{d:"Ammonia",s:-2.47},{d:"Sweaty",s:-2.53},{d:"Dirty linen",s:-2.55},{d:"Fermented (rotten fruit)",s:-2.76},{d:"Stale tobacco smoke",s:-2.83},{d:"Sour milk",s:-2.91},{d:"Burnt rubber",s:-3.01},{d:"Rancid",s:-3.15},{d:"Urine",s:-3.34},{d:"Sickening (vomit)",s:-3.34},{d:"Faecal (like manure)",s:-3.36},{d:"Cat urine",s:-3.64},{d:"Sewer odour",s:-3.68},{d:"Putrid - foul - decayed",s:-3.74},{d:"Cadaverous (dead animal)",s:-3.75}];
+HD.sort(function(a,b){return a.s-b.s});
+var BF=["0 - Calm","1 - Light air","2 - Light breeze","3 - Gentle breeze","4 - Moderate breeze","5 - Fresh breeze","6 - Strong breeze","7 - Near gale","8+ - Gale"];
+var PG=["A - Very unstable","B - Unstable","C - Slightly unstable","D - Neutral","E - Slightly stable","F - Stable"];
+var RO=["None","Drizzle","Light rain","Moderate rain","Heavy rain"];
+var CC=["Clear \u2014 mostly clear sky","Partly cloudy \u2014 broken cloud, sun in and out","Mostly cloudy \u2014 sun mostly obscured","Overcast \u2014 full cloud cover"];
+var BF_MS={"0":0,"1":1,"2":2,"3":4,"4":7,"5":10,"6":12,"7":16,"8":20};
+
+var DOC_BASE="https://odourlog.github.io/odour-recorder/";
+var DOC_USER_GUIDE=DOC_BASE+"user-guide.html";
+var DOC_TECHNICAL=DOC_BASE+"technical-paper.html";
+var DOC_PLAIN=DOC_BASE+"plain-english-guide.html";
+
+// ===== PURE FUNCTIONS =====
 function bfToMs(b){if(!b)return null;var n=b.charAt(0);return BF_MS[n]!=null?BF_MS[n]:null}
-// Solar elevation in degrees from date + lat/lng (NOAA-style approximation, accurate to within ~0.5°)
+
 function solarElevation(date,lat,lng){
   var rad=Math.PI/180;
-  var start=new Date(date.getFullYear(),0,0);
-  var diff=(date-start)+(start.getTimezoneOffset()-date.getTimezoneOffset())*60*1000;
-  var doy=Math.floor(diff/86400000);
-  var frac=2*Math.PI/365*(doy-1+(date.getHours()-12)/24);
-  var decl=0.006918-0.399912*Math.cos(frac)+0.070257*Math.sin(frac)-0.006758*Math.cos(2*frac)+0.000907*Math.sin(2*frac);
-  var eot=229.18*(0.000075+0.001868*Math.cos(frac)-0.032077*Math.sin(frac)-0.014615*Math.cos(2*frac)-0.040849*Math.sin(2*frac));
-  var solarTime=date.getHours()*60+date.getMinutes()+date.getSeconds()/60+4*lng+eot-date.getTimezoneOffset();
-  var ha=(solarTime/4-180)*rad;
-  var sinEl=Math.sin(lat*rad)*Math.sin(decl)+Math.cos(lat*rad)*Math.cos(decl)*Math.cos(ha);
-  return Math.asin(Math.max(-1,Math.min(1,sinEl)))/rad;
+  var d=new Date(date);
+  var dayOfYear=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);
+  var fracYear=2*Math.PI/365*(dayOfYear-1+(d.getHours()-12)/24);
+  var declRad=0.006918-0.399912*Math.cos(fracYear)+0.070257*Math.sin(fracYear)-0.006758*Math.cos(2*fracYear)+0.000907*Math.sin(2*fracYear)-0.002697*Math.cos(3*fracYear)+0.00148*Math.sin(3*fracYear);
+  var eqTime=229.18*(0.000075+0.001868*Math.cos(fracYear)-0.032077*Math.sin(fracYear)-0.014615*Math.cos(2*fracYear)-0.040849*Math.sin(2*fracYear));
+  var solarTimeOffset=eqTime+4*lng-60*(d.getTimezoneOffset()/-60);
+  var trueSolarTime=d.getHours()*60+d.getMinutes()+d.getSeconds()/60+solarTimeOffset;
+  var hourAngle=(trueSolarTime/4-180)*rad;
+  var latRad=lat*rad;
+  var elevation=Math.asin(Math.sin(latRad)*Math.sin(declRad)+Math.cos(latRad)*Math.cos(declRad)*Math.cos(hourAngle));
+  return elevation/rad;
 }
-// Pasquill-Gifford derivation. Falls back to UK-typical lat/lng if no GPS.
+
 function derivePG(when,lat,lng,bfBand,cloud){
   var ms=bfToMs(bfBand);
   if(ms==null||!cloud)return null;
   var el=solarElevation(when,lat,lng);
-  var isDay=el>3;  // Twilight cutoff
+  var isDay=el>3;
   if(isDay){
-    // Insolation: strong (>60°), moderate (35-60°), slight (<35°), with cloud reducing by one tier
-    var insolation;
-    if(cloud.indexOf("Overcast")>=0)return"D - Neutral";  // overcast day is always D per PG table
-    var elTier=el>60?2:el>35?1:0;  // 0=slight, 1=moderate, 2=strong
+    if(cloud.indexOf("Overcast")>=0)return"D - Neutral";
+    var elTier=el>60?2:el>35?1:0;
     if(cloud.indexOf("Mostly cloudy")>=0)elTier=Math.max(0,elTier-2);
     else if(cloud.indexOf("Partly cloudy")>=0)elTier=Math.max(0,elTier-1);
-    insolation=elTier;  // 0=slight, 1=moderate, 2=strong
-    // PG table lookup (day)
-    if(insolation>=2){  // strong
+    var insolation=elTier;
+    if(insolation>=2){
       if(ms<2)return"A - Very unstable";
-      if(ms<3)return"A - Very unstable";  // A-B → choose A
+      if(ms<3)return"A - Very unstable";
       if(ms<5)return"B - Unstable";
       if(ms<6)return"C - Slightly unstable";
       return"C - Slightly unstable";
     }
-    if(insolation>=1){  // moderate
-      if(ms<2)return"B - Unstable";  // A-B → choose B
+    if(insolation>=1){
+      if(ms<2)return"B - Unstable";
       if(ms<3)return"B - Unstable";
-      if(ms<5)return"B - Unstable";  // B-C → choose B
-      if(ms<6)return"C - Slightly unstable";  // C-D → choose C
+      if(ms<5)return"B - Unstable";
+      if(ms<6)return"C - Slightly unstable";
       return"D - Neutral";
     }
-    // slight
     if(ms<2)return"B - Unstable";
     if(ms<3)return"C - Slightly unstable";
     if(ms<5)return"C - Slightly unstable";
     if(ms<6)return"D - Neutral";
     return"D - Neutral";
   }
-  // Night: cloud > 4 oktas → cloudy night (E or D); otherwise clear night (F or E)
   var clearNight=cloud.indexOf("Clear")>=0||cloud.indexOf("Partly cloudy")>=0;
   if(clearNight){
     if(ms<2)return"F - Stable";
@@ -177,7 +225,6 @@ function derivePG(when,lat,lng,bfBand,cloud){
     if(ms<5)return"E - Slightly stable";
     return"D - Neutral";
   }
-  // Cloudy/overcast night
   if(ms<2)return"E - Slightly stable";
   if(ms<3)return"E - Slightly stable";
   return"D - Neutral";
@@ -192,63 +239,629 @@ function tbi(t){return t<=10?0:t<=20?1:t<=30?2:t<=40?3:4}
 function gExp(i,t){if(i===0)return"Negligible";if(i===1&&t===0)return"Negligible";var r=EM[i];return r?r[tbi(t)]:"N/A"}
 function gEff(e,s){if(e==="Negligible")return"Negligible";if(e==="N/A")return"N/A";return FM[e]?FM[e][s]||"N/A":"N/A"}
 function gEC(e){return e.indexOf("Substantial")>=0?"#dc2626":e.indexOf("Moderate")>=0?"#ea580c":e.indexOf("Slight adverse")>=0?"#ca8a04":"#16a34a"}
+function getTimezone(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){return""}}
+function getDeviceFingerprint(){
+  var ua=navigator.userAgent||"";
+  var dev="";
+  if(/iPhone/.test(ua))dev="iPhone";
+  else if(/iPad/.test(ua))dev="iPad";
+  else if(/Android/.test(ua))dev="Android";
+  else if(/Mac/.test(ua))dev="Mac";
+  else if(/Windows/.test(ua))dev="Windows";
+  else dev="Unknown";
+  var iosM=ua.match(/OS (\d+_\d+)/);if(iosM)dev+="; iOS "+iosM[1].replace("_",".");
+  var safM=ua.match(/Version\/(\d+\.\d+)/);
+  var safB=ua.match(/Safari\/(\d+)/);
+  if(safM)dev+="; Safari "+safM[1];
+  else if(safB)dev+="; Safari "+safB[1];
+  return dev;
+}
 
+// ===== AUDIO =====
 var audioCtx=null;
 function unlockAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch(e){}}
 function tone(freq,dur,vol,type){
   try{
     if(!audioCtx)return;
     var o=audioCtx.createOscillator(),g=audioCtx.createGain();
-    o.type=type||"square";
-    o.frequency.value=freq;
+    o.type=type||"square";o.frequency.value=freq;
+    g.gain.setValueAtTime(0,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(vol,audioCtx.currentTime+0.005);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+dur);
     o.connect(g);g.connect(audioCtx.destination);
-    var t=audioCtx.currentTime;
-    g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(vol,t+0.005);
-    g.gain.setValueAtTime(vol,t+Math.max(0.01,dur-0.04));
-    g.gain.exponentialRampToValueAtTime(0.001,t+dur);
-    o.start(t);
-    o.stop(t+dur+0.02);
+    o.start();o.stop(audioCtx.currentTime+dur+0.05);
   }catch(e){}
 }
 function pip(){tone(1000,0.08,0.5,"square")}
 function beep(){tone(1500,0.4,0.7,"square")}
-// Full-screen red flash — visual confirmation of flag tap, fades over ~400ms
 function flashScreen(){
-  var ov=document.createElement("div");
-  ov.style.cssText="position:fixed;inset:0;background:rgba(220,38,38,.28);pointer-events:none;z-index:9999;opacity:1;transition:opacity .35s ease-out";
+  var ov=document.createElement("div");ov.className="flag-flash-overlay";
   document.body.appendChild(ov);
   requestAnimationFrame(function(){ov.style.opacity="0"});
   setTimeout(function(){ov.remove()},400);
 }
 
-// Toggle .req-empty / .req-filled on a single input/select based on its current value
+// ===== HELPERS =====
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function gi(id){var el=document.getElementById(id);return el?el.value:""}
+function opts(arr,sel){return'<option value="">Select...</option>'+arr.map(function(v){return'<option value="'+esc(v)+'"'+(v===sel?' selected':'')+'>'+esc(v)+'</option>'}).join("")}
+function loadSurveyor(){try{return localStorage.getItem("orec_surveyor")||""}catch(e){return""}}
+function saveSurveyor(name){try{localStorage.setItem("orec_surveyor",name||"")}catch(e){}}
 function updateReqState(el){
-  if(!el)return;
-  var v=el.value;
-  var filled=v!=null&&String(v).trim().length>0;
-  el.classList.toggle("req-empty",!filled);
-  el.classList.toggle("req-filled",filled);
+  if(el.tagName==="SELECT"||el.tagName==="INPUT"||el.tagName==="TEXTAREA"){
+    if(el.value)el.style.color="var(--text)";else el.style.color="var(--text-faint)";
+  }
 }
-// Walk all .req fields in a scope, set initial state, and wire live updates.
-// Skip .opt cards — they have their own click-driven re-render.
 function wireReqFields(scope){
   scope.querySelectorAll(".req").forEach(function(el){
-    if(el.classList.contains("opt"))return;
     updateReqState(el);
     var fn=function(){updateReqState(el)};
-    el.addEventListener("input",fn);
-    el.addEventListener("change",fn);
+    el.addEventListener("input",fn);el.addEventListener("change",fn);el.addEventListener("blur",fn);
   });
 }
 
-var app=document.getElementById("app"),sc=1;
-var APP_VERSION="1.1.0";
-var SCHEMA_VERSION=2;
-function loadSurveyor(){try{return localStorage.getItem("orec_surveyor")||""}catch(e){return""}}
-function saveSurveyor(name){try{localStorage.setItem("orec_surveyor",name||"")}catch(e){}}
-var S={surveyor:loadSurveyor(),loc:"Location 1",sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:"",cloud:""},siteOps:"",surroundOps:"",recs:[],anomalies:[],slider:0,hedonic:null,hedonicVaried:false,hedonicVariation:"",desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV,gps:null,wakeLock:null};
+// ===== STATE =====
+var sc=1;
+var S=newSession();
+function newSession(){
+  return {
+    surveyor:loadSurveyor(),loc:"Location "+sc,sens:null,
+    met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:"",cloud:""},
+    siteOps:"",surroundOps:"",
+    recs:[],anomalies:[],slider:0,
+    hedonic:null,hedonicVaried:false,hedonicVariation:"",
+    desc:[],descSearch:"",otherDesc:"",
+    fileName:"",beep:true,
+    timer:null,tick:0,secsLeft:TOTAL,sub:INTV,
+    gps:null,wakeLock:null,startedAt:null,
+    timing:newTimingState()
+  };
+}
+function newTimingState(){
+  return {
+    recordingStartReal:0,
+    sampleSchedule:[],   // array of {n, nominalTime, attentiveTimeAtCapture or null, intensity or null, status}
+    visEvents:[],         // {startReal, endReal, startAttentive, endAttentive, durationS}
+    pauses:[],            // {type, startReal, endReal, durationS, startAttentive}
+    visibilityHidden:false,
+    hiddenStartReal:null,
+    cumulativeHiddenSinceLastModalS:0,
+    isManuallyPaused:false,
+    manualPauseStartReal:null,
+    totalManualPauseTimeMs:0,
+    isModalPause:false,
+    modalPauseStartReal:null,
+    totalModalPauseTimeMs:0,
+    pauseAccumStart:null,   // performance.now() of current pause start (any kind)
+    completed:false
+  };
+}
 
+// ===== TIMING HELPERS =====
+function getRecordingTotalPauseMs(){
+  var t=S.timing;
+  var paused=t.totalManualPauseTimeMs+t.totalModalPauseTimeMs;
+  if(t.pauseAccumStart!=null)paused+=performance.now()-t.pauseAccumStart;
+  return paused;
+}
+function getAttentiveElapsedS(){
+  var t=S.timing;
+  if(!t.recordingStartReal)return 0;
+  var realElapsedMs=performance.now()-t.recordingStartReal;
+  var pausedMs=getRecordingTotalPauseMs();
+  return Math.max(0,(realElapsedMs-pausedMs)/1000);
+}
+function getRealElapsedS(){
+  var t=S.timing;
+  if(!t.recordingStartReal)return 0;
+  return (performance.now()-t.recordingStartReal)/1000;
+}
+
+// ===== WAKE LOCK =====
+function acquireWakeLock(){
+  try{
+    if("wakeLock" in navigator){
+      navigator.wakeLock.request("screen").then(function(wl){S.wakeLock=wl}).catch(function(){});
+    }
+  }catch(e){}
+}
+function releaseWakeLock(){try{if(S.wakeLock){S.wakeLock.release();S.wakeLock=null}}catch(e){}}
+
+// ===== VISIBILITY TRACKING =====
+function setupVisibilityListener(){
+  document.addEventListener("visibilitychange",onVisibilityChange);
+}
+function teardownVisibilityListener(){
+  document.removeEventListener("visibilitychange",onVisibilityChange);
+}
+function onVisibilityChange(){
+  if(!S.timing||S.timing.completed||!S.timing.recordingStartReal)return;
+  if(S.timing.isManuallyPaused||S.timing.isModalPause)return; // ignore vis events while already paused
+  if(document.hidden){
+    onVisibilityHidden();
+  }else{
+    onVisibilityVisible();
+  }
+}
+function onVisibilityHidden(){
+  var t=S.timing;
+  if(t.visibilityHidden)return; // already hidden
+  t.visibilityHidden=true;
+  t.hiddenStartReal=performance.now();
+  // Treat as a pause for the running attentive clock — accumulate as "totalModalPauseTimeMs" semantically;
+  // but we keep visibility as a separate counter
+  t.pauseAccumStart=t.hiddenStartReal;
+}
+function onVisibilityVisible(){
+  var t=S.timing;
+  if(!t.visibilityHidden)return;
+  t.visibilityHidden=false;
+  var endReal=performance.now();
+  var durationMs=endReal-t.hiddenStartReal;
+  var durationS=durationMs/1000;
+  // Settle the running pause counter by adding to total then clearing
+  t.totalModalPauseTimeMs+=durationMs;  // actually visibility-hidden time, but it functions as a pause for elapsed-attentive reckoning
+  // ^ We re-name this in CSV; internally treating any pause symmetrically is convenient
+  t.pauseAccumStart=null;
+  // Record vis event
+  var startAtt=(t.hiddenStartReal-t.recordingStartReal-(getRecordingTotalPauseMs()-durationMs))/1000;
+  // Simpler: record the attentive seconds at hidden start
+  // Just capture in real-time terms; the CSV computation pass will derive attentive
+  t.visEvents.push({startReal:t.hiddenStartReal,endReal:endReal,durationS:durationS});
+  // Update cumulative
+  t.cumulativeHiddenSinceLastModalS+=durationS;
+  // Check modal triggers
+  var totalHiddenS=t.visEvents.reduce(function(a,e){return a+e.durationS},0);
+  if(durationS>10||t.cumulativeHiddenSinceLastModalS>15){
+    fireLiveAbortModal(durationS);
+  }
+}
+
+// ===== PAUSE/RESUME OF RECORDING TIMER =====
+// We keep a 1-second setInterval for UI animation. When pausing (manual or modal), we cancel it.
+// When resuming, we re-establish it. The performance.now() based attentive elapsed handles drift.
+
+function startRecordingTimer(){
+  if(S.timing.tickInterval)return;
+  S.timing.tickInterval=setInterval(recordingSecondTick,1000);
+}
+function stopRecordingTimer(){
+  if(S.timing.tickInterval){clearInterval(S.timing.tickInterval);S.timing.tickInterval=null}
+}
+
+function pauseRecordingForModal(){
+  var t=S.timing;
+  if(t.isModalPause)return;
+  t.isModalPause=true;
+  t.modalPauseStartReal=performance.now();
+  // If visibility was hidden, the pauseAccumStart is already set; preserve continuity
+  // We're transitioning from "vis hidden" pause to "modal" pause without gap
+  if(t.pauseAccumStart==null)t.pauseAccumStart=t.modalPauseStartReal;
+  stopRecordingTimer();
+}
+function resumeRecordingFromModal(){
+  var t=S.timing;
+  if(!t.isModalPause)return;
+  t.isModalPause=false;
+  var endReal=performance.now();
+  var durationMs=endReal-t.modalPauseStartReal;
+  t.totalModalPauseTimeMs+=durationMs;
+  t.modalPauseStartReal=null;
+  t.pauseAccumStart=null;
+  // The visibility-hidden duration was already credited in onVisibilityVisible
+  // The modal display time is added on top
+  startRecordingTimer();
+}
+
+function pauseRecordingManually(){
+  var t=S.timing;
+  if(t.isManuallyPaused||t.isModalPause)return;
+  t.isManuallyPaused=true;
+  t.manualPauseStartReal=performance.now();
+  if(t.pauseAccumStart==null)t.pauseAccumStart=t.manualPauseStartReal;
+  stopRecordingTimer();
+}
+function resumeRecordingManually(){
+  var t=S.timing;
+  if(!t.isManuallyPaused)return;
+  var endReal=performance.now();
+  var durationMs=endReal-t.manualPauseStartReal;
+  t.totalManualPauseTimeMs+=durationMs;
+  t.pauses.push({type:"Manual",startReal:t.manualPauseStartReal,endReal:endReal,durationS:durationMs/1000});
+  t.isManuallyPaused=false;
+  t.manualPauseStartReal=null;
+  t.pauseAccumStart=null;
+  startRecordingTimer();
+}
+
+// ===== RECORDING TICK =====
+function recordingSecondTick(){
+  var t=S.timing;
+  if(t.completed||t.isManuallyPaused||t.isModalPause||t.visibilityHidden)return;
+  S.tick++;
+  S.secsLeft=TOTAL-S.tick;
+  // sub-second within the 10-second window
+  S.sub=INTV-(S.tick%INTV);
+  if(S.sub===INTV)S.sub=0;
+  if(S.beep&&(S.sub===3||S.sub===2||S.sub===1))pip();
+  // Sample capture every 10 seconds
+  if(S.tick%INTV===0){
+    captureSample();
+  }
+  if(S.secsLeft<=0){
+    finishRecording();
+  }else{
+    if(S._paint)S._paint();
+  }
+}
+function captureSample(){
+  var n=S.recs.length+1;
+  var nominalTime=n*INTV;
+  var attentiveS=getAttentiveElapsedS();
+  var iv=Math.round(S.slider);
+  S.recs.push({
+    n:n,
+    seconds:nominalTime,
+    time:fmt(nominalTime),
+    nominalTime:nominalTime,
+    attentiveAtCapture:attentiveS,
+    realAtCapture:performance.now(),
+    value:iv,
+    captured:true
+  });
+  if(S.beep)beep();
+}
+function finishRecording(){
+  S.timing.completed=true;
+  S.timing.recordingEndReal=performance.now();
+  stopRecordingTimer();
+  releaseWakeLock();
+  teardownVisibilityListener();
+  show(S.anomalies.length?"anomalies":"classify");
+}
+
+// ===== SCHEMA 3 POST-PROCESSING =====
+// Determine final per-sample data given the captured samples + visibility events
+function computeSchema3Data(){
+  var t=S.timing;
+  var startReal=t.recordingStartReal;
+  // Build a flat list of all 30 nominal samples
+  var samples=[];
+  // Build attentive timeline:
+  // For each visEvent, compute startAttentive and endAttentive (the attentive seconds at which it began/ended)
+  // Attentive seconds at a real-time R = (R - startReal - cumulativePauseMsBeforeR) / 1000
+  // We need cumulativePauseMs(R) = sum of vis durations + manual pause durations + modal pause durations that ENDED before R, plus partial of one in progress
+  // For simplicity, compute attentive boundaries by accumulating in chronological order
+  var allPauses=[];
+  t.visEvents.forEach(function(e){allPauses.push({type:"Visibility",startReal:e.startReal,endReal:e.endReal,durationMs:e.durationS*1000})});
+  t.pauses.forEach(function(p){allPauses.push({type:"Manual",startReal:p.startReal,endReal:p.endReal,durationMs:p.durationS*1000})});
+  // Modal pauses are not stored as discrete events because each is paired with its visibility event
+  // Total modal pause time IS captured in totalModalPauseTimeMs minus visibility hidden time
+  // Compute modal-specific time: totalModalPauseTimeMs - sum(visEvents)
+  var visTotalMs=t.visEvents.reduce(function(a,e){return a+e.durationS*1000},0);
+  // The modal display time shifted the timeline; we need to credit it to each visibility event's tail
+  // Approach: for each visibility event, its associated "modal hold" follows immediately after endReal
+  // But we didn't record the gap between vis-end and modal-resume separately.
+  // Pragmatic approach: extend each vis event's effective pause window by its share of modal time
+  // Better: compute cumulative pause directly from real-time markers. We know totalModalPauseTimeMs and which intervals were paused.
+  // For the per-sample calculation it's enough to know: at the moment the sample was captured, what was the attentive elapsed?
+  // We already STORED that on each captured sample (attentiveAtCapture). Use it directly.
+  
+  // But we still need to identify MISSED samples (those whose nominal time never reached capture)
+  // and for each sample, compute Vis Interrupt within its 10s attentive window
+  
+  var capturedCount=S.recs.length;
+  // For each nominal sample n in [1..30]
+  for(var n=1;n<=30;n++){
+    var rec=null;
+    if(n<=capturedCount)rec=S.recs[n-1];
+    var nominalTime=n*INTV;
+    var windowStart=nominalTime-INTV;
+    var windowEnd=nominalTime;
+    // For each visEvent, calculate the OVERLAP IN ATTENTIVE TIME with this sample's window
+    // Tricky: visEvents are stored as real-time. We need to convert.
+    // The simplest method: when a vis event happens, the attentive clock pauses, so the "vis event" doesn't occupy any attentive seconds itself.
+    // It occupies the attentive seconds JUST BEFORE the pause started, but only if an earlier sample already passed.
+    // Actually: the vis event happens at real-time T. The attentive elapsed at that moment is some value A. The vis event interrupts the attentive timeline: nothing happens for some real time, then attentive resumes.
+    // From the attentive perspective, the vis event is a point event at attentive-time A. It does NOT consume any attentive seconds.
+    // So how does it affect the per-sample window? It doesn't directly. The "Vis Interrupt" in the window means: how much real-clock time was the page hidden while the attentive clock was within this sample's window.
+    // For example: if sample N's window is attentive 110-120s, and a vis event began at attentive 115s and lasted 25s, then 5s into sample N's window the page went hidden.
+    // The remainder of sample N's window (115-120, 5s) is where we're "behind". On resume, the attentive clock continues from 115. So sample N's window REMAINING attentive time is 5s of post-resume time.
+    // But the page was hidden for 25s — does that count as "Vis Interrupt" within sample N's window?
+    // Conceptually yes: the surveyor was unavailable for 5s of the leading window AND the entire 25s hidden episode. The hidden episode straddles the boundary between attentive 115 (in sample N) and the resumption point (still attentive 115).
+    // For the methodology, what matters: was sample N capturable with attention? If hidden episode > 10s, the surveyor missed enough of the window that the methodology is compromised.
+    // Define Vis Interrupt for sample N as: (real seconds page was hidden during the attentive window 110-120 of sample N) + (real seconds page was hidden right at the end-boundary of sample N if vis became hidden at exactly attentive 120)
+    
+    // Practical approach: for each captured sample, compute the actual time window during which it was being observed.
+    // Sample N was captured at real-time t.realAtCapture. The window was the 10 real seconds before t.realAtCapture, MINUS any pauses within those 10s.
+    // Actually no — the window was 10 attentive seconds. So in real-time, it's possibly more if there were pauses.
+    // Window in real-time: from when attentive elapsed reached (n-1)*10 to when it reached n*10
+    
+    // Let's simplify: compute Vis Interrupt by checking each visEvent against this sample's real-time window
+    var realWindowStart=null,realWindowEnd=null;
+    if(rec){
+      realWindowEnd=rec.realAtCapture;
+      // realWindowStart = attentive (n-1)*10 reached. We don't have this stored directly.
+      // For samples N>1, prior captured sample's realAtCapture is a useful anchor — but only if that sample was at attentive (n-1)*10 exactly (it was, by design)
+      if(n>1&&S.recs[n-2]){
+        realWindowStart=S.recs[n-2].realAtCapture;
+      }else{
+        // Sample 1: window starts at recording start
+        realWindowStart=startReal;
+      }
+    }
+    
+    var visInterruptS=0;
+    if(realWindowStart!=null&&realWindowEnd!=null){
+      t.visEvents.forEach(function(ev){
+        var oStart=Math.max(realWindowStart,ev.startReal);
+        var oEnd=Math.min(realWindowEnd,ev.endReal);
+        if(oEnd>oStart)visInterruptS+=(oEnd-oStart)/1000;
+      });
+      // Cap at 10s (window is 10 attentive seconds)
+      if(visInterruptS>10)visInterruptS=10;
+    }
+    
+    // Compromised: window overlaps any visibility episode lasting >10s
+    var compromisedByOverlap=false;
+    if(realWindowStart!=null&&realWindowEnd!=null){
+      compromisedByOverlap=t.visEvents.some(function(ev){
+        return ev.durationS>10&&ev.startReal<realWindowEnd&&ev.endReal>realWindowStart;
+      });
+    }
+    
+    // MISSED detection (≤ rule applied to ATTENTIVE timing):
+    // Sample N is MISSED if: at the moment its nominal capture time should have fired, visibility was hidden
+    // OR if no record was captured for it (sample beyond what was captured).
+    // For simplicity: if rec is null, it's MISSED.
+    // If rec exists, check whether any vis episode straddled the moment of capture (visInterruptS at the boundary)
+    var missed=false;
+    if(!rec){
+      missed=true;
+    }else{
+      // Check if a vis episode included the capture moment
+      var captureWasDuringHidden=t.visEvents.some(function(ev){
+        return ev.startReal<=rec.realAtCapture&&rec.realAtCapture<=ev.endReal;
+      });
+      if(captureWasDuringHidden)missed=true;
+    }
+    
+    // Compute drift values
+    var actualTimeS=null,interTickDriftS=null,cumulativeDriftS=null,timingFlag=false;
+    if(rec){
+      actualTimeS=rec.attentiveAtCapture;
+      cumulativeDriftS=actualTimeS-nominalTime;
+      // Inter-tick drift: only computable if previous sample was also valid (not missed) and not separated by a manual pause
+      if(n>1){
+        var prev=S.recs[n-2];
+        if(prev){
+          // Was there a manual pause between prev.realAtCapture and rec.realAtCapture?
+          var pauseBetween=t.pauses.some(function(p){return p.startReal>prev.realAtCapture&&p.endReal<rec.realAtCapture});
+          if(!pauseBetween){
+            interTickDriftS=actualTimeS-prev.attentiveAtCapture-INTV;
+            if(Math.abs(interTickDriftS)>1.0)timingFlag=true;
+          }
+        }
+      }else{
+        // Sample 1's "previous" is recording start (attentive 0)
+        interTickDriftS=actualTimeS-INTV;
+        if(Math.abs(interTickDriftS)>1.0)timingFlag=true;
+      }
+    }
+    if(missed)timingFlag=true;
+    
+    samples.push({
+      n:n,
+      nominalTime:nominalTime,
+      time:fmt(nominalTime),
+      actualTimeS:missed?null:actualTimeS,
+      interTickDriftS:missed?null:interTickDriftS,
+      cumulativeDriftS:missed?null:cumulativeDriftS,
+      visInterruptS:visInterruptS,
+      visInterruptPct:visInterruptS/INTV*100,
+      intensity:missed?null:(rec?rec.value:null),
+      oStrength:missed?null:(rec?OL[rec.value]:null),
+      status:missed?"MISSED":"",
+      timingFlag:timingFlag,
+      compromised:missed||compromisedByOverlap
+    });
+  }
+  
+  // Compute summary aggregates
+  var compCount=samples.filter(function(s){return s.compromised}).length;
+  var missedCount=samples.filter(function(s){return s.status==="MISSED"}).length;
+  // Recording duration: actual end - actual start (wall clock)
+  var endReal=t.recordingEndReal||performance.now();
+  var recordingDurationS=(endReal-startReal)/1000;
+  // Overall drift: attentive elapsed at end - 300s
+  var attentiveEndS=(recordingDurationS*1000-t.totalManualPauseTimeMs-t.totalModalPauseTimeMs)/1000;
+  var overallDriftS=attentiveEndS-TOTAL;
+  // Total hidden time (visibility only)
+  var totalHiddenS=t.visEvents.reduce(function(a,e){return a+e.durationS},0);
+  var totalHiddenPct=recordingDurationS>0?(totalHiddenS/recordingDurationS*100):0;
+  // Pauses
+  var allPauseEntries=[];
+  // Build a chronologically sorted list of visibility + manual pauses
+  t.visEvents.forEach(function(e){allPauseEntries.push({type:"Visibility",startReal:e.startReal,endReal:e.endReal,durationS:e.durationS})});
+  t.pauses.forEach(function(p){allPauseEntries.push({type:"Manual",startReal:p.startReal,endReal:p.endReal,durationS:p.durationS})});
+  allPauseEntries.sort(function(a,b){return a.startReal-b.startReal});
+  
+  // Timing Status
+  var timingStatus="OK";
+  if(Math.abs(overallDriftS)>10&&compCount>0)timingStatus="Drift detected; compromised";
+  else if(Math.abs(overallDriftS)>10)timingStatus="Drift detected";
+  else if(compCount>0)timingStatus="Compromised";
+  
+  return {
+    samples:samples,
+    compCount:compCount,
+    missedCount:missedCount,
+    recordingDurationS:recordingDurationS,
+    overallDriftS:overallDriftS,
+    overallDriftPct:overallDriftS/TOTAL*100,
+    visibilityInterruptions:t.visEvents.length,
+    totalHiddenS:totalHiddenS,
+    totalHiddenPct:totalHiddenPct,
+    manualPauseTimeS:t.totalManualPauseTimeMs/1000,
+    pauseCount:allPauseEntries.length,
+    pauseEntries:allPauseEntries,
+    timingStatus:timingStatus,
+    iaqmAvailable:compCount===0
+  };
+}
+
+// ===== MODALS =====
+var activeModalEl=null;
+function dismissModal(){
+  if(activeModalEl){activeModalEl.remove();activeModalEl=null}
+}
+function showModalHTML(html){
+  dismissModal();
+  var ov=document.createElement("div");ov.className="modal-overlay";
+  ov.innerHTML=html;
+  document.body.appendChild(ov);
+  activeModalEl=ov;
+  return ov;
+}
+
+// Live abort modal — fires when visibility returns and threshold crossed
+function fireLiveAbortModal(hiddenDurationS){
+  // Pause recording while modal shown
+  pauseRecordingForModal();
+  var t=S.timing;
+  // Estimate compromised samples so far
+  var compEstimate=t.visEvents.filter(function(e){return e.durationS>10}).length;
+  // Crude approximation: each >10s episode probably compromises ~ceil(durationS/10) samples
+  var estSamples=t.visEvents.filter(function(e){return e.durationS>10}).reduce(function(a,e){return a+Math.ceil(e.durationS/INTV)},0);
+  if(!estSamples)estSamples=Math.ceil(hiddenDurationS/INTV);
+  var html='<div class="modal">'
+    +'<h3 class="danger">Survey may be compromised</h3>'
+    +'<p>The app was hidden for <strong>'+hiddenDurationS.toFixed(1)+' seconds</strong> during recording. Approximately <strong>'+estSamples+' sample'+(estSamples===1?"":"s")+'</strong> were captured while you weren\'t viewing the screen, which may affect data quality.</p>'
+    +'<div class="pause-note"><strong>Recording is paused while you decide</strong> &mdash; take a moment. Continuing will resume recording from this point and save the survey with affected samples flagged in the CSV. Aborting discards the recording and returns to the setup screen.</div>'
+    +'<div class="opts"><button class="btn-secondary" id="lam-abort">Abort and restart</button><button class="btn" id="lam-cont">Continue anyway</button></div>'
+    +'</div>';
+  showModalHTML(html);
+  document.getElementById("lam-cont").onclick=function(){
+    // Reset cumulative-since-modal so the threshold can fire again on a NEW interruption
+    S.timing.cumulativeHiddenSinceLastModalS=0;
+    dismissModal();
+    resumeRecordingFromModal();
+  };
+  document.getElementById("lam-abort").onclick=function(){
+    dismissModal();
+    abortRecording();
+  };
+}
+function abortRecording(){
+  S.timing.completed=true;
+  stopRecordingTimer();
+  releaseWakeLock();
+  teardownVisibilityListener();
+  S=newSession();
+  show("setup");
+}
+
+// IAQM N/A modal — fires on entering results when compromised samples exist
+function fireIAQMNAModal(s3){
+  var compromised=s3.samples.filter(function(s){return s.compromised});
+  var listHtml=compromised.slice(0,3).map(function(s){return"<li>Sample "+s.n+" ("+s.time+")</li>"}).join("");
+  if(compromised.length>3)listHtml+='<li style="font-style:italic">and '+(compromised.length-3)+' more</li>';
+  // Cause line
+  var cause;
+  if(s3.totalHiddenS>0&&Math.abs(s3.overallDriftS)>10){
+    cause="The app was hidden for "+s3.totalHiddenS.toFixed(0)+"s and the timer drifted "+(s3.overallDriftS>=0?"+":"")+s3.overallDriftS.toFixed(0)+"s during recording.";
+  }else if(s3.totalHiddenS>0){
+    cause="The app was hidden for "+s3.totalHiddenS.toFixed(0)+" seconds during recording ("+s3.visibilityInterruptions+" visibility interruption"+(s3.visibilityInterruptions===1?"":"s")+").";
+  }else{
+    cause="The device timer drifted significantly during recording (overall drift "+(s3.overallDriftS>=0?"+":"")+s3.overallDriftS.toFixed(0)+"s).";
+  }
+  var html='<div class="modal">'
+    +'<h3 class="danger">IAQM calculation unavailable</h3>'
+    +'<p>This survey cannot produce a complete IAQM result because <strong>'+s3.compCount+' sample'+(s3.compCount===1?"":"s")+'</strong> were missed:</p>'
+    +'<ul>'+listHtml+'</ul>'
+    +'<div class="cause">Cause: '+esc(cause)+'</div>'
+    +'<p><strong>Save for post-processing</strong> &mdash; save with IAQM fields marked N/A. The valid samples and all conditions data are preserved. An experienced surveyor can review the CSV and compute a revised IAQM result manually if appropriate.</p>'
+    +'<p><strong>Re-survey</strong> &mdash; discard this recording and return to the setup screen.</p>'
+    +'<div class="opts"><button class="btn-secondary" id="iam-resurvey">Re-survey</button><button class="btn" id="iam-save">Save for post-processing</button></div>'
+    +'</div>';
+  showModalHTML(html);
+  document.getElementById("iam-save").onclick=function(){dismissModal()};
+  document.getElementById("iam-resurvey").onclick=function(){
+    dismissModal();
+    S=newSession();
+    show("setup");
+  };
+}
+
+// Skip confirmation modal
+function fireSkipConfirmModal(){
+  var captured=S.recs.length;
+  var html='<div class="modal">'
+    +'<h3 class="warn">Skip remaining samples?</h3>'
+    +'<p>The survey will jump to the results screen with the <strong>'+captured+' sample'+(captured===1?"":"s")+'</strong> captured so far. IAQM calculation requires all 30 samples &mdash; partial surveys will show N/A.</p>'
+    +'<div class="opts"><button class="btn-secondary" id="sk-cancel">Cancel</button><button class="btn-danger" id="sk-go">Skip to results</button></div>'
+    +'</div>';
+  showModalHTML(html);
+  document.getElementById("sk-cancel").onclick=function(){dismissModal()};
+  document.getElementById("sk-go").onclick=function(){
+    dismissModal();
+    S.timing.completed=true;
+    stopRecordingTimer();
+    releaseWakeLock();
+    teardownVisibilityListener();
+    S.timing.recordingEndReal=performance.now();
+    show(S.anomalies.length?"anomalies":"classify");
+  };
+}
+
+// Manual pause overlay
+var pauseOverlayEl=null,pauseOverlayInterval=null;
+function showManualPauseOverlay(){
+  pauseRecordingManually();
+  var ov=document.createElement("div");ov.className="pause-overlay";
+  ov.innerHTML='<div class="pause-card">'
+    +'<h3>Recording Paused</h3>'
+    +'<div class="pause-time" id="pause-time">0:00</div>'
+    +'<p>Recording will resume from where you left off when you tap Resume. Samples already captured are preserved.</p>'
+    +'<div class="opts"><button class="btn" id="pr-resume">Resume Recording</button><button class="btn-ghost" id="pr-end">End Survey</button></div>'
+    +'</div>';
+  document.body.appendChild(ov);
+  pauseOverlayEl=ov;
+  var startReal=S.timing.manualPauseStartReal;
+  pauseOverlayInterval=setInterval(function(){
+    var el=document.getElementById("pause-time");
+    if(!el)return;
+    var sec=Math.floor((performance.now()-startReal)/1000);
+    el.textContent=Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0");
+  },500);
+  document.getElementById("pr-resume").onclick=hideManualPauseOverlay;
+  document.getElementById("pr-end").onclick=function(){
+    hideManualPauseOverlay(true);
+    S.timing.completed=true;
+    stopRecordingTimer();
+    releaseWakeLock();
+    teardownVisibilityListener();
+    S.timing.recordingEndReal=performance.now();
+    show(S.anomalies.length?"anomalies":"classify");
+  };
+}
+function hideManualPauseOverlay(skipResume){
+  if(pauseOverlayInterval){clearInterval(pauseOverlayInterval);pauseOverlayInterval=null}
+  if(pauseOverlayEl){pauseOverlayEl.remove();pauseOverlayEl=null}
+  if(!skipResume)resumeRecordingManually();
+}
+
+// ===== FOOTER LINKS =====
+function docLinksHTML(currentDoc){
+  var links=[];
+  if(currentDoc!=="ug")links.push('<a href="'+DOC_USER_GUIDE+'" target="_blank" rel="noopener">User Guide</a>');
+  if(currentDoc!=="tp")links.push('<a href="'+DOC_TECHNICAL+'" target="_blank" rel="noopener">Technical Paper</a>');
+  if(currentDoc!=="pe")links.push('<a href="'+DOC_PLAIN+'" target="_blank" rel="noopener">Plain English Guide</a>');
+  return '<div class="doc-links">'+links.join('<span>&middot;</span>')+'</div>';
+}
+
+// ===== PHASE RENDERING =====
+var app=document.getElementById("app");
 function show(phase){
   app.innerHTML="";
   var d=document.createElement("div");d.className="screen";
@@ -261,7 +874,8 @@ function show(phase){
     +'<div class="opt'+(S.sens==="High"?" req-filled":(!S.sens?" req-empty":""))+'" data-v="High"><div class="t">High</div><div class="d">'+RI.High+'</div></div>'
     +'<div class="opt'+(S.sens==="Medium"?" req-filled":(!S.sens?" req-empty":""))+'" data-v="Medium"><div class="t">Medium</div><div class="d">'+RI.Medium+'</div></div>'
     +'<div class="opt'+(S.sens==="Low"?" req-filled":(!S.sens?" req-empty":""))+'" data-v="Low"><div class="t">Low</div><div class="d">'+RI.Low+'</div></div></div>'
-    +'<button class="btn" id="nxt"'+((S.sens&&S.surveyor.trim()&&S.loc.trim())?'':' disabled')+'>Next</button>';
+    +'<button class="btn" id="nxt"'+((S.sens&&S.surveyor.trim()&&S.loc.trim())?'':' disabled')+'>Next</button>'
+    +docLinksHTML(null);
     app.appendChild(d);
     wireReqFields(d);
     function updNxt(){var b=document.getElementById("nxt");b.disabled=!(S.sens&&S.surveyor.trim()&&S.loc.trim())}
@@ -315,27 +929,25 @@ function show(phase){
       if(!ws)missing.push("Wind Strength");
       if(!cc)missing.push("Cloud Cover");
       if(missing.length){msg.innerHTML="Need: "+missing.join(", ");msg.style.color="var(--warning)";return}
-      var lat=S.gps?S.gps.lat:54.0,lng=S.gps?S.gps.lng:-2.0;  // UK centre fallback
+      var lat=S.gps?S.gps.lat:54.0,lng=S.gps?S.gps.lng:-2.0;
       var when=new Date();
       var pg=derivePG(when,lat,lng,ws,cc);
       if(!pg){msg.innerHTML="Could not derive";msg.style.color="var(--warning)";return}
       S.met.stability=pg;
-      // Update the dropdown directly so the rationale message persists (show() would wipe it)
       var stSel=document.getElementById("st");
       if(stSel){stSel.value=pg;updateReqState(stSel)}
       var el=solarElevation(when,lat,lng);
       var dayNight=el>3?"Day":"Night";
       var elNote=el>3?" (sun "+Math.round(el)+"\u00b0)":" (sun below horizon)";
       var ms=bfToMs(ws);
-      var cloudShort=cc.split(" \u2014 ")[0];  // "Partly cloudy", "Clear", etc.
-      var bfName=ws.split(" - ")[1]||ws;  // "Gentle breeze" from "3 - Gentle breeze"
+      var cloudShort=cc.split(" \u2014 ")[0];
+      var bfName=ws.split(" - ")[1]||ws;
       msg.innerHTML='<strong style="color:var(--success)">\u2192 '+pg+'</strong><br>'
         +'<span style="color:var(--text-mute)">'+dayNight+elNote+' &middot; '+bfName+' (~'+ms+' m/s) &middot; '+cloudShort+(S.gps?' &middot; GPS':' &middot; approx UK location (GPS captured at Recording Start)')+'</span>';
     };
     document.getElementById("bk").onclick=function(){save();show("setup")};
     document.getElementById("go").onclick=function(){
       save();
-      // Mandatory: windDir, windStr, stability, rainfall, temp, cloud
       var missing=[];
       if(!S.met.windDir)missing.push("Wind Direction");
       if(!S.met.windStr)missing.push("Wind Strength");
@@ -348,15 +960,16 @@ function show(phase){
         return;
       }
       unlockAudio();
-      // GPS request — informed-choice flow (handled in startRec)
       startRec();
     };
   }
 
   else if(phase==="recording"){
-    // Build skeleton once; only the dynamic bits get painted on each tick / slider move.
     d.innerHTML=
-      '<div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:.4rem;min-height:1.4rem"><button class="btn-ghost" id="skip" style="padding:.3rem .7rem;font-size:.5rem;width:auto;opacity:.45">\u23e9 Skip</button></div>'
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;min-height:1.4rem">'
+        +'<button class="btn-pause" id="pause-btn" aria-label="Pause recording"><span class="btn-pause-icon"></span><span>Pause</span></button>'
+        +'<button class="btn-skip-invisible" id="skip" aria-label="Skip">.</button>'
+      +'</div>'
       +'<div style="font-size:.7rem;letter-spacing:.25em;color:var(--text-faint);text-transform:uppercase;margin-bottom:.6rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
       +'<div id="rt" style="font-size:3rem;font-weight:200;line-height:1"></div>'
       +'<div id="rs" style="font-size:1.05rem;font-weight:400;margin-top:.25rem;margin-bottom:.15rem"></div>'
@@ -386,18 +999,15 @@ function show(phase){
       +'<p id="rcnt" style="color:var(--text-faint);font-size:.65rem;margin-top:.8rem;letter-spacing:.1em"></p>';
     app.appendChild(d);
 
-    // Anomaly flag handler — debounce so a double-tap counts as 1
     var flagBtn=document.getElementById("flagcol");
     var lastFlagAt=0;
     function flag(){
       var now=Date.now();
-      if(now-lastFlagAt<400)return;  // debounce double-taps within 400ms
+      if(now-lastFlagAt<400)return;
       lastFlagAt=now;
       var sec=S.tick;
       S.anomalies.push({tick:sec,time:fmt(sec),value:Math.round(S.slider),note:""});
-      // Full-screen flash for unmistakable confirmation in field conditions
       flashScreen();
-      // Brief border highlight on the button itself
       flagBtn.style.borderColor="var(--danger)";
       flagBtn.style.background="rgba(220,38,38,.08)";
       setTimeout(function(){flagBtn.style.borderColor="var(--border-strong)";flagBtn.style.background="var(--bg-alt)"},350);
@@ -406,7 +1016,6 @@ function show(phase){
     flagBtn.onclick=flag;
     flagBtn.ontouchstart=function(e){e.preventDefault();flag()};
 
-    // Static number column (text never changes; only colour/weight on paint)
     var nc=document.getElementById("rnumcol");
     [6,5,4,3,2,1,0].forEach(function(v){var sp=document.createElement("span");sp.dataset.v=v;sp.textContent=v;nc.appendChild(sp)});
 
@@ -467,15 +1076,8 @@ function show(phase){
     track.ontouchmove=function(e){e.preventDefault();ptr(e.touches[0].clientY)};
 
     document.getElementById("beeptog").onclick=function(){S.beep=!S.beep;if(S.beep)unlockAudio();paint()};
-    document.getElementById("skip").onclick=function(){
-      if(!confirm("Skip to end? Remaining samples will be filled with the current intensity."))return;
-      clearInterval(S.timer);
-      releaseWakeLock();
-      var tot=TOTAL/INTV;
-      while(S.recs.length<tot){var sec=(S.recs.length+1)*INTV;S.recs.push({time:fmt(sec),seconds:sec,value:Math.round(S.slider)})}
-      S.secsLeft=0;
-      show(S.anomalies.length?"anomalies":"classify");
-    };
+    document.getElementById("pause-btn").onclick=showManualPauseOverlay;
+    document.getElementById("skip").onclick=fireSkipConfirmModal;
   }
 
   else if(phase==="anomalies"){
@@ -573,10 +1175,17 @@ function show(phase){
   }
 
   else if(phase==="results"){
-    var im=0,cnt=S.recs.length;if(cnt){im=Math.round(S.recs.reduce(function(a,r){return a+r.value},0)/cnt)}
-    var c4=S.recs.filter(function(r){return r.value>=4}).length;
-    var tp=cnt?Math.round(c4/cnt*100):0;
-    var exp=gExp(im,tp),eff=gEff(exp,S.sens),ec=gEC(eff);
+    var s3=computeSchema3Data();
+    var validRecs=s3.samples.filter(function(s){return s.intensity!=null});
+    var im=null,tp=null,exp="N/A",eff="N/A",ec="#64748b";
+    if(s3.iaqmAvailable&&validRecs.length>0){
+      im=Math.round(validRecs.reduce(function(a,s){return a+s.intensity},0)/validRecs.length);
+      var c4=validRecs.filter(function(s){return s.intensity>=4}).length;
+      tp=Math.round(c4/validRecs.length*100);
+      exp=gExp(im,tp);
+      eff=gEff(exp,S.sens);
+      ec=gEC(eff);
+    }
     var m=S.met;
     var metHtml='';
     if(m.windDir)metHtml+='Wind: '+m.windDir+' '+m.windStr+' &nbsp;';
@@ -589,12 +1198,20 @@ function show(phase){
     var descMean=S.desc.length?(S.desc.reduce(function(a,d){return a+d.s},0)/S.desc.length):null;
     var descScore=S.desc.length?'<div style="font-size:.62rem;color:'+(descMean>=0?"var(--success)":"var(--danger-light)")+'">'+(descMean>0?"+":"")+descMean.toFixed(2)+(S.desc.length>1?' mean':'')+'</div>':'';
     var otherDisp=S.otherDesc?'<div style="font-size:.7rem;color:var(--text-mute);margin-top:.2rem;font-style:italic">'+esc(S.otherDesc)+'</div>':'';
-    var trows=S.recs.map(function(r){return'<tr><td style="color:var(--text-mute)">'+r.time+'</td><td style="text-align:center;color:'+(r.value>=4?"#f59e0b":"var(--text)")+';font-weight:500">'+r.value+'</td><td style="text-align:right;color:var(--text-dim);font-size:.62rem">'+OL[r.value]+'</td></tr>'}).join("");
+    var trows=s3.samples.map(function(s){
+      if(s.status==="MISSED"){
+        return '<tr style="background:#fef2f2"><td style="color:#991b1b">'+s.time+'</td><td style="text-align:center;color:#991b1b;font-weight:600">\u2014</td><td style="text-align:right;color:#991b1b;font-size:.62rem">MISSED</td></tr>';
+      }
+      var compStyle=s.compromised?'background:#fff7ed;':'';
+      return '<tr style="'+compStyle+'"><td style="color:var(--text-mute)">'+s.time+'</td><td style="text-align:center;color:'+(s.intensity>=4?"#f59e0b":"var(--text)")+';font-weight:500">'+s.intensity+'</td><td style="text-align:right;color:var(--text-dim);font-size:.62rem">'+s.oStrength+'</td></tr>';
+    }).join("");
+    var driftBanner=s3.timingStatus!=="OK"?'<div class="drift-banner">Timing variation detected during recording &mdash; see CSV for details ('+s3.timingStatus+')</div>':'';
     d.innerHTML='<div class="tag" style="margin-bottom:.2rem">Session Complete</div>'
     +'<div style="font-size:.7rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:1rem">'+esc(S.loc)+' &middot; '+S.sens+' sensitivity</div>'
+    +driftBanner
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem">'
-    +'<div class="card"><div class="card-lbl">Avg Intensity (I<sub style="font-size:.7em">mean</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+im+'</div><div style="font-size:.62rem;color:var(--text-dim)">'+(OL[im]||'\u2014')+'</div></div>'
-    +'<div class="card"><div class="card-lbl">Odour Time (t<sub style="font-size:.7em">\u22654</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+tp+'%</div><div style="font-size:.62rem;color:var(--text-dim)">'+c4+' of '+cnt+' samples</div></div>'
+    +'<div class="card"><div class="card-lbl">Avg Intensity (I<sub style="font-size:.7em">mean</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+(im!=null?im:"N/A")+'</div><div style="font-size:.62rem;color:var(--text-dim)">'+(im!=null?(OL[im]||"\u2014"):"compromised")+'</div></div>'
+    +'<div class="card"><div class="card-lbl">Odour Time (t<sub style="font-size:.7em">\u22654</sub>)</div><div style="font-size:1.3rem;font-weight:300;color:var(--text)">'+(tp!=null?tp+"%":"N/A")+'</div><div style="font-size:.62rem;color:var(--text-dim)">'+(tp!=null?(validRecs.filter(function(s){return s.intensity>=4}).length+" of "+validRecs.length+" samples"):s3.compCount+" compromised")+'</div></div>'
     +'<div class="card"><div class="card-lbl">Odour Exposure</div><div style="font-size:.9rem;font-weight:500;color:var(--text);margin-top:.15rem">'+exp+'</div></div>'
     +'<div class="card" style="background:'+ec+'15;border-color:'+ec+'44"><div class="card-lbl">Odour Effect</div><div style="font-size:.95rem;font-weight:600;color:'+ec+';margin-top:.15rem">'+eff+'</div></div></div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem">'
@@ -608,83 +1225,12 @@ function show(phase){
     document.getElementById("fn").oninput=function(e){S.fileName=e.target.value};
     document.getElementById("dl").onclick=function(){
       S.fileName=document.getElementById("fn").value;
-      // Quote any value containing a comma, quote, or newline (RFC 4180)
-      function q(v){if(v==null)return"";v=String(v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
-      function row(label,value){return label+","+q(value)+"\n"}
-      var descriptorList=S.desc.map(function(d){return d.d}).join(", ");
-      var scoreList=S.desc.map(function(d){return d.s.toFixed(2)}).join(", ");
-      var meanScore=S.desc.length?(S.desc.reduce(function(a,d){return a+d.s},0)/S.desc.length).toFixed(2):"";
-      // Build set of seconds that were flagged for the per-sample Anomaly column
-      var flaggedSecs={};
-      S.anomalies.forEach(function(a){
-        // Tag the sample whose 10s window contains the flag
-        var sampleSec=Math.ceil(a.tick/INTV)*INTV;
-        if(sampleSec===0)sampleSec=INTV;
-        flaggedSecs[sampleSec]=true;
-      });
-      var h="Time,Seconds,Intensity,Odour Strength,Anomaly\n";
-      var rows=S.recs.map(function(r){return r.time+","+r.seconds+","+r.value+","+q(OL[r.value])+","+(flaggedSecs[r.seconds]?"true":"")}).join("\n");
-      var sm="\n\nSummary\n"
-        +row("App Version",APP_VERSION)
-        +row("Schema",SCHEMA_VERSION)
-        +row("Date",S.startedAt?fmtDateCSV(S.startedAt):"")
-        +row("Time",S.startedAt?fmtTimeCSV(S.startedAt):"")
-        +row("Surveyor",S.surveyor)
-        +row("Location",S.loc)
-        +row("Latitude",S.gps?S.gps.lat.toFixed(6):"")
-        +row("Longitude",S.gps?S.gps.lng.toFixed(6):"")
-        +row("GPS Accuracy (m)",S.gps?Math.round(S.gps.acc):"")
-        +row("Receptor Sensitivity",S.sens)
-        +row("Average Intensity (Imean)",im)
-        +row("Percentage Odour Time (t>=4)",tp+"%")
-        +row("Odour Exposure",exp)
-        +row("Odour Effect",eff)
-        +row("Dominant Hedonic Tone",S.hedonic)
-        +row("Hedonic Tone Varied",S.hedonicVaried?"Yes":"No")
-        +row("Variation Description",S.hedonicVariation||"")
-        +row("Odour Descriptors",descriptorList)
-        +row("Hedonic Scores",scoreList)
-        +row("Mean Hedonic Score",meanScore)
-        +row("Additional Description",S.otherDesc||"")
-        +"\nMeteorological Conditions\n"
-        +row("Wind Direction",m.windDir)
-        +row("Wind Strength",m.windStr)
-        +row("Cloud Cover",m.cloud)
-        +row("Atmospheric Stability",m.stability)
-        +row("Rainfall",m.rainfall)
-        +row("Temperature (C)",m.temp)
-        +row("Humidity (%)",m.humidity)
-        +row("Barometric Pressure (hPa)",m.pressure)
-        +"\nSite Operations\n"
-        +row("On-site activities",S.siteOps)
-        +row("Surrounding area",S.surroundOps);
-      if(S.anomalies.length){
-        sm+="\nAnomalies\nFlag,Time,Intensity,Note\n"
-          +S.anomalies.map(function(a,i){return(i+1)+","+a.time+","+a.value+","+q(a.note||"")}).join("\n")
-          +"\n";
-      }
-      var csv=h+rows+sm;
-      var fname=(S.fileName||"session")+".csv";
-      // Web Share API only on mobile (iOS / Android). On desktop we want the standard download dialog.
-      var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-      if(isMobile){
-        try{
-          if(typeof File!=="undefined"&&navigator.canShare){
-            var file=new File([csv],fname,{type:"text/csv"});
-            if(navigator.canShare({files:[file]})){
-              navigator.share({files:[file],title:fname}).then(function(){show("done")}).catch(function(){});
-              return;
-            }
-          }
-        }catch(e){}
-      }
-      // Fallback for desktop / Android / older iOS
-      var blob=new Blob([csv],{type:"text/csv"});
-      var u=URL.createObjectURL(blob),a=document.createElement("a");
-      a.href=u;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
-      setTimeout(function(){URL.revokeObjectURL(u)},100);
-      show("done");
+      generateAndDownloadCSV(s3,im,tp,exp,eff);
     };
+    // Fire IAQM N/A modal if compromised
+    if(s3.compCount>0){
+      setTimeout(function(){fireIAQMNAModal(s3)},250);
+    }
   }
 
   else if(phase==="done"){
@@ -692,46 +1238,33 @@ function show(phase){
     +'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--success)"><polyline points="20 6 9 17 4 12"/></svg></div>'
     +'<div style="font-size:.75rem;letter-spacing:.35em;text-transform:uppercase;color:var(--success);margin-bottom:.4rem">Saved</div>'
     +'<p style="color:var(--text-dim);font-size:.92rem;margin-bottom:2rem">'+esc(S.fileName)+'.csv saved</p>'
-    +'<button class="btn-ghost" id="rst">New Session</button>';
+    +'<button class="btn-ghost" id="rst">New Session</button>'
+    +docLinksHTML(null);
     app.appendChild(d);
-    document.getElementById("rst").onclick=function(){sc++;S={surveyor:loadSurveyor(),loc:"Location "+sc,sens:null,met:{windDir:"",windStr:"",stability:"",pressure:"",rainfall:"",temp:"",humidity:"",cloud:""},siteOps:"",surroundOps:"",recs:[],anomalies:[],slider:0,hedonic:null,hedonicVaried:false,hedonicVariation:"",desc:[],descSearch:"",otherDesc:"",fileName:"",beep:true,timer:null,tick:0,secsLeft:TOTAL,sub:INTV,gps:null,wakeLock:null};show("setup")};
+    document.getElementById("rst").onclick=function(){sc++;S=newSession();show("setup")};
   }
 }
 
-function acquireWakeLock(){
-  try{
-    if("wakeLock" in navigator){
-      navigator.wakeLock.request("screen").then(function(wl){
-        S.wakeLock=wl;
-        wl.addEventListener("release",function(){});
-      }).catch(function(){});
-    }
-  }catch(e){}
-}
-function releaseWakeLock(){try{if(S.wakeLock){S.wakeLock.release();S.wakeLock=null}}catch(e){}}
-
+// ===== START RECORDING =====
 function startRec(){
-  // GPS first (informed choice). Proceed regardless of outcome but record what happened.
   function go(){
     S.startedAt=new Date();
     S.recs=[];S.anomalies=[];S.slider=0;S.secsLeft=TOTAL;S.sub=INTV;S.tick=0;
     S.fileName=S.loc+" "+fmtFileStamp(S.startedAt);
+    S.timing=newTimingState();
+    S.timing.recordingStartReal=performance.now();
     acquireWakeLock();
+    setupVisibilityListener();
     show("recording");
-    S.timer=setInterval(function(){
-      S.tick++;S.secsLeft=TOTAL-S.tick;
-      S.sub=INTV-(S.tick%INTV);if(S.sub===INTV&&S.tick%INTV!==0){}else if(S.sub===INTV){S.sub=0}
-      if(S.beep&&(S.sub===3||S.sub===2||S.sub===1))pip();
-      if(S.tick%INTV===0){S.recs.push({time:fmt(S.tick),seconds:S.tick,value:Math.round(S.slider)});S.sub=INTV;if(S.beep)beep()}
-      if(S.secsLeft<=0){clearInterval(S.timer);releaseWakeLock();show(S.anomalies.length?"anomalies":"classify")}
-      else if(S._paint)S._paint();
-    },1000);
+    // Wait for the DOM to render then start the timer
+    requestAnimationFrame(function(){
+      startRecordingTimer();
+    });
   }
   if(!navigator.geolocation){
     if(confirm("GPS not available on this device. Continue without coordinates?"))go();
     return;
   }
-  // Show a brief "acquiring GPS" state by replacing button text. We're still on conditions screen.
   var btn=document.getElementById("go");
   if(btn){btn.disabled=true;btn.textContent="Acquiring GPS\u2026"}
   navigator.geolocation.getCurrentPosition(
@@ -748,9 +1281,137 @@ function startRec(){
   );
 }
 
-function opts(arr,sel){return'<option value="">Select...</option>'+arr.map(function(v){return'<option value="'+esc(v)+'"'+(v===sel?' selected':'')+'>'+esc(v)+'</option>'}).join("")}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function gi(id){var el=document.getElementById(id);return el?el.value:""}
+// ===== CSV GENERATION =====
+function generateAndDownloadCSV(s3,im,tp,exp,eff){
+  var m=S.met;
+  function q(v){if(v==null)return"";v=String(v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+  function row(label,value){return label+","+q(value)+"\n"}
+  function num(v,decimals){if(v==null)return"";return Number(v).toFixed(decimals!=null?decimals:2)}
+  function sgn(v,decimals){if(v==null)return"";var d=decimals!=null?decimals:2;return (v>=0?"+":"")+v.toFixed(d)}
+  function pct(v,decimals){if(v==null)return"";var d=decimals!=null?decimals:2;return (v>=0?"+":"")+v.toFixed(d)+"%"}
+  function tStr(realMs){
+    // Convert real ms (since recording start) to mm:ss using real timeline
+    var s=Math.floor(realMs/1000);
+    return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+  }
+
+  var descriptorList=S.desc.map(function(d){return d.d}).join(", ");
+  var scoreList=S.desc.map(function(d){return d.s.toFixed(2)}).join(", ");
+  var meanScore=S.desc.length?(S.desc.reduce(function(a,d){return a+d.s},0)/S.desc.length).toFixed(2):"";
+  var flaggedSecs={};
+  S.anomalies.forEach(function(a){
+    var sampleSec=Math.ceil(a.tick/INTV)*INTV;
+    if(sampleSec===0)sampleSec=INTV;
+    flaggedSecs[sampleSec]=true;
+  });
+
+  // Per-sample table with 12 columns (Schema 3)
+  var h="Time,Seconds,Actual Time (s),Inter-tick Drift (s),Cumulative Drift (s),Vis Interrupt (s),Vis Interrupt (%),Intensity,Odour Strength,Status,Timing Flag,Anomaly\n";
+  var rows=s3.samples.map(function(s){
+    return [
+      s.time,
+      s.nominalTime,
+      s.actualTimeS!=null?num(s.actualTimeS,2):"",
+      s.interTickDriftS!=null?sgn(s.interTickDriftS,2):"",
+      s.cumulativeDriftS!=null?sgn(s.cumulativeDriftS,2):"",
+      num(s.visInterruptS,1),
+      num(s.visInterruptPct,0)+"%",
+      s.intensity!=null?s.intensity:"",
+      s.oStrength!=null?q(s.oStrength):"",
+      s.status,
+      s.timingFlag?"true":"",
+      flaggedSecs[s.nominalTime]?"true":""
+    ].join(",");
+  }).join("\n");
+
+  // Summary block
+  var sm="\n\nSummary\n"
+    +row("App Version",APP_VERSION)
+    +row("Schema",SCHEMA_VERSION)
+    +row("Date",S.startedAt?fmtDateCSV(S.startedAt):"")
+    +row("Time",S.startedAt?fmtTimeCSV(S.startedAt):"")
+    +row("Timezone",getTimezone())
+    +row("Surveyor",S.surveyor)
+    +row("Location",S.loc)
+    +row("Latitude",S.gps?S.gps.lat.toFixed(6):"")
+    +row("Longitude",S.gps?S.gps.lng.toFixed(6):"")
+    +row("GPS Accuracy (m)",S.gps?Math.round(S.gps.acc):"")
+    +row("Receptor Sensitivity",S.sens)
+    +row("Average Intensity (Imean)",im!=null?im:"N/A")
+    +row("Percentage Odour Time (t>=4)",tp!=null?tp+"%":"N/A")
+    +row("Odour Exposure",exp)
+    +row("Odour Effect",eff)
+    +row("Dominant Hedonic Tone",S.hedonic)
+    +row("Hedonic Tone Varied",S.hedonicVaried?"Yes":"No")
+    +row("Variation Description",S.hedonicVariation||"")
+    +row("Odour Descriptors",descriptorList)
+    +row("Hedonic Scores",scoreList)
+    +row("Mean Hedonic Score",meanScore)
+    +row("Additional Description",S.otherDesc||"")
+    +row("Recording Duration (s)",num(s3.recordingDurationS,1))
+    +row("Overall Drift (s)",sgn(s3.overallDriftS,2))
+    +row("Overall Drift (%)",pct(s3.overallDriftPct,2))
+    +row("Visibility Interruptions",s3.visibilityInterruptions)
+    +row("Total Hidden Time (s)",num(s3.totalHiddenS,1))
+    +row("Total Hidden Time (%)",num(s3.totalHiddenPct,2)+"%")
+    +row("Compromised Samples",s3.compCount)
+    +row("MISSED Samples",s3.missedCount)
+    +row("Pauses",s3.pauseCount)
+    +row("Manual Pause Time (s)",num(s3.manualPauseTimeS,1))
+    +row("Timing Status",s3.timingStatus)
+    +row("Device",getDeviceFingerprint());
+
+  // Met conditions block
+  sm+="\nMeteorological Conditions\n"
+    +row("Wind Direction",m.windDir)
+    +row("Wind Strength",m.windStr)
+    +row("Cloud Cover",m.cloud)
+    +row("Atmospheric Stability",m.stability)
+    +row("Rainfall",m.rainfall)
+    +row("Temperature (C)",m.temp)
+    +row("Humidity (%)",m.humidity)
+    +row("Barometric Pressure (hPa)",m.pressure)
+    +"\nSite Operations\n"
+    +row("On-site activities",S.siteOps)
+    +row("Surrounding area",S.surroundOps);
+
+  // Pauses block (only if any)
+  if(s3.pauseEntries.length){
+    sm+="\nPauses\nPause #,Trigger,Pause Time,Resume Time,Duration (s)\n";
+    sm+=s3.pauseEntries.map(function(p,i){
+      var startMs=p.startReal-S.timing.recordingStartReal;
+      var endMs=p.endReal-S.timing.recordingStartReal;
+      return [(i+1),p.type,tStr(startMs),tStr(endMs),num(p.durationS,1)].join(",");
+    }).join("\n")+"\n";
+  }
+
+  // Anomalies block (only if any)
+  if(S.anomalies.length){
+    sm+="\nAnomalies\nFlag,Time,Intensity,Note\n"
+      +S.anomalies.map(function(a,i){return(i+1)+","+a.time+","+a.value+","+q(a.note||"")}).join("\n")
+      +"\n";
+  }
+
+  var csv=h+rows+sm;
+  var fname=(S.fileName||"session")+".csv";
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  if(isMobile){
+    try{
+      if(typeof File!=="undefined"&&navigator.canShare){
+        var file=new File([csv],fname,{type:"text/csv"});
+        if(navigator.canShare({files:[file]})){
+          navigator.share({files:[file],title:fname}).then(function(){show("done")}).catch(function(){});
+          return;
+        }
+      }
+    }catch(e){}
+  }
+  var blob=new Blob([csv],{type:"text/csv"});
+  var u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(u)},100);
+  show("done");
+}
 
 show("setup");
 </script>

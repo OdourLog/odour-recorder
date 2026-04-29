@@ -35,8 +35,7 @@ body{
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
-.wrap{max-width:780px;margin:0 auto;padding:3rem 1.5rem 6rem}
-
+.wrap{max-width:760px;margin:0 auto;padding:3rem 1.5rem 6rem}
 header.cover{
   border-bottom:1px solid var(--border-soft);
   padding-bottom:2rem;
@@ -72,13 +71,14 @@ h1{
   letter-spacing:.04em;
 }
 .meta span+span::before{content:" · ";margin:0 .3em;color:var(--border)}
-
 nav.toc{
   background:var(--bg-soft);
   border:1px solid var(--border-soft);
   border-radius:6px;
   padding:1.25rem 1.5rem;
   margin-bottom:3rem;
+  columns:2;
+  column-gap:2.5rem;
 }
 nav.toc h2{
   font-size:.72rem;
@@ -87,6 +87,7 @@ nav.toc h2{
   text-transform:uppercase;
   color:var(--text-faint);
   margin:0 0 .8rem;
+  column-span:all;
 }
 nav.toc ol{
   margin:0;
@@ -96,26 +97,26 @@ nav.toc ol{
 }
 nav.toc li{
   counter-increment:toc;
-  padding:.25rem 0;
-  font-size:.95rem;
+  padding:.18rem 0;
+  font-size:.92rem;
   display:flex;
-  gap:.7rem;
+  gap:.6rem;
   align-items:baseline;
+  break-inside:avoid;
 }
-nav.toc li.appendix{
-  padding-left:1.6rem;
-  font-size:.88rem;
-  color:var(--text-mute);
-}
+nav.toc li.appendix{counter-increment:none}
 nav.toc li::before{
   content:counter(toc,decimal-leading-zero);
   font-feature-settings:"tnum";
   color:var(--text-faint);
-  font-size:.78rem;
+  font-size:.74rem;
   font-weight:500;
   min-width:1.6rem;
 }
-nav.toc li.appendix::before{content:""}
+nav.toc li.appendix::before{
+  content:attr(data-letter);
+  color:var(--accent);
+}
 nav.toc a{
   color:var(--text);
   text-decoration:none;
@@ -125,7 +126,6 @@ nav.toc a{
 nav.toc a:hover{border-bottom-color:var(--accent)}
 
 section{margin-bottom:3.5rem;scroll-margin-top:1rem}
-section.appendix{margin-bottom:3rem}
 h2.section{
   font-size:1.5rem;
   font-weight:700;
@@ -135,13 +135,24 @@ h2.section{
   padding-bottom:.6rem;
   border-bottom:1px solid var(--border-soft);
 }
-h2.appendix-h{
-  font-size:1.25rem;
+h2.appendix-title{
+  font-size:1.5rem;
   font-weight:700;
-  margin:0 0 1rem;
-  color:var(--text);
-  padding-bottom:.5rem;
-  border-bottom:1px dashed var(--border);
+  letter-spacing:-.01em;
+  margin:0 0 .4rem;
+  color:var(--accent-deep);
+  padding-bottom:.6rem;
+  border-bottom:1px solid var(--border-soft);
+}
+h2.appendix-title .letter{
+  display:inline-block;
+  background:var(--accent);
+  color:#fff;
+  padding:0 .55rem;
+  border-radius:3px;
+  font-size:.92em;
+  margin-right:.5rem;
+  vertical-align:.05em;
 }
 h3{
   font-size:1.1rem;
@@ -159,41 +170,45 @@ p{margin:0 0 1rem}
 .lead{font-size:1.05rem;color:var(--text-mute);margin-bottom:1.5rem}
 ul,ol{margin:0 0 1rem;padding-left:1.5rem}
 li{margin-bottom:.4rem}
-li>ul,li>ol{margin-top:.4rem;margin-bottom:0}
 strong{font-weight:600;color:var(--text)}
 em{color:var(--text-mute);font-style:italic}
-sup,sub{font-size:.7em;line-height:0}
-
-code,kbd{
+code,kbd,var{
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   font-size:.88em;
   background:var(--bg-alt);
   padding:.1em .4em;
   border-radius:3px;
   color:var(--accent-deep);
+  font-style:normal;
 }
 a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft);transition:border-color .15s}
 a:hover{border-bottom-color:var(--accent)}
+sup,sub{line-height:0;font-size:.78em}
 
-/* Formulas / equations */
-.formula{
-  display:block;
-  margin:1rem auto;
-  padding:.8rem 1rem;
+.eq{
   background:var(--bg-soft);
   border-left:3px solid var(--accent);
-  border-radius:0 4px 4px 0;
-  font-family:Charter,Georgia,Cambria,"Times New Roman",serif;
-  font-style:italic;
-  font-size:1rem;
-  text-align:left;
+  padding:.95rem 1.25rem;
+  margin:1.25rem 0;
+  font-family:"Iowan Old Style",Georgia,"Times New Roman",serif;
+  font-size:1.05rem;
   color:var(--text);
+  border-radius:0 4px 4px 0;
   overflow-x:auto;
 }
-.formula .op,.formula .num{font-style:normal;color:var(--text-mute)}
-.formula .var{font-weight:500}
+.eq .where{
+  display:block;
+  margin-top:.55rem;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  font-size:.85rem;
+  color:var(--text-dim);
+  line-height:1.5;
+}
+.eq .where strong{
+  color:var(--text);
+  font-weight:600;
+}
 
-/* Notice boxes */
 .notice{
   border-left:3px solid var(--accent);
   background:var(--bg-soft);
@@ -203,7 +218,7 @@ a:hover{border-bottom-color:var(--accent)}
   font-size:.95rem;
 }
 .notice.warn{border-left-color:var(--warning)}
-.notice.danger{border-left-color:var(--danger)}
+.notice.lim{border-left-color:var(--text-faint)}
 .notice strong:first-child{
   display:block;
   font-size:.7rem;
@@ -214,68 +229,110 @@ a:hover{border-bottom-color:var(--accent)}
   color:var(--accent);
 }
 .notice.warn strong:first-child{color:var(--warning)}
+.notice.lim strong:first-child{color:var(--text-faint)}
 
-/* Tables */
 table{
   width:100%;
   border-collapse:collapse;
   font-size:.88rem;
   margin:1rem 0 1.5rem;
 }
+table.compact{font-size:.82rem}
 th{
   text-align:left;
   font-weight:600;
-  font-size:.72rem;
+  font-size:.74rem;
   letter-spacing:.05em;
   text-transform:uppercase;
   color:var(--text-faint);
-  padding:.55rem .7rem;
+  padding:.55rem .65rem;
   border-bottom:2px solid var(--border-soft);
-  background:var(--bg-soft);
+  vertical-align:bottom;
 }
+th.center,td.center{text-align:center}
+th.right,td.right{text-align:right}
 td{
-  padding:.5rem .7rem;
+  padding:.5rem .65rem;
   border-bottom:1px solid var(--border-soft);
   vertical-align:top;
+  font-feature-settings:"tnum";
 }
-td code{font-size:.82em}
-table.matrix th,table.matrix td{text-align:center;font-feature-settings:"tnum"}
-table.matrix th:first-child,table.matrix td:first-child{text-align:left}
-table.compact td,table.compact th{padding:.3rem .55rem;font-size:.85rem}
+td.code{
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:.85em;
+  color:var(--accent-deep);
+}
+table.matrix th,table.matrix td{
+  text-align:center;
+  padding:.5rem;
+}
+table.matrix .row-head{
+  text-align:right;
+  font-weight:600;
+  color:var(--text-mute);
+  background:var(--bg-soft);
+}
+table.matrix .corner{background:var(--bg-soft)}
+table.matrix .col-head{
+  font-weight:600;
+  color:var(--text-mute);
+  background:var(--bg-soft);
+}
+.cell-neg{background:rgba(22,163,74,.08);color:var(--success);font-weight:600}
+.cell-sml{color:var(--text-mute)}
+.cell-med{color:var(--accent-deep)}
+.cell-lrg{background:rgba(245,158,11,.10);color:var(--warning);font-weight:600}
+.cell-vlg{background:rgba(220,38,38,.08);color:var(--danger);font-weight:600}
+.cell-na{color:var(--text-faint);font-style:italic}
+.score-neg{color:var(--danger);font-feature-settings:"tnum";font-weight:500}
+.score-pos{color:var(--success);font-feature-settings:"tnum";font-weight:500}
+.score-zero{color:var(--text-mute);font-feature-settings:"tnum"}
 
-/* Cell colour codes for IAQM matrices */
-.cell-veryLarge{background:#fef2f2;color:#991b1b;font-weight:600}
-.cell-large{background:#fef3c7;color:#92400e;font-weight:600}
-.cell-medium{background:#fef9c3;color:#854d0e}
-.cell-small{background:#f0f9ff;color:#075985}
-.cell-na{background:var(--bg-alt);color:var(--text-faint)}
-.cell-substantial{background:#fee2e2;color:#991b1b;font-weight:600}
-.cell-moderate{background:#fed7aa;color:#9a3412;font-weight:600}
-.cell-slight{background:#fef3c7;color:#854d0e}
-.cell-negligible{background:#dcfce7;color:#166534}
-
-/* Caption */
-figcaption,.caption{
+figure.diagram{
+  margin:1.5rem 0;
+  background:var(--bg-soft);
+  border:1px solid var(--border-soft);
+  border-radius:6px;
+  padding:1.25rem;
+  text-align:center;
+}
+figure.diagram svg{
+  max-width:100%;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+figure.diagram figcaption{
+  margin-top:.75rem;
   font-size:.85rem;
   color:var(--text-faint);
-  text-align:center;
   font-style:italic;
-  margin-top:.5rem;
-  margin-bottom:1.5rem;
 }
 
-/* Two-column layout for descriptor list */
-.two-col{
-  column-count:2;
-  column-gap:2rem;
-  font-size:.82rem;
-  line-height:1.5;
-  color:var(--text-mute);
+ol.refs{
+  list-style:none;
+  padding:0;
+  counter-reset:ref;
+  font-size:.92rem;
 }
-.two-col p{margin:0 0 .15rem;break-inside:avoid;display:flex;justify-content:space-between;gap:1rem}
-.two-col .sc{font-feature-settings:"tnum";color:var(--text-faint);font-size:.78rem}
-.two-col .sc.neg{color:var(--danger)}
-.two-col .sc.pos{color:var(--success)}
+ol.refs li{
+  counter-increment:ref;
+  padding:.5rem 0 .5rem 2.4rem;
+  position:relative;
+  border-top:1px solid var(--border-soft);
+  line-height:1.55;
+}
+ol.refs li:first-child{border-top:none}
+ol.refs li::before{
+  content:"["counter(ref)"]";
+  position:absolute;
+  left:0;
+  top:.5rem;
+  color:var(--text-faint);
+  font-feature-settings:"tnum";
+  font-weight:500;
+  font-size:.85rem;
+}
 
 footer.foot{
   margin-top:6rem;
@@ -286,33 +343,26 @@ footer.foot{
   text-align:center;
 }
 
-/* Reference list */
-ol.refs{
-  list-style:none;
-  padding-left:0;
-  counter-reset:ref;
-  font-size:.92rem;
-}
-ol.refs li{
-  counter-increment:ref;
-  padding:.5rem 0 .5rem 2.4rem;
-  position:relative;
-  border-top:1px solid var(--border-soft);
-  color:var(--text-mute);
-  line-height:1.55;
-}
-ol.refs li:first-child{border-top:none}
-ol.refs li::before{
-  content:"["counter(ref)"]";
-  position:absolute;
-  left:0;
-  top:.5rem;
-  color:var(--accent);
-  font-weight:600;
+.descriptor-list{
+  columns:2;
+  column-gap:2rem;
   font-size:.85rem;
-  font-feature-settings:"tnum";
 }
-ol.refs li cite{font-style:italic;color:var(--text)}
+.descriptor-list .row{
+  display:flex;
+  justify-content:space-between;
+  padding:.25rem 0;
+  border-bottom:1px solid var(--border-soft);
+  break-inside:avoid;
+  gap:.5rem;
+}
+.descriptor-list .row .name{color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.descriptor-list .row .score{font-feature-settings:"tnum";flex-shrink:0;font-weight:500}
+
+@media (max-width:540px){
+  nav.toc{columns:1}
+  .descriptor-list{columns:1}
+}
 </style>
 </head>
 <body>
@@ -321,10 +371,10 @@ ol.refs li cite{font-style:italic;color:var(--text)}
 <header class="cover">
   <div class="eyebrow">Technical Paper</div>
   <h1>Odour Intensity Recorder</h1>
-  <p class="lede">A specification of the methodology, lookup tables, derivations, assumptions, and limitations of the Odour Intensity Recorder — a structured field tool for IAQM-compliant odour observations.</p>
+  <p class="lede">Methodology, derivation logic, lookup tables and assumptions for the field tool that records odour observations to the IAQM <em>Guidance on the Assessment of Odour for Planning</em> framework.</p>
   <div class="meta">
-    <span>Application v1.1.0</span>
-    <span>Schema 2</span>
+    <span>Application v1.2.0</span>
+    <span>Schema 3</span>
   </div>
 </header>
 
@@ -332,708 +382,856 @@ ol.refs li cite{font-style:italic;color:var(--text)}
   <h2>Contents</h2>
   <ol>
     <li><a href="#purpose">Purpose and scope</a></li>
-    <li><a href="#iaqm">The IAQM framework for odour assessment</a></li>
-    <li><a href="#sampling">Live sampling: rationale and design</a></li>
-    <li><a href="#stability">Atmospheric stability classification</a></li>
-    <li><a href="#hedonic">Hedonic tone and odour descriptors</a></li>
-    <li><a href="#implementation">Implementation</a></li>
-    <li><a href="#assumptions">Assumptions, limitations and exclusions</a></li>
-    <li><a href="#schema">Data schema</a></li>
-    <li><a href="#refs">References</a></li>
-    <li class="appendix"><a href="#app-a">Appendix A — IAQM lookup tables</a></li>
-    <li class="appendix"><a href="#app-b">Appendix B — Pasquill-Gifford derivation</a></li>
-    <li class="appendix"><a href="#app-c">Appendix C — Dravnieks descriptor list</a></li>
+    <li><a href="#methodology">Methodology overview</a></li>
+    <li><a href="#intensity">The 0–6 intensity scale</a></li>
+    <li><a href="#sampling">Per-sample capture and aggregate calculations</a></li>
+    <li><a href="#sensitivity">Receptor sensitivity classification</a></li>
+    <li><a href="#exposure">Exposure determination</a></li>
+    <li><a href="#effect">Effect determination</a></li>
+    <li><a href="#stability">Atmospheric stability derivation</a></li>
+    <li><a href="#hedonic">Hedonic tone and descriptor capture</a></li>
+    <li><a href="#meteorological">Meteorological conditions</a></li>
+    <li><a href="#anomalies">Anomaly flagging</a></li>
+    <li><a href="#schema">Output schema</a></li>
+    <li><a href="#location">Coordinate capture</a></li>
+    <li><a href="#persistence">Persistence and session state</a></li>
+    <li><a href="#assumptions">Assumptions and limitations</a></li>
+    <li><a href="#qa">Quality assurance considerations</a></li>
+    <li><a href="#references">References</a></li>
+    <li class="appendix" data-letter="A"><a href="#appendix-a">Pasquill–Gifford derivation grid</a></li>
+    <li class="appendix" data-letter="B"><a href="#appendix-b">IAQM exposure and effect matrices</a></li>
+    <li class="appendix" data-letter="C"><a href="#appendix-c">Dravnieks descriptor list</a></li>
   </ol>
 </nav>
 
 <section id="purpose">
   <h2 class="section">1 · Purpose and scope</h2>
-  <p class="lead">The Odour Intensity Recorder is a structured field tool for capturing odour observations to the methodology defined by the UK Institute of Air Quality Management <a href="#refs">[1]</a>. It produces a defensible, auditable comma-separated record of a single five-minute survey at a single receptor, comprising thirty intensity samples taken at ten-second intervals together with the meteorological conditions, hedonic tone, descriptor classification, surveyor identity, and computed IAQM exposure and effect outputs.</p>
+  <p class="lead">The Odour Intensity Recorder is a self-contained web application designed to support consultants and regulatory officers conducting structured field-based odour observations. It implements the methodology set out in the Institute of Air Quality Management's <em>Guidance on the Assessment of Odour for Planning</em> <a href="#ref-1">[1]</a>, producing a complete CSV record of a five-minute observation including per-sample intensities, derived statistical outputs, meteorological conditions, hedonic classification, surveyor identity and (where available) GPS coordinates.</p>
 
-  <h3>What the tool is</h3>
-  <p>A methodological aid. It enforces the discipline of structured sampling — a precise five-minute window, ten-second intervals, audible cues to maintain temporal accuracy, and mandatory capture of the conditions and contextual variables required for a defensible regulatory record. It performs the IAQM exposure and effect calculations from those inputs and writes the result to a single CSV file with a versioned schema.</p>
+  <p>This document describes the methodology adopted, the derivation logic implemented, the lookup tables consulted, and the assumptions and limitations that bear on the output. It is intended as the primary methodological reference for users of the tool and for downstream parties (planning officers, environmental health officers, expert witnesses) who receive the CSV outputs and need to understand how the figures were arrived at.</p>
 
-  <h3>What the tool is not</h3>
-  <p>It is not an instrument. The intensity values it captures are subjective ratings by a human surveyor on the seven-point IAQM scale (0–6), not measurements from a chemical sensor or olfactometer. The recorder therefore inherits all the limitations of human odour perception: it is sensitive to fatigue, adaptation, masking, individual variability, and surveyor training. EN 13725 olfactometry <a href="#refs">[2]</a> remains the reference standard for objective odour concentration measurement; the recorder does not displace it but complements it where the requirement is for a structured exposure assessment in the field.</p>
-
-  <p>It is also not a continuous monitor, a dispersion model, a complaint-correlation engine, or a community-exposure tool. A single survey is a snapshot at a point — one surveyor, one location, five minutes — and is intended to feed into a wider assessment alongside other surveys, modelling, and complaint records.</p>
-
-  <h3>Scope of the methodology</h3>
-  <p>The methodology implemented is the IAQM 2018 sniff-test framework as applied in UK planning and environmental permitting practice. It is appropriate for assessing whether an odour source produces an effect that would be considered <em>negligible</em>, <em>slight adverse</em>, <em>moderate adverse</em>, or <em>substantial adverse</em> at a particular receptor, given that receptor's land-use sensitivity. It is not appropriate for setting source emission limits, modelling plume behaviour, or predicting effects at unobserved receptors — those tasks require dispersion modelling and odour concentration measurement.</p>
-</section>
-
-<section id="iaqm">
-  <h2 class="section">2 · The IAQM framework for odour assessment</h2>
-
-  <p>The IAQM <em>Guidance on the assessment of odour for planning</em> <a href="#refs">[1]</a> defines a structured approach for characterising odour exposure and translating it into a planning-relevant effect. Three inputs are combined: the average intensity perceived during the survey, the proportion of the survey time during which the odour is at or above the recognisable threshold, and the sensitivity of the receptors at the survey location.</p>
-
-  <h3>The seven-point intensity scale</h3>
-  <p>Intensity is rated on an integer scale from 0 to 6, with each level corresponding to a specific perceptual definition:</p>
-
-  <table>
-    <thead><tr><th>Level</th><th>Label</th><th>Definition</th></tr></thead>
-    <tbody>
-      <tr><td>0</td><td>No odour</td><td>No odour when compared to the clean site.</td></tr>
-      <tr><td>1</td><td>Slight / very weak</td><td>Probably some doubt as to whether the odour is actually present.</td></tr>
-      <tr><td>2</td><td>Slight / weak</td><td>Odour is present but cannot be described using precise words or terms.</td></tr>
-      <tr><td>3</td><td>Distinct</td><td>Odour character is barely recognisable.</td></tr>
-      <tr><td>4</td><td>Strong</td><td>Odour character is easily recognisable.</td></tr>
-      <tr><td>5</td><td>Very strong</td><td>Odour is offensive — exposure would be considered undesirable.</td></tr>
-      <tr><td>6</td><td>Extremely strong</td><td>Odour is offensive — instinctive reaction would be to mitigate against further exposure.</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table 1. The IAQM seven-point intensity scale. Level 4 (the "recognisable" threshold) is the basis for the t<sub>≥4</sub> metric.</div>
-
-  <h3>The two primary exposure metrics</h3>
-  <p>From a survey of <em>n</em> samples taken at fixed intervals, two metrics are derived:</p>
-
-  <p class="formula">
-    I<sub>mean</sub> <span class="op">=</span> round<span class="op">(</span> <span class="op">∑</span> i<sub>k</sub> <span class="op">/</span> n <span class="op">)</span>
-    <br>
-    t<sub>≥4</sub> <span class="op">=</span> 100 <span class="op">×</span> <span class="op">|</span>{ k <span class="op">:</span> i<sub>k</sub> <span class="op">≥</span> 4 }<span class="op">|</span> <span class="op">/</span> n
-  </p>
-
-  <p>Where i<sub>k</sub> is the intensity recorded at sample <em>k</em>. I<sub>mean</sub> is rounded to the nearest integer in the range 0–6, and t<sub>≥4</sub> is expressed as a whole-number percentage. These two values are the inputs to the exposure matrix.</p>
-
-  <h3>Receptor sensitivity</h3>
-  <p>Receptor sensitivity reflects the land-use vulnerability of the location to odour exposure. The IAQM defines three categories:</p>
-
-  <table>
-    <thead><tr><th>Category</th><th>Examples of receptors</th></tr></thead>
-    <tbody>
-      <tr><td>High</td><td>Residential, hospitals, schools, tourist or cultural sites</td></tr>
-      <tr><td>Medium</td><td>Workplaces, commercial or retail premises, recreation fields</td></tr>
-      <tr><td>Low</td><td>Industrial sites, farms, footpaths, roads</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table 2. IAQM receptor sensitivity categories.</div>
-
-  <h3>Exposure category</h3>
-  <p>The IAQM exposure matrix combines I<sub>mean</sub> and t<sub>≥4</sub> into one of five categories: <em>N/A</em>, <em>Small</em>, <em>Medium</em>, <em>Large</em>, or <em>Very Large</em>. The full matrix is reproduced in <a href="#app-a">Appendix A, Table A.1</a>. In summary, exposure rises with both intensity and time at threshold: a high I<sub>mean</sub> always produces a Large or Very Large exposure regardless of t<sub>≥4</sub>, and a low I<sub>mean</sub> with a brief t<sub>≥4</sub> produces a Small exposure.</p>
-
-  <h3>Odour effect</h3>
-  <p>The exposure category is then combined with the receptor sensitivity to yield the final IAQM odour effect classification: <em>Negligible</em>, <em>Slight adverse</em>, <em>Moderate adverse</em>, or <em>Substantial adverse</em>. The effect matrix is reproduced in <a href="#app-a">Appendix A, Table A.2</a>. The same exposure produces a more adverse effect at a more sensitive receptor — for example, a Medium exposure produces a Slight adverse effect at a Low or Medium sensitivity receptor but a Moderate adverse effect at a High sensitivity receptor.</p>
-
-  <p>The effect classification is the headline output of the survey and the primary input to a wider planning or permitting decision.</p>
-</section>
-
-<section id="sampling">
-  <h2 class="section">3 · Live sampling: rationale and design</h2>
-
-  <p class="lead">The recorder samples the surveyor's live intensity rating at fixed ten-second intervals over a five-minute window, producing thirty observations per session. This duration and interval are matters of methodological convention rather than physical optimality, and the design choices in the recorder are intended to make the convention easier to follow accurately.</p>
-
-  <h3>The five-minute, thirty-sample window</h3>
-  <p>A five-minute survey balances three competing pressures. It must be long enough to characterise a fluctuating plume — typical plume meander, eddy structure, and wind direction shifts produce variability on tens-of-seconds timescales, which a one-minute survey would systematically under-sample. It must be short enough to be repeatable across many receptors in a single field visit, and short enough that surveyor adaptation and fatigue do not significantly distort later samples. It must also be a duration that produces enough samples for the t<sub>≥4</sub> metric to have meaningful resolution: at thirty samples each sample contributes 3.3 percentage points, which is a useful minimum granularity. Five minutes at ten-second intervals satisfies all three constraints and is the established UK convention.</p>
-
-  <p>The first sample is taken at <em>t</em> = 10 s, not <em>t</em> = 0. The opening ten seconds is used as a settling window to allow the surveyor to stabilise their rating, with the user interface displaying <em>"Get ready · first sample at 00:10"</em>. The last sample is at <em>t</em> = 300 s. The session therefore captures exactly thirty samples at <em>t</em> ∈ {10, 20, 30, …, 300}.</p>
-
-  <h3>The slider and the live rating model</h3>
-  <p>Intensity is captured via a vertical slider rather than discrete buttons. The slider supports continuous positioning between integer levels, and the value at each ten-second tick is rounded to the nearest integer for the formal record. Three reasons motivate this design:</p>
-
-  <ol>
-    <li><strong>Continuity matches perception.</strong> Odour intensity does not jump in discrete steps as a plume passes; the surveyor's percept moves smoothly. A continuous slider lets them reflect that smoothness in their input rather than forcing artificial discretisation between samples.</li>
-    <li><strong>The position before the tick is what matters.</strong> By the time the audible cue fires, the surveyor has already had ten seconds to settle on their best estimate. The discrete sample taken at the tick captures that settled position; intermediate movements during the window are not recorded and need not be.</li>
-    <li><strong>It reduces the mental load of the rating itself.</strong> Discrete buttons require the surveyor to make an explicit category decision before each tick. A slider lets them adjust continuously and only forces a category at the moment of capture, which is how the methodology intends the rating to be used.</li>
-  </ol>
-
-  <h3>Audible cues: the pip-pip-pip-BEEP sequence</h3>
-  <p>Holding precise ten-second discipline visually requires the surveyor to keep glancing at the screen, which competes with the actual job of perceiving the odour. The recorder therefore emits an audible four-element sequence at every sample boundary: three short 80 ms pips at <em>t</em> = 7 s, 8 s, and 9 s into the ten-second window, followed by a longer 400 ms beep at <em>t</em> = 10 s when the sample is captured. Frequencies are 1000 Hz for the pip and 1500 Hz for the beep, both square-wave to maximise audibility through phone speakers in moderate field noise.</p>
-
-  <p>The pip-pip-pip-BEEP design is borrowed from broadcast time signals (notably the BBC pips). It allows the surveyor to keep their eyes off the screen for almost the entire ten-second cycle, glancing only when needed, while still hitting each capture moment precisely. The audio can be silenced via the <em>BEEP ON / OFF</em> toggle for surveys where audible signals would be inappropriate (residential complaint visits, for example), at the cost of requiring more frequent visual checks.</p>
-
-  <h3>Anomaly flagging</h3>
-  <p>Field surveys are routinely contaminated by transient events — a tractor passing, a kitchen extractor cycling on, a delivery van idling nearby. These events introduce intensity excursions that are real for the surveyor but not representative of the source under assessment. The recorder provides an anomaly flag: a tap on the right-hand flag button captures a flag with the current time and intensity, and the screen flashes red as a confirmation cue.</p>
-
-  <p>Flags are recorded but do not alter the IAQM calculation, which continues to use all thirty samples at face value. After recording, an interstitial review screen lets the surveyor add a brief optional note for each flag. Flags appear in two places in the CSV output: as a Boolean column on each affected sample row, and as an explicit Anomalies block listing each flag with its time, intensity, and note. Downstream analysis can then choose to exclude or weight these samples as the assessor's judgement requires.</p>
-
-  <p>Double-tap protection is implemented as a 400 ms debounce: a second tap within that window of the previous tap is ignored, so an accidental double-tap is recorded as a single flag rather than two.</p>
-</section>
-
-<section id="stability">
-  <h2 class="section">4 · Atmospheric stability classification</h2>
-
-  <p class="lead">The Pasquill-Gifford stability classification <a href="#refs">[3,4]</a> is a six-class scheme (A through F, very unstable through stable) widely used in dispersion modelling and odour assessment. The recorder provides an inline derivation of the appropriate class from the surveyor's other inputs, both as a methodological aid and as a check on the surveyor's manual choice.</p>
-
-  <h3>Why stability matters for odour assessment</h3>
-  <p>Atmospheric stability governs how readily a plume disperses vertically and horizontally. Under unstable conditions (Class A or B, typical of sunny daytime with light winds) thermal turbulence mixes the plume rapidly and produces high but transient ground-level concentrations that loop and disperse over short distances. Under stable conditions (Class F, typical of clear calm nights) the plume hugs the ground, travels long distances with little dilution, and produces sustained low-to-moderate concentrations at receptors well downwind. The same source can produce qualitatively different odour effects under different stability regimes, and capturing the stability category is essential for interpreting the survey result against modelling outputs or other observations.</p>
-
-  <h3>Inputs to the derivation</h3>
-  <p>The Pasquill-Gifford class is determined from three quantities:</p>
-
-  <ol>
-    <li><strong>Solar elevation</strong> at the time and location of the survey, which determines the maximum potential insolation.</li>
-    <li><strong>Cloud cover</strong>, which reduces the actual insolation received at the ground.</li>
-    <li><strong>Surface wind speed</strong>, which determines the strength of mechanical (as opposed to thermal) mixing.</li>
-  </ol>
-
-  <p>The recorder derives wind speed from the Beaufort band selected by the surveyor, using the mid-band conversion in <a href="#app-b">Appendix B, Table B.4</a>. This is a lossy conversion at band boundaries — Beaufort 3 covers approximately 3.4–5.4 m/s while the recorder uses the single value 4 m/s — but is sufficient for a coarse classification scheme that itself has only six categories.</p>
-
-  <h3>Solar elevation</h3>
-  <p>Solar elevation is computed from a NOAA-style approximation <a href="#refs">[5]</a> using the date, time, latitude, and longitude. The implementation calculates the day of year, then an orbital fractional year, from which it derives solar declination and the equation of time. These combine with the local hour angle to give the elevation:</p>
-
-  <p class="formula">
-    sin(<span class="var">α</span>) <span class="op">=</span> sin(<span class="var">φ</span>) <span class="op">·</span> sin(<span class="var">δ</span>) <span class="op">+</span> cos(<span class="var">φ</span>) <span class="op">·</span> cos(<span class="var">δ</span>) <span class="op">·</span> cos(<span class="var">H</span>)
-  </p>
-
-  <p>Where <em>α</em> is solar elevation above the horizon, <em>φ</em> is the observer's latitude, <em>δ</em> is the solar declination, and <em>H</em> is the hour angle. The approximation is accurate to within approximately ±0.5° of true elevation, which is more than adequate for a classification scheme whose insolation tiers are 35° wide.</p>
-
-  <p>Elevations greater than 3° are classified as <em>day</em> and used to drive the day branch of the derivation. Elevations of 3° or below are classified as <em>night</em>. This 3° cutoff is a practical choice: at and below 3°, the sun delivers negligible mechanical heating to the surface even when above the horizon, and the air column behaves as if in nocturnal-radiative balance.</p>
-
-  <h3>Insolation tier</h3>
-  <p>During the day, three insolation tiers are recognised:</p>
-
+  <h3>In scope</h3>
   <ul>
-    <li><strong>Strong insolation</strong> — solar elevation greater than 60°.</li>
-    <li><strong>Moderate insolation</strong> — solar elevation between 35° and 60°.</li>
-    <li><strong>Slight insolation</strong> — solar elevation less than 35°.</li>
-  </ul>
-
-  <p>Cloud cover then reduces the insolation tier:</p>
-
-  <ul>
-    <li><em>Clear</em> — no reduction.</li>
-    <li><em>Partly cloudy</em> — reduce by one tier.</li>
-    <li><em>Mostly cloudy</em> — reduce by two tiers (i.e. effectively slight, regardless of solar elevation).</li>
-    <li><em>Overcast</em> — special case: stability is set directly to D (Neutral) per the standard PG table, regardless of wind speed.</li>
-  </ul>
-
-  <h3>Day and night branches</h3>
-  <p>The derivation then enters one of two branches.</p>
-
-  <p><strong>Day branch.</strong> The combination of effective insolation tier and wind speed (in m/s) is used to look up the PG class in the day matrix reproduced in <a href="#app-b">Appendix B, Table B.1</a>. Where the standard PG table specifies a boundary case such as "A or B", the recorder selects the more conservative (more unstable) of the two, which favours over-classification of dispersion potential and is consistent with the precautionary principle in environmental assessment.</p>
-
-  <p><strong>Night branch.</strong> At night, only two cloud bands are recognised — <em>clear</em> (which includes Partly cloudy in the recorder's classification, since both retain meaningful nocturnal radiative cooling) and <em>cloudy</em>. The night matrix is reproduced in <a href="#app-b">Appendix B, Table B.2</a>. Stability classes E and F are typical of clear nights with light winds; D becomes more likely under cloudy or windy nights.</p>
-
-  <h3>Location and the UK fallback</h3>
-  <p>Solar elevation requires the observer's latitude and longitude. The recorder requests GPS permission at the start of the recording session — by which point the conditions screen has already been completed — and so at the moment the surveyor taps the <em>Suggest</em> button on the conditions screen, GPS coordinates are not yet available. The derivation falls back to a UK-typical reference of 54.0°N, 2.0°W for this case, and the rationale string makes the fallback explicit (<em>"approx UK location (GPS captured at Recording Start)"</em>).</p>
-
-  <p>The error introduced by the UK-centre fallback is bounded. Solar elevation across England varies by approximately ±1° at the same instant, and the insolation tier boundaries (35° and 60°) are 25° wide. The fallback can therefore only change the tier when the actual elevation is within ±1° of a boundary, which is a small window. In the night branch the calculation depends only on whether the sun is above or below 3° elevation, which is robust to a 1° location error except for a brief window around astronomical twilight. For surveys outside the UK, the fallback is less reliable and surveyors should ensure GPS permission is granted before tapping <em>Suggest</em>; alternatively, the stability category can be selected manually.</p>
-
-  <h3>Surveyor override</h3>
-  <p>The Suggest button populates the stability dropdown but does not lock it. Surveyors can override the suggestion based on local knowledge — proximity to the sea, terrain effects, recent weather, or visible plume behaviour — and the manually-selected value is what is recorded. The rationale string remains visible on screen so the surveyor can compare their choice with the system's reasoning.</p>
-</section>
-
-<section id="hedonic">
-  <h2 class="section">5 · Hedonic tone and odour descriptors</h2>
-
-  <p class="lead">Beyond intensity, two qualitative dimensions of an odour observation are captured: the surveyor's overall impression of pleasantness (hedonic tone) and the perceptual character of the odour (descriptor). These do not feed into the IAQM exposure or effect calculation but are critical for interpretation, for matching to a hypothesised source, and for downstream complaint correlation.</p>
-
-  <h3>Hedonic tone</h3>
-  <p>The dominant hedonic tone is captured as one of three categories — <em>Pleasant</em>, <em>Neutral</em>, or <em>Unpleasant</em>. This is the surveyor's overall impression of the odour averaged across the five-minute session.</p>
-
-  <p>A separate boolean field captures whether the tone <em>varied</em> during the session. When checked, an optional free-text field lets the surveyor describe the variation, for example <em>"started pleasant floral, became chemical after three minutes"</em>. This pattern accommodates the common case where odour character shifts during a survey — a wind-direction change exposing the receptor to a different source, or different processing activities cycling on and off — without the friction of a per-sample tone field.</p>
-
-  <p>Variation data is stored in the CSV summary as three fields: <code>Dominant Hedonic Tone</code>, <code>Hedonic Tone Varied</code> (Yes/No), and <code>Variation Description</code>.</p>
-
-  <h3>Descriptor: the Dravnieks atlas</h3>
-  <p>For perceptual character, the recorder uses the 141-descriptor list from Dravnieks' <em>Atlas of Odor Character Profiles</em> <a href="#refs">[6]</a>, the most widely cited reference set for structured odour description. Each descriptor in the atlas has an associated hedonic score in the approximate range −3.75 to +3.55, derived from panel ratings and intended to reflect the descriptor's typical pleasantness. The atlas covers a broad space — pleasant categories (floral, fruity, bakery, citrus), neutral categories (woody, leathery, grainy), and unpleasant categories (chemical, decay-related, sulphurous, faecal).</p>
-
-  <p>The recorder presents the full list, sorted with the most negative (most unpleasant) descriptors first. This ordering matches the dominant use case in regulatory survey work, where the typical observation is of an unpleasant industrial or agricultural source. The full list with scores is reproduced in <a href="#app-c">Appendix C</a>.</p>
-
-  <h3>Multi-select and mean score</h3>
-  <p>Mixed odours are common — a slurry application can present as <em>Faecal</em> blended with <em>Ammonia</em> and <em>Sulphurous</em>, none of which alone captures the percept. The recorder allows the surveyor to select any number of descriptors, presented as removable chips above the search list. When more than one is selected, the recorded hedonic score is the arithmetic mean:</p>
-
-  <p class="formula">
-    s<sub>mean</sub> <span class="op">=</span> (<span class="op">∑</span> s<sub>k</sub>) <span class="op">/</span> N
-  </p>
-
-  <p>Where s<sub>k</sub> is the Dravnieks score of the <em>k</em>th selected descriptor and <em>N</em> is the number of selected descriptors. The CSV preserves the individual descriptors and individual scores so that downstream analysts can apply alternative weighting if required.</p>
-
-  <h3>Free-text fallback</h3>
-  <p>The 141-descriptor list is comprehensive but not exhaustive, particularly for industrial sources whose character may not match any standard atlas entry well. A free-text <em>"additional or alternative description"</em> field lets the surveyor capture nuance that the standard list cannot. The free text is preserved verbatim in the CSV summary alongside the selected descriptors.</p>
-
-  <p>If the surveyor provides only free text and selects no standard descriptors, no hedonic score is recorded — the score column in the CSV remains empty, signalling to downstream parsers that no atlas-based score is available for this observation.</p>
-</section>
-
-<section id="implementation">
-  <h2 class="section">6 · Implementation</h2>
-
-  <p class="lead">The recorder is a single self-contained HTML5 web application. The complete user interface, state management, calculation engine, audio synthesis, lookup tables, and CSV export are delivered in one HTML file with no external dependencies after first load.</p>
-
-  <h3>Architecture</h3>
-  <p>The application is structured as a small state machine with seven phases — <em>setup</em>, <em>conditions</em>, <em>recording</em>, <em>anomalies</em>, <em>classify</em> (hedonic), <em>descriptor</em>, and <em>results</em>, plus a final <em>done</em> screen. Each phase is rendered by a single <code>show()</code> function that rebuilds the document body from the current state. The recording phase is an exception: it builds a static skeleton on entry and uses surgical DOM updates on each tick to avoid the visual flash and slider-handle disruption that full re-renders would cause.</p>
-
-  <p>State is held in a single JavaScript object and is not persisted across page loads. The surveyor name is the one exception, kept in <code>localStorage</code> under the key <code>orec_surveyor</code> so it auto-fills across sessions on the same device. Surveys in progress are not recoverable across reloads or crashes; this is a deliberate scope limitation discussed in the next section.</p>
-
-  <h3>Browser APIs used</h3>
-  <ul>
-    <li><strong>Web Audio API</strong> — square-wave oscillators with envelope shaping for the pip and beep cues. The audio context is created and resumed lazily on the first user interaction, which is required by iOS Safari to permit subsequent autonomous audio playback.</li>
-    <li><strong>Geolocation API</strong> — single high-accuracy fix at recording start, with an 8 second timeout and an informed-choice fallback dialog if the user denies permission or the fix fails.</li>
-    <li><strong>Wake Lock API</strong> — acquired during the recording phase to prevent the screen from dimming or sleeping. Released on completion, on skip, and on phase transitions away from recording. Falls back gracefully on browsers that do not support the API.</li>
-    <li><strong>Web Share API</strong> — used on mobile devices for CSV export, which opens the system share sheet (Save to Files, Mail, AirDrop, etc.). On desktop the standard <code>Blob</code> + <code>a.download</code> mechanism is used instead, gated by a User Agent test.</li>
-    <li><strong>HTML5 form validation pseudo-classes</strong> (<code>:valid</code> / <code>:invalid</code>) — used together with <code>required</code> attributes to drive the red/green border treatment on mandatory fields with no JavaScript event handling required.</li>
-    <li><strong>CSS custom properties</strong> — the entire colour palette is defined as variables on <code>:root</code>, with <code>color-scheme: light</code> declared explicitly to prevent automatic dark-mode adjustment by browsers in system dark mode.</li>
-  </ul>
-
-  <h3>Calculation pipeline</h3>
-  <p>On reaching the <em>results</em> phase, the application computes the IAQM outputs in this order:</p>
-
-  <ol>
-    <li><strong>I<sub>mean</sub>.</strong> Sum the intensity values of all thirty samples; divide by <em>n</em> = 30; round to the nearest integer in [0, 6].</li>
-    <li><strong>t<sub>≥4</sub>.</strong> Count samples with intensity ≥ 4; divide by <em>n</em>; multiply by 100; round to the nearest integer percent.</li>
-    <li><strong>t bucket.</strong> Map t<sub>≥4</sub> to a column index in the exposure matrix using the IAQM bucket boundaries: ≤10% → column 0, ≤20% → column 1, ≤30% → column 2, ≤40% → column 3, otherwise column 4.</li>
-    <li><strong>Exposure category.</strong> Index the IAQM exposure matrix at row I<sub>mean</sub> and column <em>t bucket</em>. Special cases: when I<sub>mean</sub> = 0 the exposure is forced to <em>Negligible</em>; when I<sub>mean</sub> = 1 and <em>t bucket</em> = 0 the exposure is also forced to <em>Negligible</em>.</li>
-    <li><strong>Effect.</strong> Index the IAQM effect matrix at row <em>exposure</em> and column <em>sensitivity</em>. The result is one of <em>Negligible</em>, <em>Slight adverse</em>, <em>Moderate adverse</em>, or <em>Substantial adverse</em>.</li>
-    <li><strong>Mean hedonic score.</strong> If at least one descriptor is selected, compute the arithmetic mean of the selected descriptors' Dravnieks scores. Otherwise leave blank.</li>
-  </ol>
-
-  <h3>CSV output</h3>
-  <p>The CSV file is built in three logical blocks (per-sample table, summary, and conditions) plus an optional fourth block for anomalies. All field values pass through an RFC 4180-compliant quoting helper that wraps any value containing a comma, double quote, or newline in double quotes and doubles any internal quote characters. The file uses Unix-style line endings and UTF-8 encoding without a BOM; both Excel and Numbers handle this correctly.</p>
-
-  <p>The Summary block opens with the application version and schema version, allowing downstream parsers to branch on methodology version. The full schema is documented in <a href="#schema">Section 8</a>.</p>
-</section>
-
-<section id="assumptions">
-  <h2 class="section">7 · Assumptions, limitations and exclusions</h2>
-
-  <p class="lead">The recorder is a methodological aid for a methodology that is itself bounded. Honest reporting of those bounds matters more for a regulatory-facing tool than for most software.</p>
-
-  <h3>Methodological assumptions</h3>
-  <p>The IAQM framework, and therefore this tool, makes the following assumptions:</p>
-
-  <ul>
-    <li>That a trained surveyor can rate odour intensity reliably on the seven-point scale with adequate inter-rater agreement after calibration. Variability between surveyors is real and should be addressed through training and where practicable through paired surveys.</li>
-    <li>That a five-minute window with thirty ten-second samples adequately characterises odour exposure at a receptor under stable wind conditions. Under highly variable conditions or with intermittent sources, multiple surveys at different times are required to characterise the exposure.</li>
-    <li>That the receptor sensitivity classification can be determined from land use alone. The IAQM categories are summary heuristics and do not capture, for example, individual variability or activities such as outdoor dining.</li>
-    <li>That intensity, the proportion of time at threshold, and sensitivity adequately summarise the observation for planning decisions. The framework does not directly weight character, frequency of occurrence, or duration over hours and days, although these are typically considered alongside the IAQM output in a wider assessment.</li>
-  </ul>
-
-  <h3>Tool-specific limitations</h3>
-  <ul>
-    <li><strong>Subjective measurement.</strong> All intensity values are surveyor ratings, not instrumental measurements. The tool does not interface with any olfactometer or chemical sensor.</li>
-    <li><strong>Single-point, single-time observation.</strong> Each survey is a snapshot at one receptor for five minutes. Wider exposure characterisation requires multiple surveys, and complaint correlation requires temporal coverage that a single survey cannot provide.</li>
-    <li><strong>Background suspension on iOS.</strong> If the device is locked, an incoming call is taken, or another app is brought to the foreground during recording, iOS will throttle or suspend background timers. Samples may be skipped or duplicated. The wake lock prevents the screen from auto-sleeping but does not prevent deliberate locking. Surveyors should keep the device unlocked and the app foreground for the full five minutes.</li>
-    <li><strong>No mid-session persistence.</strong> A phone restart, browser crash, or accidental tab close during recording loses the in-progress data. Once <em>Start Recording</em> is tapped, the surveyor should remain in the app until the CSV has been saved.</li>
-    <li><strong>GPS optional with degraded fallback.</strong> If GPS permission is denied or the fix times out, the survey continues without coordinates. The Pasquill-Gifford derivation falls back to UK-centre coordinates, which is adequate for UK use but introduces error for surveys at significantly different latitudes.</li>
-    <li><strong>Beaufort to m/s is mid-band.</strong> The conversion in Appendix B uses the centre of each Beaufort band. Wind speeds at the band boundaries (the upper end of B3 vs the lower end of B4, for example) will be classified into the same PG cell only by chance.</li>
-    <li><strong>Solar elevation is approximate.</strong> The NOAA-style algorithm is accurate to ±0.5°, which is sufficient for the PG insolation tiers but should not be relied upon for purposes requiring better than degree-level solar position.</li>
-    <li><strong>Cloud cover and stability are surveyor estimates.</strong> Both fields rely on the surveyor's visual judgement. The recorder cannot validate these against satellite imagery or radiosonde data.</li>
-    <li><strong>No automatic outlier or contamination detection.</strong> Anomaly flagging is manual; the tool does not detect or down-weight unusual samples on its own.</li>
+    <li>Structured five-minute field observation with thirty samples at ten-second intervals.</li>
+    <li>Calculation of mean intensity (<var>I<sub>mean</sub></var>) and percentage of time above the recognisability threshold (<var>t<sub>≥4</sub></var>).</li>
+    <li>Determination of odour exposure and odour effect from the IAQM matrices, parameterised by receptor sensitivity.</li>
+    <li>Derivation of Pasquill–Gifford atmospheric stability category from time, location, wind speed and cloud cover.</li>
+    <li>Capture of hedonic tone (dominant and varied) and Dravnieks atlas descriptors.</li>
+    <li>Anomaly flagging during recording with optional post-recording notes.</li>
+    <li>Production of a single CSV record per session.</li>
   </ul>
 
   <h3>Out of scope</h3>
-  <p>The recorder explicitly does not perform, and is not intended to support:</p>
-
   <ul>
-    <li>Continuous monitoring or long-duration deployment.</li>
-    <li>Plume dispersion modelling, source attribution, or back-trajectory analysis.</li>
-    <li>Statistical aggregation across multiple surveys (this is a downstream task with a different tool).</li>
-    <li>Direct integration with chemical sensors, electronic noses, or olfactometers.</li>
-    <li>Methodologies other than IAQM 2018 — for example VDI 3940 grid sampling <a href="#refs">[7]</a> uses a different protocol that this tool does not implement.</li>
-  </ul>
-
-  <h3>Methodological ambiguities resolved by convention</h3>
-  <p>Three points of methodological ambiguity are resolved by convention in the recorder, and are noted here for transparency:</p>
-
-  <ul>
-    <li><strong>Boundary cases in the PG day matrix</strong> (where the standard table specifies "A or B", "B or C", etc.) are resolved toward the more unstable class, in line with the precautionary principle.</li>
-    <li><strong>Overcast day</strong> is treated as Class D regardless of solar elevation or wind speed. This matches the standard PG table behaviour where overcast conditions effectively neutralise both solar input and the day/night distinction.</li>
-    <li><strong>The recognisable threshold</strong> for t<sub>≥4</sub> is intensity ≥ 4 (i.e. inclusive of 4). This matches the IAQM definition of "Strong: odour character is easily recognisable" as the relevant threshold.</li>
+    <li>Olfactometric quantification by dynamic dilution (governed by EN 13725 <a href="#ref-6">[6]</a>).</li>
+    <li>Atmospheric dispersion modelling.</li>
+    <li>Intake or processing of complaints data.</li>
+    <li>Continuous (24-hour or longer) observation. The tool produces a snapshot.</li>
+    <li>Cross-observer agreement or panel methods. The tool assumes a single trained observer.</li>
   </ul>
 </section>
 
-<section id="schema">
-  <h2 class="section">8 · Data schema</h2>
+<section id="methodology">
+  <h2 class="section">2 · Methodology overview</h2>
+  <p>The IAQM 2018 framework <a href="#ref-1">[1]</a> classifies odour effect on a four-point ordinal scale (Negligible, Slight adverse, Moderate adverse, Substantial adverse) based on the combination of an odour exposure category and a receptor sensitivity classification. Exposure is itself determined from a continuous-quantity intensity rating (the FIDOL framework's <em>I</em> term) integrated against the proportion of time the odour is recognisable. The tool implements this by structured field sampling.</p>
 
-  <p class="lead">Each survey produces a single CSV file. The schema is versioned in the file itself so downstream parsers can branch on methodology version. Schema 2 is documented below.</p>
+  <p>A session captures three layers of information:</p>
+  <ol>
+    <li>The <strong>per-sample timeline</strong> — thirty discrete observer ratings on a 0–6 scale, one every ten seconds across a five-minute window.</li>
+    <li>The <strong>contextual record</strong> — surveyor identity, location label, GPS coordinates, meteorological conditions, on-site activities and surrounding-area activities.</li>
+    <li>The <strong>character record</strong> — hedonic tone, hedonic variation note, and one or more descriptors with their hedonic scores from the Dravnieks atlas <a href="#ref-5">[5]</a>.</li>
+  </ol>
 
-  <h3>File structure</h3>
-  <p>The file has up to four logical blocks, in this order:</p>
+  <figure class="diagram">
+    <svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg" aria-label="Timeline of the five-minute survey, showing 30 sample ticks at 10-second intervals.">
+      <line x1="40" y1="65" x2="560" y2="65" stroke="#cbd5e1" stroke-width="2"/>
+      <g font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="11" fill="#475569">
+        <text x="40" y="95" text-anchor="middle">0:00</text>
+        <text x="40" y="108" text-anchor="middle" font-size="9" fill="#94a3b8">Start</text>
+        <text x="560" y="95" text-anchor="middle">5:00</text>
+        <text x="560" y="108" text-anchor="middle" font-size="9" fill="#94a3b8">End</text>
+      </g>
+      <g stroke="#0284c7" stroke-width="1.5">
+        <line x1="57.3" y1="58" x2="57.3" y2="72"/>
+        <line x1="74.7" y1="58" x2="74.7" y2="72"/>
+        <line x1="92" y1="58" x2="92" y2="72"/>
+        <line x1="109.3" y1="58" x2="109.3" y2="72"/>
+        <line x1="126.7" y1="58" x2="126.7" y2="72"/>
+        <line x1="144" y1="58" x2="144" y2="72"/>
+        <line x1="161.3" y1="58" x2="161.3" y2="72"/>
+        <line x1="178.7" y1="58" x2="178.7" y2="72"/>
+        <line x1="196" y1="58" x2="196" y2="72"/>
+        <line x1="213.3" y1="58" x2="213.3" y2="72"/>
+        <line x1="230.7" y1="58" x2="230.7" y2="72"/>
+        <line x1="248" y1="58" x2="248" y2="72"/>
+        <line x1="265.3" y1="58" x2="265.3" y2="72"/>
+        <line x1="282.7" y1="58" x2="282.7" y2="72"/>
+        <line x1="300" y1="58" x2="300" y2="72"/>
+        <line x1="317.3" y1="58" x2="317.3" y2="72"/>
+        <line x1="334.7" y1="58" x2="334.7" y2="72"/>
+        <line x1="352" y1="58" x2="352" y2="72"/>
+        <line x1="369.3" y1="58" x2="369.3" y2="72"/>
+        <line x1="386.7" y1="58" x2="386.7" y2="72"/>
+        <line x1="404" y1="58" x2="404" y2="72"/>
+        <line x1="421.3" y1="58" x2="421.3" y2="72"/>
+        <line x1="438.7" y1="58" x2="438.7" y2="72"/>
+        <line x1="456" y1="58" x2="456" y2="72"/>
+        <line x1="473.3" y1="58" x2="473.3" y2="72"/>
+        <line x1="490.7" y1="58" x2="490.7" y2="72"/>
+        <line x1="508" y1="58" x2="508" y2="72"/>
+        <line x1="525.3" y1="58" x2="525.3" y2="72"/>
+        <line x1="542.7" y1="58" x2="542.7" y2="72"/>
+        <line x1="560" y1="58" x2="560" y2="72"/>
+      </g>
+      <g font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="10" fill="#0284c7">
+        <text x="57.3" y="46" text-anchor="middle">1</text>
+        <text x="300" y="46" text-anchor="middle">15</text>
+        <text x="560" y="46" text-anchor="middle">30</text>
+      </g>
+      <g font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="11" fill="#0f172a">
+        <text x="300" y="20" text-anchor="middle" font-weight="600">30 samples × 10 s = 5 min</text>
+      </g>
+    </svg>
+    <figcaption>Sample timing. The first sample is captured at 0:10 and the last at 5:00; the interval from 0:00 to 0:10 is a "get ready" period during which no sample is taken.</figcaption>
+  </figure>
+
+  <p>Pip-pip-pip-beep audio cues at <var>t–3</var>, <var>t–2</var>, <var>t–1</var> and <var>t</var> seconds before each sample help the observer prepare and capture an instantaneous rather than retrospective rating. The intensity rating at each ten-second tick is taken to be the slider value at that moment.</p>
+</section>
+
+<section id="intensity">
+  <h2 class="section">3 · The 0–6 intensity scale</h2>
+  <p>The intensity scale is the seven-point ordinal scale specified in IAQM 2018 <a href="#ref-1">[1]</a>. The observer rates the perceived strength of the odour at each sample tick on the following scale:</p>
+
+  <table>
+    <thead><tr><th class="center" style="width:3.5em">Value</th><th>Label</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="center code">0</td><td>No odour</td><td>No odour when compared to the clean site.</td></tr>
+      <tr><td class="center code">1</td><td>Slight / very weak</td><td>Probably some doubt as to whether the odour is actually present.</td></tr>
+      <tr><td class="center code">2</td><td>Slight / weak</td><td>Odour is present but cannot be described using precise words or terms.</td></tr>
+      <tr><td class="center code">3</td><td>Distinct</td><td>Odour character is barely recognisable.</td></tr>
+      <tr><td class="center code">4</td><td>Strong</td><td>Odour character is easily recognisable.</td></tr>
+      <tr><td class="center code">5</td><td>Very strong</td><td>Odour is offensive — exposure would be considered undesirable.</td></tr>
+      <tr><td class="center code">6</td><td>Extremely strong</td><td>Odour is offensive — instinctive reaction would be to mitigate against further exposure.</td></tr>
+    </tbody>
+  </table>
+
+  <p>The threshold at intensity 4 ("Strong / easily recognisable") is the operative cutoff for the percentage-time calculation in the IAQM exposure matrix. This threshold corresponds to the point at which the odour is not merely present but clearly characterisable by a non-trained observer, and is the basis on which the tool's <var>t<sub>≥4</sub></var> aggregate is computed.</p>
+</section>
+
+<section id="sampling">
+  <h2 class="section">4 · Per-sample capture and aggregate calculations</h2>
+  <p>For each session of 300 seconds duration, the application captures <var>N = 30</var> samples at 10-second intervals starting at <var>t = 10 s</var>. The set of intensity ratings is denoted <var>x<sub>1</sub>, x<sub>2</sub>, &hellip;, x<sub>30</sub></var>, with each <var>x<sub>i</sub> &isin; {0, 1, 2, 3, 4, 5, 6}</var>.</p>
+
+  <h3>Mean intensity</h3>
+  <p>The mean intensity is the arithmetic average of the thirty samples, rounded to the nearest integer to align with the discrete intensity scale used by the IAQM exposure matrix:</p>
+
+  <div class="eq">
+    <var>I</var><sub>mean</sub> = round( <span style="white-space:nowrap">(1/N) ⋅ &Sigma;<sub>i=1</sub><sup>N</sup> <var>x</var><sub>i</sub></span> )
+    <span class="where">
+      where <strong>N = 30</strong> and <strong>x<sub>i</sub></strong> is the observer's intensity rating at sample <em>i</em>.
+    </span>
+  </div>
+
+  <h3>Percentage time at recognisable intensity</h3>
+  <p>The percentage of time the odour is at or above the recognisability threshold is:</p>
+
+  <div class="eq">
+    <var>t</var><sub>≥4</sub> = round( <span style="white-space:nowrap">100 ⋅ |{ <var>i</var> : <var>x</var><sub>i</sub> &ge; 4 }| / N</span> )%
+    <span class="where">
+      The numerator is the count of samples meeting or exceeding intensity 4 (the "Strong" threshold).
+    </span>
+  </div>
+
+  <h3>Special cases</h3>
+  <p>Two boundary conditions are applied before the IAQM exposure matrix is consulted:</p>
+
+  <ul>
+    <li>If <var>I<sub>mean</sub> = 0</var>, the exposure is set to <strong>Negligible</strong> regardless of the percentage time. This handles the edge case where a transient odour pulse early in a session is averaged away.</li>
+    <li>If <var>I<sub>mean</sub> = 1</var> and <var>t<sub>≥4</sub> &le; 10%</var>, the exposure is again set to <strong>Negligible</strong>. This handles cases where the observer detected only a faint odour for a small portion of the session, where treating it as a positive exposure would be disproportionate.</li>
+  </ul>
+
+  <p>Outside these two cases the exposure is read from the IAQM matrix <a href="#appendix-b">(Appendix B)</a> by using <var>I<sub>mean</sub></var> as the row index and a binned representation of <var>t<sub>≥4</sub></var> as the column index. The binning is given by:</p>
+
+  <table class="compact">
+    <thead><tr><th>Column index</th><th class="center">Range of <var>t<sub>≥4</sub></var></th></tr></thead>
+    <tbody>
+      <tr><td class="center code">0</td><td class="center">0% &le; <var>t</var> &le; 10%</td></tr>
+      <tr><td class="center code">1</td><td class="center">10% &lt; <var>t</var> &le; 20%</td></tr>
+      <tr><td class="center code">2</td><td class="center">20% &lt; <var>t</var> &le; 30%</td></tr>
+      <tr><td class="center code">3</td><td class="center">30% &lt; <var>t</var> &le; 40%</td></tr>
+      <tr><td class="center code">4</td><td class="center">40% &lt; <var>t</var> &le; 100%</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sensitivity">
+  <h2 class="section">5 · Receptor sensitivity classification</h2>
+  <p>The IAQM framework specifies three receptor sensitivity classes <a href="#ref-1">[1]</a>, reflecting the relative tolerance of the receiving land use to odour exposure. The classification is not derived by the tool — it is set by the surveyor based on the receptor in question and is a mandatory input on the setup screen:</p>
+
+  <table>
+    <thead><tr><th style="width:5em">Class</th><th>Typical receptors</th></tr></thead>
+    <tbody>
+      <tr><td><strong>High</strong></td><td>Residential dwellings, hospitals, schools, tourist or cultural sites where the receptor's primary purpose involves prolonged occupation and a reasonable expectation of an absence of unpleasant odour.</td></tr>
+      <tr><td><strong>Medium</strong></td><td>Workplaces, commercial or retail premises, recreational fields where occupation is regular but secondary to the receptor's function, and a less acute expectation of low odour.</td></tr>
+      <tr><td><strong>Low</strong></td><td>Industrial sites, farms, footpaths, roads where occupation is transient and odour is often associated with the activity itself.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="exposure">
+  <h2 class="section">6 · Exposure determination</h2>
+  <p>The odour exposure is one of four ordinal categories — <em>Small</em>, <em>Medium</em>, <em>Large</em>, <em>Very Large</em> — determined by indexing the IAQM exposure matrix by the rounded mean intensity (rows, descending from 6 to 1) and the binned percentage time (columns, ascending from 0 to 4). Two cells in the matrix are marked <em>N/A</em> because the IAQM framework does not consider the combination physically meaningful (intensity 1 with high percentage time is internally inconsistent).</p>
+
+  <p>The matrix is reproduced in full in <a href="#appendix-b">Appendix B, Table B.1</a>.</p>
+
+  <p>The two boundary conditions described in §4 take precedence over the matrix lookup:</p>
+  <ol>
+    <li><var>I<sub>mean</sub> = 0</var> &rArr; <strong>Negligible</strong>.</li>
+    <li><var>I<sub>mean</sub> = 1</var> &and; <var>t<sub>≥4</sub> &le; 10%</var> &rArr; <strong>Negligible</strong>.</li>
+  </ol>
+
+  <p>The "Negligible" exposure category is therefore an additional outcome over and above the four matrix categories. It collapses to "Negligible" in the effect determination regardless of receptor sensitivity (see §7).</p>
+</section>
+
+<section id="effect">
+  <h2 class="section">7 · Effect determination</h2>
+  <p>The final IAQM odour effect classification is one of four categories: <em>Negligible</em>, <em>Slight adverse</em>, <em>Moderate adverse</em>, or <em>Substantial adverse</em>. It is determined from the exposure category and the receptor sensitivity by indexing the IAQM effect matrix.</p>
+
+  <p>The matrix is reproduced in full in <a href="#appendix-b">Appendix B, Table B.2</a>.</p>
+
+  <p>The principle embedded in the matrix is that the same exposure causes a more adverse effect at a more sensitive receptor. For example a "Medium" exposure produces a "Slight adverse" effect at a Low- or Medium-sensitivity receptor but a "Moderate adverse" effect at a High-sensitivity receptor.</p>
+
+  <p>Two special cases:</p>
+  <ul>
+    <li>If exposure is <strong>Negligible</strong>, the effect is <strong>Negligible</strong> for all receptor sensitivities.</li>
+    <li>If exposure is marked <strong>N/A</strong> in the matrix (a physically inconsistent combination), the effect is also marked <strong>N/A</strong>.</li>
+  </ul>
+</section>
+
+<section id="stability">
+  <h2 class="section">8 · Atmospheric stability derivation</h2>
+  <p>Atmospheric stability is captured using the Pasquill–Gifford classification scheme <a href="#ref-2">[2]</a><a href="#ref-3">[3]</a>, which assigns one of six categories (A–F) describing the degree of vertical mixing in the lower atmosphere. Stability is required as a meteorological context for the survey but is not used in the IAQM effect calculation; it is recorded for downstream interpretation and dispersion comparison purposes.</p>
+
+  <table class="compact">
+    <thead><tr><th style="width:4em">Class</th><th>Name</th><th>Conditions</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A</strong></td><td>Very unstable</td><td>Strong daytime heating, light wind, plume loops and disperses rapidly.</td></tr>
+      <tr><td><strong>B</strong></td><td>Unstable</td><td>Moderate-to-strong daytime heating with moderate wind, cumulus develops.</td></tr>
+      <tr><td><strong>C</strong></td><td>Slightly unstable</td><td>Slight daytime heating or strong heating with stronger wind.</td></tr>
+      <tr><td><strong>D</strong></td><td>Neutral</td><td>Overcast (day or night) or any strong wind. The most common condition in temperate climates and the most frequently observed UK condition.</td></tr>
+      <tr><td><strong>E</strong></td><td>Slightly stable</td><td>Clear or partly cloudy night with light to moderate wind, plume fans.</td></tr>
+      <tr><td><strong>F</strong></td><td>Stable</td><td>Clear night with light wind, mist or fog often forming, plume hugs ground.</td></tr>
+    </tbody>
+  </table>
+
+  <p>The tool implements an automated suggestion of the stability class through a "Suggest from sun + wind + cloud" action on the conditions screen. This combines three inputs: the time of day (used to compute solar elevation), the wind speed (converted from the observer's selected Beaufort band to a representative metres-per-second value) and the cloud cover bucket. The derivation runs in three stages.</p>
+
+  <h3>Solar elevation</h3>
+  <p>The solar elevation angle <var>α</var> (degrees above horizon) is computed using a NOAA-style approximation <a href="#ref-4">[4]</a> from the calendar date, time, and latitude/longitude. The accuracy is approximately ±0.5° within the British Isles, more than adequate for the coarse insolation tiers required by the Pasquill–Gifford scheme. The full procedure:</p>
 
   <ol>
-    <li>The <strong>per-sample table</strong> at the top, with a header row and one row per sample.</li>
-    <li>A <strong>Summary</strong> block of key-value pairs covering the application version, survey metadata, IAQM outputs, and the surveyor's classifications.</li>
-    <li>A <strong>Meteorological Conditions</strong> block with the meteorological observations.</li>
-    <li>A <strong>Site Operations</strong> block with the two free-text descriptions.</li>
-    <li>An <strong>Anomalies</strong> block, present only if the surveyor flagged at least one anomaly during recording.</li>
+    <li>Compute day-of-year <var>n</var> from the supplied date.</li>
+    <li>Compute the fractional year angle <var>γ</var>:
+      <div class="eq">γ = (2π / 365) ⋅ ( <var>n</var> − 1 + (<var>h</var> − 12) / 24 )<span class="where">where <strong>h</strong> is the local hour.</span></div>
+    </li>
+    <li>Compute the solar declination <var>δ</var> from a truncated Fourier series in <var>γ</var>.</li>
+    <li>Compute the equation of time <var>E</var> from a similar Fourier expansion.</li>
+    <li>Compute the solar time, hour angle and finally the elevation:
+      <div class="eq">sin α = sin(<var>φ</var>) sin(<var>δ</var>) + cos(<var>φ</var>) cos(<var>δ</var>) cos(<var>H</var>)<span class="where">where <strong>φ</strong> is latitude and <strong>H</strong> is the hour angle in radians.</span></div>
+    </li>
   </ol>
 
-  <p>Blocks are separated by blank lines. Each non-table block has a single-cell header row giving the block name, followed by key-value rows with the key in column A and the value in column B.</p>
+  <p>For the day/night cutoff the tool uses <var>α &gt; 3°</var>. This is slightly above the geometric horizon to account for atmospheric refraction and to avoid the ambiguous low-elevation period when surface solar input is negligible but the sun is technically above the horizon.</p>
 
-  <h3>Per-sample table</h3>
-
-  <table class="compact">
-    <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
-    <tbody>
-      <tr><td><code>Time</code></td><td>m:ss</td><td>Mm:ss elapsed within the session, e.g. <code>2:30</code>.</td></tr>
-      <tr><td><code>Seconds</code></td><td>integer</td><td>Numeric seconds elapsed; useful for plotting.</td></tr>
-      <tr><td><code>Intensity</code></td><td>integer 0–6</td><td>The surveyor's rating at the moment of capture.</td></tr>
-      <tr><td><code>Odour Strength</code></td><td>text</td><td>Label corresponding to the intensity, per Table 1.</td></tr>
-      <tr><td><code>Anomaly</code></td><td><code>true</code> / empty</td><td><code>true</code> if the ten-second window containing this sample contained at least one anomaly flag; otherwise empty.</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Summary block</h3>
+  <h3>Insolation tier (daytime)</h3>
+  <p>The solar elevation is mapped to one of three insolation tiers, then adjusted downward by the cloud cover bucket. The tiers are:</p>
 
   <table class="compact">
-    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+    <thead><tr><th>Solar elevation</th><th>Insolation</th></tr></thead>
     <tbody>
-      <tr><td><code>App Version</code></td><td>Application version string (e.g. <code>1.1.0</code>).</td></tr>
-      <tr><td><code>Schema</code></td><td>Schema version integer. Currently <code>2</code>.</td></tr>
-      <tr><td><code>Date</code></td><td>YYYY-MM-DD; date of survey start.</td></tr>
-      <tr><td><code>Time</code></td><td>HH:MM in local time; survey start time.</td></tr>
-      <tr><td><code>Surveyor</code></td><td>Surveyor's name as entered on the setup screen.</td></tr>
-      <tr><td><code>Location</code></td><td>Location identifier as entered on the setup screen.</td></tr>
-      <tr><td><code>Latitude</code></td><td>Decimal degrees, six places. Empty if GPS not captured.</td></tr>
-      <tr><td><code>Longitude</code></td><td>Decimal degrees, six places. Empty if GPS not captured.</td></tr>
-      <tr><td><code>GPS Accuracy (m)</code></td><td>Reported accuracy radius in metres. Empty if GPS not captured.</td></tr>
-      <tr><td><code>Receptor Sensitivity</code></td><td><em>High</em>, <em>Medium</em>, or <em>Low</em>.</td></tr>
-      <tr><td><code>Average Intensity (Imean)</code></td><td>Integer 0–6.</td></tr>
-      <tr><td><code>Percentage Odour Time (t&gt;=4)</code></td><td>Whole-number percentage with <code>%</code> suffix.</td></tr>
-      <tr><td><code>Odour Exposure</code></td><td>One of <em>N/A</em>, <em>Small</em>, <em>Medium</em>, <em>Large</em>, <em>Very Large</em>.</td></tr>
-      <tr><td><code>Odour Effect</code></td><td>One of <em>Negligible</em>, <em>Slight adverse</em>, <em>Moderate adverse</em>, <em>Substantial adverse</em>.</td></tr>
-      <tr><td><code>Dominant Hedonic Tone</code></td><td><em>Pleasant</em>, <em>Neutral</em>, or <em>Unpleasant</em>.</td></tr>
-      <tr><td><code>Hedonic Tone Varied</code></td><td><em>Yes</em> or <em>No</em>.</td></tr>
-      <tr><td><code>Variation Description</code></td><td>Free text, optional.</td></tr>
-      <tr><td><code>Odour Descriptors</code></td><td>Comma-separated list of selected Dravnieks descriptors.</td></tr>
-      <tr><td><code>Hedonic Scores</code></td><td>Comma-separated list of selected descriptors' scores in the same order.</td></tr>
-      <tr><td><code>Mean Hedonic Score</code></td><td>Arithmetic mean of selected descriptors' scores; empty if no descriptors selected.</td></tr>
-      <tr><td><code>Additional Description</code></td><td>Free text alternative description, optional.</td></tr>
+      <tr><td><var>α</var> &gt; 60°</td><td>Strong</td></tr>
+      <tr><td>35° &lt; <var>α</var> &le; 60°</td><td>Moderate</td></tr>
+      <tr><td>3° &lt; <var>α</var> &le; 35°</td><td>Slight</td></tr>
     </tbody>
   </table>
 
-  <h3>Meteorological Conditions block</h3>
+  <p>The cloud cover bucket reduces the insolation tier:</p>
+  <ul>
+    <li><strong>Clear (0–2 oktas)</strong> — no reduction.</li>
+    <li><strong>Partly cloudy (3–5 oktas)</strong> — reduce insolation by one tier (Strong → Moderate, Moderate → Slight, Slight → unchanged at zero).</li>
+    <li><strong>Mostly cloudy (6–7 oktas)</strong> — reduce by two tiers.</li>
+    <li><strong>Overcast (8 oktas)</strong> — bypasses the lookup; daytime overcast yields class D directly.</li>
+  </ul>
+
+  <h3>Wind speed conversion</h3>
+  <p>The Beaufort band selected by the observer is converted to a representative wind speed in m/s using the mid-band of each Beaufort range:</p>
 
   <table class="compact">
-    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+    <thead><tr><th class="center">Beaufort</th><th>Description</th><th class="center">m/s (approx)</th></tr></thead>
     <tbody>
-      <tr><td><code>Wind Direction</code></td><td>Sixteen-point compass plus <em>Variable</em> and <em>Calm</em>.</td></tr>
-      <tr><td><code>Wind Strength</code></td><td>Beaufort band as displayed on the interface (e.g. <code>3 - Gentle breeze</code>).</td></tr>
-      <tr><td><code>Cloud Cover</code></td><td>Cloud bucket label (e.g. <code>Partly cloudy — broken cloud, sun in and out</code>).</td></tr>
-      <tr><td><code>Atmospheric Stability</code></td><td>PG class label (e.g. <code>D - Neutral</code>).</td></tr>
-      <tr><td><code>Rainfall</code></td><td>One of <em>None</em>, <em>Drizzle</em>, <em>Light rain</em>, <em>Moderate rain</em>, <em>Heavy rain</em>.</td></tr>
-      <tr><td><code>Temperature (C)</code></td><td>Decimal degrees Celsius.</td></tr>
-      <tr><td><code>Humidity (%)</code></td><td>Whole-number percent. Optional.</td></tr>
-      <tr><td><code>Barometric Pressure (hPa)</code></td><td>Whole-number hectopascals. Optional.</td></tr>
+      <tr><td class="center code">0</td><td>Calm</td><td class="center">0</td></tr>
+      <tr><td class="center code">1</td><td>Light air</td><td class="center">1</td></tr>
+      <tr><td class="center code">2</td><td>Light breeze</td><td class="center">2</td></tr>
+      <tr><td class="center code">3</td><td>Gentle breeze</td><td class="center">4</td></tr>
+      <tr><td class="center code">4</td><td>Moderate breeze</td><td class="center">7</td></tr>
+      <tr><td class="center code">5</td><td>Fresh breeze</td><td class="center">10</td></tr>
+      <tr><td class="center code">6</td><td>Strong breeze</td><td class="center">12</td></tr>
+      <tr><td class="center code">7</td><td>Near gale</td><td class="center">16</td></tr>
+      <tr><td class="center code">8+</td><td>Gale</td><td class="center">20</td></tr>
     </tbody>
   </table>
 
-  <h3>Site Operations block</h3>
+  <h3>Stability lookup</h3>
+  <p>With insolation tier (or, for night, the cloud cover) and wind speed in m/s, the stability category is read from the lookup grid in <a href="#appendix-a">Appendix A</a>. Where the canonical Pasquill–Gifford table specifies an interpolated boundary (such as "A–B"), the implementation selects a single class deterministically — the more unstable class for daytime boundaries and the more stable class for night-time boundaries — to produce a single suggested output. The original Pasquill table values and the deterministic resolution rule are both shown in Appendix A.</p>
 
-  <table class="compact">
-    <thead><tr><th>Field</th><th>Description</th></tr></thead>
-    <tbody>
-      <tr><td><code>On-site activities</code></td><td>Free text describing site operations during the survey.</td></tr>
-      <tr><td><code>Surrounding area</code></td><td>Free text describing surrounding area activities.</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Anomalies block</h3>
-
-  <p>Present only if at least one anomaly was flagged. The block contains a header row with columns <code>Flag</code>, <code>Time</code>, <code>Intensity</code>, <code>Note</code>, and one row per flag.</p>
-
-  <table class="compact">
-    <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
-    <tbody>
-      <tr><td><code>Flag</code></td><td>integer</td><td>One-based sequence number.</td></tr>
-      <tr><td><code>Time</code></td><td>m:ss</td><td>Time within the session at which the flag was tapped.</td></tr>
-      <tr><td><code>Intensity</code></td><td>integer 0–6</td><td>Slider intensity at the moment of the flag.</td></tr>
-      <tr><td><code>Note</code></td><td>text</td><td>Surveyor's optional note from the anomaly review screen.</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Quoting and encoding</h3>
-  <p>All values are quoted per RFC 4180 when they contain commas, double quotes, or newlines. Internal double quotes are doubled. The file is UTF-8 without a BOM. Line endings are LF (Unix-style). Excel, Numbers, and Google Sheets all parse the format correctly.</p>
-</section>
-
-<section id="refs">
-  <h2 class="section">9 · References</h2>
-
-  <ol class="refs">
-    <li><cite>IAQM Guidance on the Assessment of Odour for Planning</cite>. Institute of Air Quality Management, London, July 2018. The primary methodological basis for the recorder's exposure and effect calculations.</li>
-    <li><cite>BS EN 13725:2022 — Stationary source emissions. Determination of odour concentration by dynamic olfactometry</cite>. British Standards Institution / European Committee for Standardization. Cited for context as the reference standard for objective odour concentration measurement; the recorder does not implement this method.</li>
-    <li>Pasquill, F. (1961). The estimation of the dispersion of windborne material. <cite>The Meteorological Magazine</cite>, 90, pp. 33–49. The original specification of the six-class atmospheric stability scheme.</li>
-    <li>Gifford, F. A. (1976). Turbulent diffusion-typing schemes: A review. <cite>Nuclear Safety</cite>, 17, pp. 68–86. The Gifford refinement of Pasquill's scheme as applied in dispersion practice.</li>
-    <li>U.S. National Oceanic and Atmospheric Administration. <cite>Solar Position Calculator</cite> documentation, NOAA Earth System Research Laboratories Global Monitoring Division. Source for the solar elevation algorithm used in the Suggest derivation.</li>
-    <li>Dravnieks, A. (1985). <cite>Atlas of Odor Character Profiles</cite>. ASTM Data Series DS 61, American Society for Testing and Materials, Philadelphia. The 141-descriptor list with hedonic scores reproduced in Appendix C.</li>
-    <li><cite>VDI 3940 Part 1:2006 — Measurement of odour impact by field inspection. Measurement of the impact frequency of recognisable odours. Grid measurement</cite>. Verein Deutscher Ingenieure, Düsseldorf. Cited for context as an alternative grid-based methodology that this recorder does not implement.</li>
-    <li>Beaufort, F. (1805 onward, as standardised by the World Meteorological Organisation). The Beaufort scale of wind force, with terrestrial visual indicators as currently published by the UK Met Office. Source for the Beaufort band definitions and observational cues used in the wind strength tooltip.</li>
-    <li>Holland, J. Z. (1953). <cite>A Meteorological Survey of the Oak Ridge Area</cite>. U.S. Atomic Energy Commission Report ORO-99. Origin of the day insolation tier conventions adopted in subsequent PG implementations.</li>
-  </ol>
-</section>
-
-<section id="app-a" class="appendix">
-  <h2 class="appendix-h">Appendix A — IAQM lookup tables</h2>
-
-  <h3>Table A.1 · Exposure matrix</h3>
-  <p>Rows are the rounded average intensity I<sub>mean</sub>; columns are the percentage of samples at intensity ≥ 4, banded into five groups. Cells give the IAQM exposure category. The special case of I<sub>mean</sub> = 0 always yields <em>Negligible</em>; the case I<sub>mean</sub> = 1 with t<sub>≥4</sub> ≤ 10% also yields <em>Negligible</em>.</p>
-
-  <table class="matrix compact">
-    <thead>
-      <tr>
-        <th>I<sub>mean</sub></th>
-        <th>≤10%</th>
-        <th>≤20%</th>
-        <th>≤30%</th>
-        <th>≤40%</th>
-        <th>&gt;40%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td><strong>6</strong></td><td class="cell-large">Large</td><td class="cell-veryLarge">Very Large</td><td class="cell-veryLarge">Very Large</td><td class="cell-veryLarge">Very Large</td><td class="cell-veryLarge">Very Large</td></tr>
-      <tr><td><strong>5</strong></td><td class="cell-medium">Medium</td><td class="cell-large">Large</td><td class="cell-large">Large</td><td class="cell-veryLarge">Very Large</td><td class="cell-veryLarge">Very Large</td></tr>
-      <tr><td><strong>4</strong></td><td class="cell-small">Small</td><td class="cell-medium">Medium</td><td class="cell-medium">Medium</td><td class="cell-large">Large</td><td class="cell-large">Large</td></tr>
-      <tr><td><strong>3</strong></td><td class="cell-small">Small</td><td class="cell-medium">Medium</td><td class="cell-medium">Medium</td><td class="cell-medium">Medium</td><td class="cell-medium">Medium</td></tr>
-      <tr><td><strong>2</strong></td><td class="cell-small">Small</td><td class="cell-small">Small</td><td class="cell-medium">Medium</td><td class="cell-medium">Medium</td><td class="cell-medium">Medium</td></tr>
-      <tr><td><strong>1</strong></td><td class="cell-small">Small</td><td class="cell-small">Small</td><td class="cell-small">Small</td><td class="cell-na">N/A</td><td class="cell-na">N/A</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table A.1 — IAQM Odour Exposure matrix.</div>
-
-  <h3>Table A.2 · Effect matrix</h3>
-  <p>Rows are the exposure category from Table A.1; columns are the receptor sensitivity (Table 2). Cells give the IAQM odour effect classification — the headline output of the survey.</p>
-
-  <table class="matrix compact">
-    <thead>
-      <tr>
-        <th>Exposure</th>
-        <th>Low sensitivity</th>
-        <th>Medium sensitivity</th>
-        <th>High sensitivity</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td><strong>Very Large</strong></td><td class="cell-substantial">Substantial adverse</td><td class="cell-substantial">Substantial adverse</td><td class="cell-substantial">Substantial adverse</td></tr>
-      <tr><td><strong>Large</strong></td><td class="cell-moderate">Moderate adverse</td><td class="cell-moderate">Moderate adverse</td><td class="cell-substantial">Substantial adverse</td></tr>
-      <tr><td><strong>Medium</strong></td><td class="cell-slight">Slight adverse</td><td class="cell-slight">Slight adverse</td><td class="cell-moderate">Moderate adverse</td></tr>
-      <tr><td><strong>Small</strong></td><td class="cell-negligible">Negligible</td><td class="cell-negligible">Negligible</td><td class="cell-slight">Slight adverse</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table A.2 — IAQM Odour Effect matrix.</div>
-</section>
-
-<section id="app-b" class="appendix">
-  <h2 class="appendix-h">Appendix B — Pasquill-Gifford derivation</h2>
-
-  <h3>Table B.1 · Daytime PG class lookup</h3>
-  <p>Rows are the effective insolation tier after cloud cover reduction (see Table B.3); columns are surface wind speed in m/s. Cells give the resulting PG class. Where the standard PG table specifies a boundary case ("A or B" etc.), the recorder selects the more unstable class.</p>
-
-  <table class="matrix compact">
-    <thead>
-      <tr>
-        <th>Insolation</th>
-        <th>&lt; 2 m/s</th>
-        <th>2–3 m/s</th>
-        <th>3–5 m/s</th>
-        <th>5–6 m/s</th>
-        <th>&gt; 6 m/s</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td><strong>Strong</strong></td><td>A</td><td>A</td><td>B</td><td>C</td><td>C</td></tr>
-      <tr><td><strong>Moderate</strong></td><td>B</td><td>B</td><td>B</td><td>C</td><td>D</td></tr>
-      <tr><td><strong>Slight</strong></td><td>B</td><td>C</td><td>C</td><td>D</td><td>D</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table B.1 — PG class for daytime conditions.</div>
-
-  <p><strong>Special case:</strong> Overcast day → D (Neutral) regardless of wind speed or solar elevation.</p>
-
-  <h3>Table B.2 · Nighttime PG class lookup</h3>
-  <p>Rows are the cloud condition; columns are surface wind speed in m/s. <em>Clear night</em> applies when cloud cover is Clear or Partly cloudy; <em>Cloudy night</em> applies when cloud cover is Mostly cloudy or Overcast. Night is defined as solar elevation ≤ 3°.</p>
-
-  <table class="matrix compact">
-    <thead>
-      <tr>
-        <th>Sky</th>
-        <th>&lt; 2 m/s</th>
-        <th>2–3 m/s</th>
-        <th>3–5 m/s</th>
-        <th>≥ 5 m/s</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td><strong>Clear night</strong></td><td>F</td><td>F</td><td>E</td><td>D</td></tr>
-      <tr><td><strong>Cloudy night</strong></td><td>E</td><td>E</td><td>D</td><td>D</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table B.2 — PG class for nighttime conditions.</div>
-
-  <h3>Table B.3 · Solar insolation tiers</h3>
-  <p>Daytime insolation tier is determined first from solar elevation, then reduced by cloud cover.</p>
-
-  <table class="compact">
-    <thead><tr><th>Solar elevation</th><th>Tier (Clear)</th><th>Partly cloudy</th><th>Mostly cloudy</th><th>Overcast</th></tr></thead>
-    <tbody>
-      <tr><td>&gt; 60°</td><td>Strong</td><td>Moderate</td><td>Slight</td><td>D direct</td></tr>
-      <tr><td>35°–60°</td><td>Moderate</td><td>Slight</td><td>Slight</td><td>D direct</td></tr>
-      <tr><td>3°–35°</td><td>Slight</td><td>Slight</td><td>Slight</td><td>D direct</td></tr>
-      <tr><td>≤ 3°</td><td colspan="4">Night branch (see Table B.2)</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table B.3 — Solar elevation to insolation tier mapping, with cloud-cover reductions.</div>
-
-  <h3>Table B.4 · Beaufort band to mid-band wind speed</h3>
-  <p>The recorder converts the Beaufort band selected by the surveyor to a single mid-band value in m/s for the PG lookup. The value used is given in the rightmost column.</p>
-
-  <table class="compact">
-    <thead><tr><th>Beaufort</th><th>Name</th><th>Visible signs on land</th><th>m/s used</th></tr></thead>
-    <tbody>
-      <tr><td>0</td><td>Calm</td><td>Smoke rises vertically.</td><td>0</td></tr>
-      <tr><td>1</td><td>Light air</td><td>Smoke drifts; vanes still.</td><td>1</td></tr>
-      <tr><td>2</td><td>Light breeze</td><td>Wind felt on face; leaves rustle.</td><td>2</td></tr>
-      <tr><td>3</td><td>Gentle breeze</td><td>Leaves and small twigs in constant motion; light flag extended.</td><td>4</td></tr>
-      <tr><td>4</td><td>Moderate breeze</td><td>Dust and loose paper raised; small branches moved.</td><td>7</td></tr>
-      <tr><td>5</td><td>Fresh breeze</td><td>Small leafy trees begin to sway.</td><td>10</td></tr>
-      <tr><td>6</td><td>Strong breeze</td><td>Large branches in motion; whistling in wires.</td><td>12</td></tr>
-      <tr><td>7</td><td>Near gale</td><td>Whole trees in motion; difficulty walking into wind.</td><td>16</td></tr>
-      <tr><td>8+</td><td>Gale</td><td>Twigs break from trees; impedes progress.</td><td>20</td></tr>
-    </tbody>
-  </table>
-  <div class="caption">Table B.4 — Beaufort scale with land-based visual cues and the mid-band m/s value used by the recorder.</div>
-</section>
-
-<section id="app-c" class="appendix">
-  <h2 class="appendix-h">Appendix C — Dravnieks descriptor list</h2>
-  <p>The 141-descriptor list with hedonic scores from Dravnieks (1985). Sorted from most negative (most unpleasant) to most positive (most pleasant), matching the order presented in the recorder's descriptor screen. Negative scores indicate unpleasant odours; positive scores indicate pleasant odours; scores near zero are perceptually neutral.</p>
-
-  <div class="two-col">
-    <p><span>Cadaverous (dead animal)</span><span class="sc neg">−3.75</span></p>
-    <p><span>Putrid - foul - decayed</span><span class="sc neg">−3.74</span></p>
-    <p><span>Sewer odour</span><span class="sc neg">−3.68</span></p>
-    <p><span>Cat urine</span><span class="sc neg">−3.64</span></p>
-    <p><span>Faecal (like manure)</span><span class="sc neg">−3.36</span></p>
-    <p><span>Sickening (vomit)</span><span class="sc neg">−3.34</span></p>
-    <p><span>Urine</span><span class="sc neg">−3.34</span></p>
-    <p><span>Rancid</span><span class="sc neg">−3.15</span></p>
-    <p><span>Burnt rubber</span><span class="sc neg">−3.01</span></p>
-    <p><span>Sour milk</span><span class="sc neg">−2.91</span></p>
-    <p><span>Stale tobacco smoke</span><span class="sc neg">−2.83</span></p>
-    <p><span>Fermented (rotten fruit)</span><span class="sc neg">−2.76</span></p>
-    <p><span>Dirty linen</span><span class="sc neg">−2.55</span></p>
-    <p><span>Sweaty</span><span class="sc neg">−2.53</span></p>
-    <p><span>Ammonia</span><span class="sc neg">−2.47</span></p>
-    <p><span>Sulphurous</span><span class="sc neg">−2.45</span></p>
-    <p><span>Sharp - pungent - acid</span><span class="sc neg">−2.34</span></p>
-    <p><span>Household gas</span><span class="sc neg">−2.30</span></p>
-    <p><span>Wet wool - wet dog</span><span class="sc neg">−2.28</span></p>
-    <p><span>Mouse-like</span><span class="sc neg">−2.20</span></p>
-    <p><span>Burnt milk</span><span class="sc neg">−2.19</span></p>
-    <p><span>Stale</span><span class="sc neg">−2.04</span></p>
-    <p><span>Fishy</span><span class="sc neg">−1.98</span></p>
-    <p><span>Musty - earthy - mouldy</span><span class="sc neg">−1.94</span></p>
-    <p><span>Cleaning fluid</span><span class="sc neg">−1.69</span></p>
-    <p><span>Sooty</span><span class="sc neg">−1.69</span></p>
-    <p><span>Kerosene</span><span class="sc neg">−1.67</span></p>
-    <p><span>Blood - raw meat</span><span class="sc neg">−1.64</span></p>
-    <p><span>Chemical</span><span class="sc neg">−1.64</span></p>
-    <p><span>Tar</span><span class="sc neg">−1.63</span></p>
-    <p><span>Disinfectant - carbolic</span><span class="sc neg">−1.60</span></p>
-    <p><span>Ether - anaesthetic</span><span class="sc neg">−1.54</span></p>
-    <p><span>Burn - smoky</span><span class="sc neg">−1.53</span></p>
-    <p><span>Burnt paper</span><span class="sc neg">−1.47</span></p>
-    <p><span>Oily - fatty</span><span class="sc neg">−1.41</span></p>
-    <p><span>Bitter</span><span class="sc neg">−1.38</span></p>
-    <p><span>Creosote</span><span class="sc neg">−1.35</span></p>
-    <p><span>Sour - vinegar</span><span class="sc neg">−1.26</span></p>
-    <p><span>Mothballs</span><span class="sc neg">−1.25</span></p>
-    <p><span>Gasoline - solvent</span><span class="sc neg">−1.16</span></p>
-    <p><span>Animal</span><span class="sc neg">−1.13</span></p>
-    <p><span>Seminal - sperm-like</span><span class="sc neg">−1.04</span></p>
-    <p><span>New rubber</span><span class="sc neg">−0.96</span></p>
-    <p><span>Metallic</span><span class="sc neg">−0.94</span></p>
-    <p><span>Wet paper</span><span class="sc neg">−0.94</span></p>
-    <p><span>Medicinal</span><span class="sc neg">−0.89</span></p>
-    <p><span>Chalky</span><span class="sc neg">−0.85</span></p>
-    <p><span>Varnish</span><span class="sc neg">−0.85</span></p>
-    <p><span>Nail polish remover</span><span class="sc neg">−0.81</span></p>
-    <p><span>Paint</span><span class="sc neg">−0.75</span></p>
-    <p><span>Turpentine (pine oil)</span><span class="sc neg">−0.73</span></p>
-    <p><span>Kippery-smoked fish</span><span class="sc neg">−0.69</span></p>
-    <p><span>Fresh tobacco smoke</span><span class="sc neg">−0.66</span></p>
-    <p><span>Sauerkraut</span><span class="sc neg">−0.60</span></p>
-    <p><span>Camphor</span><span class="sc neg">−0.55</span></p>
-    <p><span>Cardboard</span><span class="sc neg">−0.54</span></p>
-    <p><span>Alcoholic</span><span class="sc neg">−0.47</span></p>
-    <p><span>Crushed weeds</span><span class="sc neg">−0.21</span></p>
-    <p><span>Garlic - onion</span><span class="sc neg">−0.17</span></p>
-    <p><span>Rope</span><span class="sc neg">−0.16</span></p>
-    <p><span>Beery</span><span class="sc neg">−0.14</span></p>
-    <p><span>Burnt candle</span><span class="sc neg">−0.08</span></p>
-    <p><span>Dry - powdery</span><span class="sc neg">−0.07</span></p>
-    <p><span>Yeasty</span><span class="sc neg">−0.07</span></p>
-    <p><span>Black pepper</span><span class="sc pos">+0.19</span></p>
-    <p><span>Cork</span><span class="sc pos">+0.19</span></p>
-    <p><span>Musky</span><span class="sc pos">+0.21</span></p>
-    <p><span>Raw potato</span><span class="sc pos">+0.26</span></p>
-    <p><span>Eggy (fresh eggs)</span><span class="sc pos">+0.45</span></p>
-    <p><span>Mushroom</span><span class="sc pos">+0.52</span></p>
-    <p><span>Beany</span><span class="sc pos">+0.54</span></p>
-    <p><span>Geranium leaves</span><span class="sc pos">+0.57</span></p>
-    <p><span>Grainy (as grain)</span><span class="sc pos">+0.63</span></p>
-    <p><span>Dill</span><span class="sc pos">+0.87</span></p>
-    <p><span>Woody - resinous</span><span class="sc pos">+0.94</span></p>
-    <p><span>Soapy</span><span class="sc pos">+0.96</span></p>
-    <p><span>Laurel leaves</span><span class="sc pos">+0.97</span></p>
-    <p><span>Eucalyptus</span><span class="sc pos">+0.99</span></p>
-    <p><span>Molasses</span><span class="sc pos">+1.00</span></p>
-    <p><span>Incense</span><span class="sc pos">+1.01</span></p>
-    <p><span>Malty</span><span class="sc pos">+1.05</span></p>
-    <p><span>Caraway</span><span class="sc pos">+1.06</span></p>
-    <p><span>Soupy</span><span class="sc pos">+1.13</span></p>
-    <p><span>Bark - birch bark</span><span class="sc pos">+1.18</span></p>
-    <p><span>Anise (liquorice)</span><span class="sc pos">+1.21</span></p>
-    <p><span>Oak wood - cognac</span><span class="sc pos">+1.23</span></p>
-    <p><span>Seasoning (for meat)</span><span class="sc pos">+1.27</span></p>
-    <p><span>Leather</span><span class="sc pos">+1.30</span></p>
-    <p><span>Raw cucumber</span><span class="sc pos">+1.30</span></p>
-    <p><span>Hay</span><span class="sc pos">+1.31</span></p>
-    <p><span>Crushed grass</span><span class="sc pos">+1.34</span></p>
-    <p><span>Celery</span><span class="sc pos">+1.36</span></p>
-    <p><span>Green pepper</span><span class="sc pos">+1.39</span></p>
-    <p><span>Tea leaves</span><span class="sc pos">+1.40</span></p>
-    <p><span>Aromatic</span><span class="sc pos">+1.41</span></p>
-    <p><span>Raisins</span><span class="sc pos">+1.56</span></p>
-    <p><span>Cooked vegetables</span><span class="sc pos">+1.58</span></p>
-    <p><span>Clove</span><span class="sc pos">+1.67</span></p>
-    <p><span>Nutty</span><span class="sc pos">+1.92</span></p>
-    <p><span>Coconut</span><span class="sc pos">+1.93</span></p>
-    <p><span>Grapefruit</span><span class="sc pos">+1.95</span></p>
-    <p><span>Perfumery</span><span class="sc pos">+1.96</span></p>
-    <p><span>Peanut butter</span><span class="sc pos">+1.99</span></p>
-    <p><span>Spicy</span><span class="sc pos">+1.99</span></p>
-    <p><span>Banana</span><span class="sc pos">+2.00</span></p>
-    <p><span>Almond</span><span class="sc pos">+2.01</span></p>
-    <p><span>Sweet</span><span class="sc pos">+2.03</span></p>
-    <p><span>Buttery - fresh butter</span><span class="sc pos">+2.04</span></p>
-    <p><span>Grape juice</span><span class="sc pos">+2.07</span></p>
-    <p><span>Honey</span><span class="sc pos">+2.08</span></p>
-    <p><span>Cedarwood</span><span class="sc pos">+2.11</span></p>
-    <p><span>Herbal - green - cut grass</span><span class="sc pos">+2.14</span></p>
-    <p><span>Cologne</span><span class="sc pos">+2.16</span></p>
-    <p><span>Fresh green vegetables</span><span class="sc pos">+2.19</span></p>
-    <p><span>Fruity - other than citrus</span><span class="sc pos">+2.23</span></p>
-    <p><span>Lavender</span><span class="sc pos">+2.25</span></p>
-    <p><span>Maple syrup</span><span class="sc pos">+2.26</span></p>
-    <p><span>Pear</span><span class="sc pos">+2.26</span></p>
-    <p><span>Caramel</span><span class="sc pos">+2.32</span></p>
-    <p><span>Coffee</span><span class="sc pos">+2.33</span></p>
-    <p><span>Meaty (cooked - good)</span><span class="sc pos">+2.34</span></p>
-    <p><span>Melon</span><span class="sc pos">+2.41</span></p>
-    <p><span>Popcorn</span><span class="sc pos">+2.47</span></p>
-    <p><span>Lemon</span><span class="sc pos">+2.50</span></p>
-    <p><span>Minty - peppermint</span><span class="sc pos">+2.50</span></p>
-    <p><span>Fragrant</span><span class="sc pos">+2.52</span></p>
-    <p><span>Fried chicken</span><span class="sc pos">+2.53</span></p>
-    <p><span>Cinnamon</span><span class="sc pos">+2.54</span></p>
-    <p><span>Cherry</span><span class="sc pos">+2.55</span></p>
-    <p><span>Vanilla</span><span class="sc pos">+2.57</span></p>
-    <p><span>Pineapple</span><span class="sc pos">+2.59</span></p>
-    <p><span>Apple</span><span class="sc pos">+2.61</span></p>
-    <p><span>Peach</span><span class="sc pos">+2.67</span></p>
-    <p><span>Violets</span><span class="sc pos">+2.68</span></p>
-    <p><span>Fruity - citrus</span><span class="sc pos">+2.72</span></p>
-    <p><span>Chocolate</span><span class="sc pos">+2.78</span></p>
-    <p><span>Floral</span><span class="sc pos">+2.79</span></p>
-    <p><span>Orange</span><span class="sc pos">+2.86</span></p>
-    <p><span>Strawberry</span><span class="sc pos">+2.93</span></p>
-    <p><span>Rose</span><span class="sc pos">+3.08</span></p>
-    <p><span>Bakery (fresh bread)</span><span class="sc pos">+3.53</span></p>
+  <div class="notice">
+    <strong>Location source for the suggestion</strong>
+    Because GPS coordinates are captured at recording start (after the conditions screen), the Suggest action runs before GPS is available. In this case the application uses a UK-centroid fallback latitude (54.0°N, 2.0°W). This produces a solar elevation that differs from the actual surveyor location by no more than ±0.5° for any UK observation, which is well below the granularity of the insolation tiers and never changes the resulting Pasquill–Gifford class. The rationale message identifies the location source explicitly so the surveyor can verify or override.
   </div>
 </section>
 
+<section id="hedonic">
+  <h2 class="section">9 · Hedonic tone and descriptor capture</h2>
+  <p>Hedonic tone (the surveyor's overall impression of pleasantness) and descriptor identification are captured after the recording phase. Both are mandatory inputs for the survey record, though the descriptor field accepts free text in lieu of, or in addition to, structured selections.</p>
+
+  <h3>Dominant tone and variation</h3>
+  <p>The dominant hedonic tone is recorded on a three-point scale: <strong>Pleasant</strong>, <strong>Neutral</strong> or <strong>Unpleasant</strong>. The surveyor selects one. A separate boolean flag, "Tone varied during session", is provided for cases where the character changed materially within the five-minute window — a typical example is a sweet-floral profile transitioning to a chemical or solvent profile. When ticked, an optional free-text field captures the description of the variation.</p>
+
+  <p>This pattern (single dominant + boolean varied + free text) was chosen over the alternative of capturing per-sample hedonic tones because:</p>
+  <ul>
+    <li>The hedonic dimension is generally more stable than the intensity dimension within a single observation window.</li>
+    <li>Per-sample hedonic capture would impose substantial cognitive load on the observer alongside the per-sample intensity rating.</li>
+    <li>The boolean flag preserves the analytical signal (variation occurred / did not) for downstream analysis without requiring the granular detail.</li>
+  </ul>
+
+  <h3>Dravnieks descriptors</h3>
+  <p>The application provides a search-and-select interface over 141 standard odour descriptors drawn from the Dravnieks (1985) <em>Atlas of Odor Character Profiles</em> <a href="#ref-5">[5]</a>. Each descriptor is associated with a hedonic score (a continuous value in approximately the range −3.75 to +3.53) derived from panel ratings of the descriptor's pleasantness or unpleasantness. The descriptors are sorted with the most negative (most unpleasant) first, as regulatory and complaint-driven surveys are typically concerned with unpleasant sources.</p>
+
+  <p>The full list with scores is reproduced in <a href="#appendix-c">Appendix C</a>.</p>
+
+  <p>Multi-selection is supported. When more than one descriptor is selected, the application reports the arithmetic mean of the individual scores in the results screen and CSV, alongside the comma-separated list of selected descriptors and their individual scores. This provides a quantified summary for blended odour characters that no single descriptor captures.</p>
+
+  <p>An "Additional / alternative description" free-text field is provided for descriptors not in the standard list, or for nuance that the standard list cannot capture. The session can complete with this field alone (no Dravnieks selections) — a common case for site-specific odours such as rendering plant emissions, anaerobic digestate, or industry-specific solvents.</p>
+</section>
+
+<section id="meteorological">
+  <h2 class="section">10 · Meteorological conditions</h2>
+  <p>Six meteorological fields are mandatory and two are optional. The mandatory fields are those required by IAQM 2018 to qualify the survey context; the optional fields are atmospheric record items that are useful for cross-referencing but are sometimes genuinely unavailable to the surveyor in the field.</p>
+
+  <table>
+    <thead><tr><th>Field</th><th>Mandatory</th><th>Permitted values</th></tr></thead>
+    <tbody>
+      <tr><td>Wind direction</td><td>Yes</td><td>16-point compass plus <em>Variable</em> and <em>Calm</em>. The direction the wind is coming from.</td></tr>
+      <tr><td>Wind strength</td><td>Yes</td><td>Beaufort 0–8+ (see §8 conversion table).</td></tr>
+      <tr><td>Cloud cover</td><td>Yes</td><td>Four buckets: Clear (0–2 oktas), Partly cloudy (3–5 oktas), Mostly cloudy (6–7 oktas), Overcast (8 oktas).</td></tr>
+      <tr><td>Atmospheric stability</td><td>Yes</td><td>Pasquill–Gifford A–F. Suggested by the application from the other three fields plus solar elevation; surveyor can override.</td></tr>
+      <tr><td>Rainfall</td><td>Yes</td><td>None, Drizzle, Light rain, Moderate rain, Heavy rain.</td></tr>
+      <tr><td>Temperature</td><td>Yes</td><td>°C, one decimal place supported.</td></tr>
+      <tr><td>Humidity</td><td>No</td><td>%, integer.</td></tr>
+      <tr><td>Barometric pressure</td><td>No</td><td>hPa, integer.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two free-text fields are also captured: <strong>On-site Operations &amp; Activities</strong> describes what is happening at the site under observation (slurry spreading, kitchen exhaust, processing line running) and <strong>Surrounding Area Activities</strong> describes other potential odour sources nearby (neighbouring farms, traffic, vegetation). Neither is mandatory but both are persisted to the CSV when supplied.</p>
+</section>
+
+<section id="anomalies">
+  <h2 class="section">11 · Anomaly flagging</h2>
+  <p>An anomaly flag is a structured marker the surveyor can apply during recording to indicate that a specific sample window was contaminated by an unrelated event — a vehicle passing, an extractor cycling on, a door opening at a neighbouring property. The flag is an explicit acknowledgement that the affected sample's intensity rating may not represent the source under investigation.</p>
+
+  <p>Flags are captured by tapping a dedicated flag button on the recording screen. A 400 ms debounce is applied so that an accidental double-tap counts as one flag. Each flag captures:</p>
+  <ul>
+    <li>The session-relative time at the moment of the tap (e.g. <var>0:11</var>).</li>
+    <li>The slider's current intensity value.</li>
+    <li>An optional free-text note added on a post-recording review screen.</li>
+  </ul>
+
+  <p>After the recording phase ends, if any flags were captured the application presents an Anomaly Review screen. Each flag is listed with its time and recorded intensity, and a free-text input is provided for the optional note. The notes screen is skip-able — the flag itself is the structured signal, and notes are nice-to-have detail.</p>
+
+  <p>In the CSV record, anomalies surface in two places:</p>
+  <ol>
+    <li>An <code>Anomaly</code> column on each per-sample row, set to <code>true</code> when the sample window contains a flag and otherwise empty.</li>
+    <li>A separate <em>Anomalies</em> block at the end of the file listing each flag with its sequence number, time, intensity, and note.</li>
+  </ol>
+
+  <p>The two-locations representation lets a downstream parser do either approach: filter the per-sample rows by the Anomaly column to exclude contaminated samples from re-analysis, or read the Anomalies block to retrieve narrative context for QA review.</p>
+</section>
+
+<section id="schema">
+  <h2 class="section">12 · Output schema</h2>
+  <p>Every session produces a single CSV file with a defined schema. The current schema is version 3, introduced in application v1.2.0; this number increments whenever the column structure or methodology changes in a way that could affect a downstream parser. Schema 3 extends Schema 2 with per-sample timing telemetry, visibility-loss tracking, and pause logging.</p>
+
+  <h3>File structure</h3>
+  <p>The CSV is logically composed of five to seven blocks separated by blank lines:</p>
+  <ol>
+    <li><strong>Per-sample table</strong> at the top: thirty rows of <code>Time, Seconds, Actual Time (s), Inter-tick Drift (s), Cumulative Drift (s), Vis Interrupt (s), Vis Interrupt (%), Intensity, Odour Strength, Status, Timing Flag, Anomaly</code>.</li>
+    <li><strong>Summary block</strong>: key-value pairs with the schema/version metadata, timestamp, timezone, surveyor identity, location, GPS coordinates, IAQM outputs (or <code>N/A</code> if compromised), hedonic and descriptor records, and Schema 3 timing telemetry.</li>
+    <li><strong>Meteorological Conditions block</strong>: key-value pairs with the eight conditions fields.</li>
+    <li><strong>Site Operations block</strong>: the two free-text activity fields.</li>
+    <li><strong>Pauses block</strong> (only present if any pauses occurred): one row per pause with trigger, pause time, resume time, and duration.</li>
+    <li><strong>Anomalies block</strong> (only present if any flags were captured): one row per flag.</li>
+  </ol>
+
+  <h3>Per-sample columns</h3>
+  <p>The twelve per-sample columns capture both the user-supplied intensity rating and the timing/visibility provenance of each capture:</p>
+  <ul>
+    <li><code>Time</code>, <code>Seconds</code> — nominal sample time as <code>mm:ss</code> and integer seconds (10, 20, … 300). Constant across all sessions; useful for joining or pivoting.</li>
+    <li><code>Actual Time (s)</code> — the attentive elapsed seconds at the moment of capture, derived from <code>performance.now()</code> minus accumulated pause time. For a perfectly timed sample N, this equals 10×N. Empty for MISSED samples.</li>
+    <li><code>Inter-tick Drift (s)</code> — signed difference between this sample's actual time and the previous sample's actual time, minus the nominal 10-second interval. For sample 1, the reference is recording start (attentive 0). Empty if the previous sample was MISSED or a manual pause occurred between them.</li>
+    <li><code>Cumulative Drift (s)</code> — signed total drift since recording start: <code>actualTime − nominalTime</code>.</li>
+    <li><code>Vis Interrupt (s)</code>, <code>Vis Interrupt (%)</code> — number of real seconds the page was hidden during this sample's 10-second window, expressed both absolutely and as a percentage of the window. Capped at 10s.</li>
+    <li><code>Intensity</code>, <code>Odour Strength</code> — the surveyor's rating and its text label. Empty for MISSED.</li>
+    <li><code>Status</code> — <code>MISSED</code> if the sample's nominal capture moment fell within a visibility-hidden episode (boundary rule: <code>ev.startReal ≤ realAtCapture ≤ ev.endReal</code>); otherwise empty.</li>
+    <li><code>Timing Flag</code> — <code>true</code> if <code>|Inter-tick Drift|</code> exceeded 1.0 second (10% of the nominal interval) or the sample is MISSED.</li>
+    <li><code>Anomaly</code> — <code>true</code> if the sample window contained a surveyor-flagged anomaly.</li>
+  </ul>
+
+  <h3>Summary block additions (Schema 3)</h3>
+  <p>The following keys are added to the Summary block beyond Schema 2:</p>
+  <ul>
+    <li><code>Timezone</code> — IANA zone derived from <code>Intl.DateTimeFormat().resolvedOptions().timeZone</code>.</li>
+    <li><code>Recording Duration (s)</code> — total wall-clock recording time from start to end. Equals 300 for a clean recording; longer if any pauses occurred.</li>
+    <li><code>Overall Drift (s)</code>, <code>Overall Drift (%)</code> — signed difference between attentive elapsed time at end of recording and 300 seconds, expressed in seconds and as a percentage. Excludes pause time.</li>
+    <li><code>Visibility Interruptions</code> — count of distinct hidden-then-visible episodes during recording.</li>
+    <li><code>Total Hidden Time (s)</code>, <code>Total Hidden Time (%)</code> — sum of all visibility-hidden duration, absolute and as a percentage of <code>Recording Duration</code>.</li>
+    <li><code>Compromised Samples</code> — count of samples flagged as compromised. A sample is compromised if it is MISSED <em>or</em> its 10-second window overlaps any visibility episode lasting more than 10 seconds.</li>
+    <li><code>MISSED Samples</code> — count of samples whose nominal capture moment fell within a hidden episode. Always ≤ <code>Compromised Samples</code>.</li>
+    <li><code>Pauses</code> — total count of pause events (visibility plus manual).</li>
+    <li><code>Manual Pause Time (s)</code> — sum of explicit Pause-button durations.</li>
+    <li><code>Timing Status</code> — one of <code>OK</code>, <code>Drift detected</code>, <code>Compromised</code>, or <code>Drift detected; compromised</code>. Drives the yellow banner on the results screen and signals downstream consumers whether the timing telemetry warrants review.</li>
+    <li><code>Device</code> — parsed device fingerprint (e.g. <code>iPhone; iOS 17.4; Safari 17.4</code>) extracted from the <code>navigator.userAgent</code> string. Used by support to triage device-specific timing issues.</li>
+  </ul>
+  <p>If <code>Compromised Samples</code> &gt; 0, the IAQM-related rows (<code>Average Intensity</code>, <code>Percentage Odour Time</code>, <code>Odour Exposure</code>, <code>Odour Effect</code>) take the literal value <code>N/A</code> rather than computed numbers. The CSV is still saved with all telemetry preserved so a reviewer can decide whether a manual recomputation against the valid samples is appropriate.</p>
+
+  <h3>Pauses block</h3>
+  <p>Present only if at least one pause occurred. Five columns: <code>Pause #, Trigger, Pause Time, Resume Time, Duration (s)</code>. Trigger values:</p>
+  <ul>
+    <li><code>Visibility</code> — the page entered the hidden state. The recorded duration includes both the hidden episode and any subsequent live-abort modal display time as a single combined entry, since the recording timer is paused for both.</li>
+    <li><code>Manual</code> — the surveyor tapped the Pause button. Modal display time for the manual pause overlay is included in the duration.</li>
+  </ul>
+  <p><code>Pause Time</code> and <code>Resume Time</code> are <code>mm:ss</code> offsets from the recording start (real time, not attentive). Entries are listed in chronological order.</p>
+
+  <h3>Quoting and escaping</h3>
+  <p>The file uses RFC 4180 quoting throughout. Any value containing a comma, double-quote, or newline is wrapped in double quotes; embedded double-quotes are escaped by doubling. This applies uniformly to all user-supplied free-text fields (location name, surveyor name, on-site activities, surrounding area activities, additional descriptor, anomaly notes) and protects against accidentally introducing additional columns or breaking row boundaries.</p>
+
+  <h3>Schema versioning</h3>
+  <p>Two version-related rows appear at the top of the Summary block:</p>
+  <ul>
+    <li><code>App Version</code> — semver string identifying the application build (e.g. <code>1.2.0</code>). Cosmetic and behavioural changes that do not affect the schema bump the application version but not the schema.</li>
+    <li><code>Schema</code> — integer identifying the column structure and methodology version (e.g. <code>3</code>). Any change that adds/removes/reorders columns, or changes the methodology in a way that affects calculated values, increments the schema number.</li>
+  </ul>
+
+  <p>Downstream parsers should branch on the <code>Schema</code> value when supporting multiple historical formats. Schema 3 is a strict superset of Schema 2 in the per-sample table (additional columns appended in fixed positions), so a Schema 2 parser that reads only the first five per-sample columns will continue to function on Schema 3 files but will miss the timing telemetry.</p>
+
+  <h3>Filename convention</h3>
+  <p>The default filename is constructed from the location name and the survey start timestamp:</p>
+  <div class="eq" style="font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.92rem">
+    {Location Name} {YYYY-MM-DD} {HH-MM}.csv
+  </div>
+  <p>For example: <code>Plant 3 North Boundary 2026-04-28 17-44.csv</code>. The hyphen separator in the time portion (rather than the colon used inside the CSV's <code>Time</code> field) is required because colons are not valid filename characters on Windows or iOS. The user can override the filename before download.</p>
+</section>
+
+<section id="location">
+  <h2 class="section">13 · Coordinate capture</h2>
+  <p>GPS coordinates are captured at the moment the surveyor taps "Start Recording" on the conditions screen, immediately before the timer begins. This is implemented through the browser's standard Geolocation API.</p>
+
+  <p>The acquisition parameters are:</p>
+  <ul>
+    <li><code>enableHighAccuracy: true</code> — requests the device's most precise positioning available, which on iOS triggers GNSS rather than coarse Wi-Fi triangulation when conditions permit.</li>
+    <li><code>timeout: 8000</code> — the application abandons the request after eight seconds and proceeds without coordinates.</li>
+    <li><code>maximumAge: 60000</code> — a position fix obtained within the previous 60 seconds may be reused.</li>
+  </ul>
+
+  <p>Three outcomes are possible:</p>
+  <ol>
+    <li><strong>Success</strong> — the position is recorded with its reported accuracy (in metres) and the session begins.</li>
+    <li><strong>Permission denied</strong> — the application presents a confirmation dialog ("Location permission denied. Continue without GPS coordinates?") and the surveyor can choose whether to abandon or to proceed without coordinates.</li>
+    <li><strong>Timeout or error</strong> — same dialog flow as permission denied.</li>
+  </ol>
+
+  <p>When GPS coordinates are present, three rows appear in the CSV Summary: <code>Latitude</code>, <code>Longitude</code> and <code>GPS Accuracy (m)</code>, with the latitude and longitude recorded to six decimal places (approximately 11 cm precision) and the accuracy to integer metres. When GPS is absent, the rows are present but empty.</p>
+</section>
+
+<section id="persistence">
+  <h2 class="section">14 · Persistence and session state</h2>
+
+  <h3>Surveyor name retention</h3>
+  <p>The surveyor name is persisted in the browser's <code>localStorage</code> on the device, scoped to the application origin. This means a surveyor entering their name once does not re-enter it for subsequent sessions on the same device. A different surveyor using the same device can simply edit the name on the setup screen, and the new value is saved. This is the only piece of state the application persists across sessions.</p>
+
+  <h3>Mid-session persistence</h3>
+  <p>The application does not persist in-progress sessions across browser reloads or device restarts. If the device restarts during the five-minute recording phase, the data captured up to that point is unrecoverable. The recommended practice is to keep the application in the foreground until the CSV is saved.</p>
+
+  <h3>Wake lock</h3>
+  <p>For the duration of the recording phase, the application requests a screen wake lock through the browser's Wake Lock API <a href="#ref-7">[7]</a>. This prevents the device's screen from dimming or sleeping, which would otherwise pause the JavaScript timer and cause samples to be missed. The wake lock is released on session completion (whether the timer expires naturally, the surveyor ends the session early via the Pause overlay, or recording is aborted). On platforms or browser versions that do not support the Wake Lock API the request silently no-ops, but a screen sleep would still be observable as a session interruption (and would now also be captured as a visibility-loss episode in the per-sample telemetry).</p>
+
+  <h3>Timing and visibility tracking (Schema 3)</h3>
+  <p>The recorder anchors all timing measurements to <code>performance.now()</code>, a monotonic high-resolution clock unaffected by wall-clock corrections (NTP adjustments, manual clock changes, daylight savings). At the moment of each sample capture, the difference between <code>performance.now()</code> and the recording start time, minus any accumulated pause time, gives the <em>attentive elapsed</em> seconds. The signed difference between this value and the nominal capture time produces the cumulative drift; the difference between successive samples' attentive elapsed values, minus the nominal 10-second interval, produces the inter-tick drift.</p>
+  <p>The Page Visibility API <a href="#ref-page-vis">[10]</a> tracks every transition into and out of the hidden state via <code>document.visibilityState</code> and the <code>visibilitychange</code> event. A hidden episode is recorded as a <code>{startReal, endReal, durationS}</code> tuple. On return to the visible state, the application evaluates two thresholds — single-episode duration &gt; 10 seconds, or cumulative hidden time since the last warning &gt; 15 seconds — and fires a "Survey may be compromised" modal if either is crossed. The modal pauses the recording timer (cancels the pending tick and prevents new ticks from firing) until the surveyor selects Continue or Abort, ensuring the surveyor's deliberation time is not itself counted against subsequent samples.</p>
+  <p>The boundary rule for MISSED status uses inclusive comparison on both ends: a sample whose <code>realAtCapture</code> falls within <code>[ev.startReal, ev.endReal]</code> for any visibility episode <code>ev</code> is marked MISSED. The strict <code>≤</code> on both ends reflects the fact that a sample fired at the exact moment of visibility transition still gives the surveyor zero attentive time to review or amend the slider value.</p>
+  <p>The compromised-sample definition combines this with a window-overlap rule: a sample is compromised if it is MISSED <em>or</em> its 10 attentive seconds (mapped to real time) overlap any visibility episode of duration &gt; 10 seconds. The 10-second threshold for the overlap rule is methodologically equivalent to the live-modal trigger — any visibility loss large enough to fire a modal is treated as compromising the affected sample(s).</p>
+  <p>Manual pauses (initiated by the surveyor tapping the Pause button) follow a separate code path that does <em>not</em> generate MISSED or Compromised status. A manual pause is by definition a deliberate, witnessed break in the recording, recorded in the Pauses block as a <code>Manual</code> entry with full duration. The recording resumes from the point of pause, with the next sample firing 10 attentive seconds later.</p>
+</section>
+
+<section id="assumptions">
+  <h2 class="section">15 · Assumptions and limitations</h2>
+  <p>The methodology and implementation rely on a number of assumptions, and the resulting record carries corresponding limitations. These should be understood by anyone commissioning, conducting, or relying on the output of a survey.</p>
+
+  <h3>Single-observer methodology</h3>
+  <p>The tool assumes a single observer. There is no cross-observer agreement or panel reliability check built in. Inter-observer variation in odour intensity rating is well-documented in the literature and the tool's record reflects the single observer's assessment only. For applications requiring panel-style assessment, dynamic olfactometry to EN 13725 <a href="#ref-6">[6]</a> is the appropriate methodology.</p>
+
+  <h3>Snapshot, not continuous monitoring</h3>
+  <p>A five-minute observation is a snapshot. Odour exposure varies with operational state, meteorology, and time of day. A single session captures conditions over five minutes only and cannot speak to longer-term temporal patterns. For a defensible characterisation of a receptor's odour environment, multiple sessions across time of day, day of week, season and meteorological conditions are typically required. The tool's CSV format and timestamped filename convention are designed to support such a programme of sessions.</p>
+
+  <h3>Slider linearity</h3>
+  <p>The intensity scale is ordinal, not interval. Computing an arithmetic mean over an ordinal scale is methodologically conventional within IAQM 2018 but assumes that the surveyor interprets adjacent values as approximately equally spaced. Surveyor calibration through training and reference exposures is the standard mitigation.</p>
+
+  <h3>Browser runtime constraints</h3>
+  <p>The application runs in a web browser on the surveyor's device, predominantly iOS Safari in field deployments. Three iOS-specific behaviours bear on data integrity:</p>
+  <ul>
+    <li>Audio cues will not play until the user has performed at least one tap (the audio context is unlocked by the Start Recording tap). This is a fixed iOS Safari constraint and cannot be worked around.</li>
+    <li>If the application is backgrounded (the user switches apps or locks the device) during recording, iOS Safari throttles or suspends the JavaScript timer. As of Schema 3, every visibility transition is captured via the Page Visibility API and surfaced both in real time as a warning modal (when a threshold is crossed) and in the CSV as per-sample <code>Vis Interrupt</code> values, a Pauses block entry, and a <code>Compromised Samples</code> count. The Wake Lock implementation reduces the likelihood of unintended backgrounding but does not eliminate it.</li>
+    <li>iOS Safari's quiet hours and silent mode override the application's audio output. A surveyor who switches to silent mode will not hear the pip-pip-pip-beep cues; the timer continues to run and capture samples, but the audible structure of the session is lost.</li>
+  </ul>
+
+  <h3>GPS accuracy</h3>
+  <p>Reported accuracy varies from a few metres in clear sky GNSS conditions to several tens of metres in urban canyons or indoor surveys. The accuracy value is preserved in the CSV so downstream consumers can apply their own confidence thresholds.</p>
+
+  <h3>Solar elevation approximation</h3>
+  <p>The solar elevation calculation is accurate to approximately ±0.5°, which is well within the granularity of the Pasquill–Gifford insolation tiers (boundaries at 35° and 60°). The approximation introduces no observable error in the stability category derivation.</p>
+
+  <h3>Cloud cover bucketing</h3>
+  <p>The four-bucket cloud cover scheme abstracts the eighths-of-sky (oktas) standard into a coarser categorisation that is more reliable for an observer estimating by eye than asking for a numeric oktas value. The trade-off is loss of granularity at the bucket boundaries; a sky at the boundary between Partly cloudy and Mostly cloudy may be classified differently by different observers, which can swing the suggested stability class by one tier near the day-edge cases.</p>
+
+  <h3>Pre-recording PG suggestion</h3>
+  <p>As described in §8, the Suggest action runs before GPS is available and uses a UK-centroid fallback latitude. This is methodologically defensible for any UK observation but would introduce systematic error if the application were used outside the British Isles. Surveyors operating elsewhere should manually set the stability category rather than relying on the suggestion.</p>
+
+  <h3>Fixed descriptor list</h3>
+  <p>The Dravnieks atlas descriptor list is fixed at the 141 entries from the 1985 publication <a href="#ref-5">[5]</a>. It is not user-extensible. Site-specific descriptors not in the list (e.g. "rendering plant," "pulper effluent") must be captured through the free-text additional description field.</p>
+
+  <h3>Background dispersion</h3>
+  <p>The tool records what the observer perceives at the survey point. It does not account for source-to-receptor dispersion, atmospheric back-trajectory analysis, or apportionment between possible sources. These are dispersion-modelling exercises outside the scope of an in-situ observation.</p>
+</section>
+
+<section id="qa">
+  <h2 class="section">16 · Quality assurance considerations</h2>
+  <p>The output CSV is designed to support a defensible audit trail.</p>
+
+  <ul>
+    <li>Every session carries the surveyor's identity, the start timestamp, GPS coordinates with reported accuracy, and the application and schema versions.</li>
+    <li>Every per-sample rating is preserved verbatim alongside the aggregate calculations, so a third party can recompute the IAQM outputs from the raw data and confirm the matrix lookups.</li>
+    <li>Anomaly flags provide explicit acknowledgement of contamination events with their time and the surveyor's note.</li>
+    <li>The schema versioning and RFC 4180 quoting protect against accidental data corruption from edge-case free-text inputs.</li>
+  </ul>
+
+  <p>What the tool does not provide:</p>
+
+  <ul>
+    <li>Olfactometric quantification (concentration in odour units per cubic metre). This requires controlled laboratory dilution to EN 13725 <a href="#ref-6">[6]</a>, which is outside the scope of any in-situ observation.</li>
+    <li>Statistical inference about a receptor's typical exposure. A single session is one data point; a representative characterisation requires a programme of sessions designed to sample the relevant variability.</li>
+    <li>Compliance determination against any specific regulatory standard. The tool computes the IAQM 2018 outputs as the methodology defines them; whether those outputs constitute compliance under any given local regulation, planning condition, or environmental permit is a separate question that depends on the regulatory framework in question.</li>
+  </ul>
+</section>
+
+<section id="references">
+  <h2 class="section">17 · References</h2>
+  <ol class="refs">
+    <li id="ref-1"><strong>IAQM (2018)</strong>. <em>Guidance on the Assessment of Odour for Planning</em>. Institute of Air Quality Management, London. Version 1.1.</li>
+    <li id="ref-2"><strong>Pasquill, F. (1961)</strong>. The estimation of the dispersion of windborne material. <em>Meteorological Magazine</em>, 90 (1063), pp. 33–49.</li>
+    <li id="ref-3"><strong>Gifford, F. A. (1976)</strong>. Turbulent diffusion-typing schemes: A review. <em>Nuclear Safety</em>, 17 (1), pp. 68–86.</li>
+    <li id="ref-4"><strong>NOAA (n.d.)</strong>. <em>Solar Position Calculator: technical notes</em>. National Oceanic and Atmospheric Administration, Earth System Research Laboratories. The solar declination and equation-of-time approximations used here follow the NOAA spreadsheet methodology, accurate to approximately ±0.5° from year 1900 to 2100.</li>
+    <li id="ref-5"><strong>Dravnieks, A. (1985)</strong>. <em>Atlas of Odor Character Profiles</em>. ASTM Data Series DS 61. American Society for Testing and Materials, Philadelphia.</li>
+    <li id="ref-6"><strong>BS EN 13725:2022</strong>. <em>Stationary source emissions — Determination of odour concentration by dynamic olfactometry and odour emission rate</em>. British Standards Institution / European Committee for Standardization.</li>
+    <li id="ref-7"><strong>W3C (current)</strong>. <em>Screen Wake Lock API</em>. World Wide Web Consortium, Web Working Group.</li>
+    <li id="ref-8"><strong>WMO (2019)</strong>. <em>Manual on Codes — International Codes, Volume I.1</em>. World Meteorological Organization, WMO-No. 306. The Beaufort scale specification is given in Annex II.</li>
+    <li id="ref-page-vis"><strong>W3C (current)</strong>. <em>Page Visibility Level 2</em>. World Wide Web Consortium, Web Performance Working Group. Defines <code>document.visibilityState</code> and the <code>visibilitychange</code> event used by the recorder to track whether the application is foregrounded during a recording.</li>
+  </ol>
+</section>
+
+<section id="appendix-a">
+  <h2 class="appendix-title"><span class="letter">A</span>Pasquill–Gifford derivation grid</h2>
+  <p>The lookup grid as implemented. Where the original Pasquill scheme indicates an interpolated boundary (e.g. "A–B"), the implementation resolves to a single class as noted in the <em>Resolved</em> column.</p>
+
+  <h3>Daytime (solar elevation &gt; 3°)</h3>
+  <p>Index by adjusted insolation tier (after cloud-cover reduction) and wind speed in m/s.</p>
+  <table class="matrix compact">
+    <thead>
+      <tr>
+        <th class="corner" rowspan="2">Wind (m/s)</th>
+        <th class="col-head" colspan="3">Insolation tier</th>
+      </tr>
+      <tr>
+        <th>Strong</th><th>Moderate</th><th>Slight</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="row-head">&lt; 2</td><td>A</td><td>A–B → <strong>B</strong></td><td>B</td></tr>
+      <tr><td class="row-head">2–3</td><td>A</td><td>B</td><td>C</td></tr>
+      <tr><td class="row-head">3–5</td><td>B</td><td>B–C → <strong>B</strong></td><td>C</td></tr>
+      <tr><td class="row-head">5–6</td><td>C</td><td>C–D → <strong>C</strong></td><td>D</td></tr>
+      <tr><td class="row-head">&gt; 6</td><td>C</td><td>D</td><td>D</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:.85rem;color:var(--text-dim);margin-top:-.5rem">Daytime overcast bypasses this lookup and yields class D directly.</p>
+
+  <h3>Night-time (solar elevation ≤ 3°)</h3>
+  <p>Index by cloud cover bucket and wind speed in m/s. "Clear night" includes Clear and Partly cloudy buckets; "Cloudy night" includes Mostly cloudy and Overcast.</p>
+  <table class="matrix compact">
+    <thead>
+      <tr>
+        <th class="corner" rowspan="2">Wind (m/s)</th>
+        <th class="col-head" colspan="2">Cloud condition</th>
+      </tr>
+      <tr>
+        <th>Clear (≤ 5 oktas)</th><th>Cloudy (&gt; 5 oktas)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="row-head">&lt; 2</td><td>F</td><td>E</td></tr>
+      <tr><td class="row-head">2–3</td><td>F</td><td>E</td></tr>
+      <tr><td class="row-head">3–5</td><td>E</td><td>D</td></tr>
+      <tr><td class="row-head">&gt; 5</td><td>D</td><td>D</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Insolation tier reduction by cloud cover</h3>
+  <table class="compact">
+    <thead><tr><th>Cloud cover bucket</th><th>Tier reduction</th></tr></thead>
+    <tbody>
+      <tr><td>Clear (0–2 oktas)</td><td>None</td></tr>
+      <tr><td>Partly cloudy (3–5 oktas)</td><td>−1 tier (Strong → Moderate, etc.)</td></tr>
+      <tr><td>Mostly cloudy (6–7 oktas)</td><td>−2 tiers</td></tr>
+      <tr><td>Overcast (8 oktas)</td><td>Daytime: bypasses lookup, yields D</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Beaufort to wind speed conversion</h3>
+  <table class="compact">
+    <thead><tr><th class="center">Beaufort</th><th>Description</th><th class="center">m/s (used)</th></tr></thead>
+    <tbody>
+      <tr><td class="center code">0</td><td>Calm</td><td class="center">0</td></tr>
+      <tr><td class="center code">1</td><td>Light air</td><td class="center">1</td></tr>
+      <tr><td class="center code">2</td><td>Light breeze</td><td class="center">2</td></tr>
+      <tr><td class="center code">3</td><td>Gentle breeze</td><td class="center">4</td></tr>
+      <tr><td class="center code">4</td><td>Moderate breeze</td><td class="center">7</td></tr>
+      <tr><td class="center code">5</td><td>Fresh breeze</td><td class="center">10</td></tr>
+      <tr><td class="center code">6</td><td>Strong breeze</td><td class="center">12</td></tr>
+      <tr><td class="center code">7</td><td>Near gale</td><td class="center">16</td></tr>
+      <tr><td class="center code">8+</td><td>Gale or stronger</td><td class="center">20</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="appendix-b">
+  <h2 class="appendix-title"><span class="letter">B</span>IAQM exposure and effect matrices</h2>
+
+  <h3>Table B.1 · Exposure from intensity and percentage time</h3>
+  <p>Index by the rounded mean intensity <var>I<sub>mean</sub></var> (rows, descending from 6 to 1) and the binned percentage time <var>t<sub>≥4</sub></var> (columns).</p>
+
+  <table class="matrix compact">
+    <thead>
+      <tr>
+        <th class="corner" rowspan="2"><var>I<sub>mean</sub></var></th>
+        <th class="col-head" colspan="5"><var>t<sub>≥4</sub></var> &mdash; percentage of samples ≥ intensity 4</th>
+      </tr>
+      <tr>
+        <th>0–10%</th><th>11–20%</th><th>21–30%</th><th>31–40%</th><th>41–100%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="row-head">6</td><td class="cell-lrg">Large</td><td class="cell-vlg">Very Large</td><td class="cell-vlg">Very Large</td><td class="cell-vlg">Very Large</td><td class="cell-vlg">Very Large</td></tr>
+      <tr><td class="row-head">5</td><td class="cell-med">Medium</td><td class="cell-lrg">Large</td><td class="cell-lrg">Large</td><td class="cell-vlg">Very Large</td><td class="cell-vlg">Very Large</td></tr>
+      <tr><td class="row-head">4</td><td class="cell-sml">Small</td><td class="cell-med">Medium</td><td class="cell-med">Medium</td><td class="cell-lrg">Large</td><td class="cell-lrg">Large</td></tr>
+      <tr><td class="row-head">3</td><td class="cell-sml">Small</td><td class="cell-med">Medium</td><td class="cell-med">Medium</td><td class="cell-med">Medium</td><td class="cell-med">Medium</td></tr>
+      <tr><td class="row-head">2</td><td class="cell-sml">Small</td><td class="cell-sml">Small</td><td class="cell-med">Medium</td><td class="cell-med">Medium</td><td class="cell-med">Medium</td></tr>
+      <tr><td class="row-head">1</td><td class="cell-sml">Small</td><td class="cell-sml">Small</td><td class="cell-sml">Small</td><td class="cell-na">N/A</td><td class="cell-na">N/A</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:.85rem;color:var(--text-dim);margin-top:-.5rem">Boundary conditions: <var>I<sub>mean</sub> = 0</var> &rArr; Negligible; <var>I<sub>mean</sub> = 1</var> &and; <var>t<sub>≥4</sub> &le; 10%</var> &rArr; Negligible (overrides "Small").</p>
+
+  <h3>Table B.2 · Effect from exposure and receptor sensitivity</h3>
+  <p>Index by the exposure category from Table B.1 and the receptor sensitivity classification.</p>
+
+  <table class="matrix compact">
+    <thead>
+      <tr>
+        <th class="corner" rowspan="2">Exposure</th>
+        <th class="col-head" colspan="3">Receptor sensitivity</th>
+      </tr>
+      <tr>
+        <th>Low</th><th>Medium</th><th>High</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="row-head">Negligible</td><td class="cell-neg">Negligible</td><td class="cell-neg">Negligible</td><td class="cell-neg">Negligible</td></tr>
+      <tr><td class="row-head">Small</td><td class="cell-neg">Negligible</td><td class="cell-neg">Negligible</td><td class="cell-med">Slight adverse</td></tr>
+      <tr><td class="row-head">Medium</td><td class="cell-med">Slight adverse</td><td class="cell-med">Slight adverse</td><td class="cell-lrg">Moderate adverse</td></tr>
+      <tr><td class="row-head">Large</td><td class="cell-lrg">Moderate adverse</td><td class="cell-lrg">Moderate adverse</td><td class="cell-vlg">Substantial adverse</td></tr>
+      <tr><td class="row-head">Very Large</td><td class="cell-vlg">Substantial adverse</td><td class="cell-vlg">Substantial adverse</td><td class="cell-vlg">Substantial adverse</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="appendix-c">
+  <h2 class="appendix-title"><span class="letter">C</span>Dravnieks descriptor list</h2>
+  <p>The 141 odour descriptors from the Dravnieks (1985) atlas <a href="#ref-5">[5]</a> with their hedonic scores. Sorted from most negative (most unpleasant) to most positive (most pleasant) — the order in which they appear in the application's selector.</p>
+
+  <div class="descriptor-list">
+  <div class="row"><span class="name">Cadaverous (dead animal)</span><span class="score score-neg">-3.75</span></div>
+  <div class="row"><span class="name">Putrid - foul - decayed</span><span class="score score-neg">-3.74</span></div>
+  <div class="row"><span class="name">Sewer odour</span><span class="score score-neg">-3.68</span></div>
+  <div class="row"><span class="name">Cat urine</span><span class="score score-neg">-3.64</span></div>
+  <div class="row"><span class="name">Faecal (like manure)</span><span class="score score-neg">-3.36</span></div>
+  <div class="row"><span class="name">Urine</span><span class="score score-neg">-3.34</span></div>
+  <div class="row"><span class="name">Sickening (vomit)</span><span class="score score-neg">-3.34</span></div>
+  <div class="row"><span class="name">Rancid</span><span class="score score-neg">-3.15</span></div>
+  <div class="row"><span class="name">Burnt rubber</span><span class="score score-neg">-3.01</span></div>
+  <div class="row"><span class="name">Sour milk</span><span class="score score-neg">-2.91</span></div>
+  <div class="row"><span class="name">Stale tobacco smoke</span><span class="score score-neg">-2.83</span></div>
+  <div class="row"><span class="name">Fermented (rotten fruit)</span><span class="score score-neg">-2.76</span></div>
+  <div class="row"><span class="name">Dirty linen</span><span class="score score-neg">-2.55</span></div>
+  <div class="row"><span class="name">Sweaty</span><span class="score score-neg">-2.53</span></div>
+  <div class="row"><span class="name">Ammonia</span><span class="score score-neg">-2.47</span></div>
+  <div class="row"><span class="name">Sulphurous</span><span class="score score-neg">-2.45</span></div>
+  <div class="row"><span class="name">Sharp - pungent - acid</span><span class="score score-neg">-2.34</span></div>
+  <div class="row"><span class="name">Household gas</span><span class="score score-neg">-2.30</span></div>
+  <div class="row"><span class="name">Wet wool - wet dog</span><span class="score score-neg">-2.28</span></div>
+  <div class="row"><span class="name">Mouse-like</span><span class="score score-neg">-2.20</span></div>
+  <div class="row"><span class="name">Burnt milk</span><span class="score score-neg">-2.19</span></div>
+  <div class="row"><span class="name">Stale</span><span class="score score-neg">-2.04</span></div>
+  <div class="row"><span class="name">Fishy</span><span class="score score-neg">-1.98</span></div>
+  <div class="row"><span class="name">Musty - earthy - mouldy</span><span class="score score-neg">-1.94</span></div>
+  <div class="row"><span class="name">Cleaning fluid</span><span class="score score-neg">-1.69</span></div>
+  <div class="row"><span class="name">Sooty</span><span class="score score-neg">-1.69</span></div>
+  <div class="row"><span class="name">Kerosene</span><span class="score score-neg">-1.67</span></div>
+  <div class="row"><span class="name">Chemical</span><span class="score score-neg">-1.64</span></div>
+  <div class="row"><span class="name">Blood - raw meat</span><span class="score score-neg">-1.64</span></div>
+  <div class="row"><span class="name">Tar</span><span class="score score-neg">-1.63</span></div>
+  <div class="row"><span class="name">Disinfectant - carbolic</span><span class="score score-neg">-1.60</span></div>
+  <div class="row"><span class="name">Ether - anaesthetic</span><span class="score score-neg">-1.54</span></div>
+  <div class="row"><span class="name">Burn - smoky</span><span class="score score-neg">-1.53</span></div>
+  <div class="row"><span class="name">Burnt paper</span><span class="score score-neg">-1.47</span></div>
+  <div class="row"><span class="name">Oily - fatty</span><span class="score score-neg">-1.41</span></div>
+  <div class="row"><span class="name">Bitter</span><span class="score score-neg">-1.38</span></div>
+  <div class="row"><span class="name">Creosote</span><span class="score score-neg">-1.35</span></div>
+  <div class="row"><span class="name">Sour - vinegar</span><span class="score score-neg">-1.26</span></div>
+  <div class="row"><span class="name">Mothballs</span><span class="score score-neg">-1.25</span></div>
+  <div class="row"><span class="name">Gasoline - solvent</span><span class="score score-neg">-1.16</span></div>
+  <div class="row"><span class="name">Animal</span><span class="score score-neg">-1.13</span></div>
+  <div class="row"><span class="name">Seminal - sperm-like</span><span class="score score-neg">-1.04</span></div>
+  <div class="row"><span class="name">New rubber</span><span class="score score-neg">-0.96</span></div>
+  <div class="row"><span class="name">Wet paper</span><span class="score score-neg">-0.94</span></div>
+  <div class="row"><span class="name">Metallic</span><span class="score score-neg">-0.94</span></div>
+  <div class="row"><span class="name">Medicinal</span><span class="score score-neg">-0.89</span></div>
+  <div class="row"><span class="name">Varnish</span><span class="score score-neg">-0.85</span></div>
+  <div class="row"><span class="name">Chalky</span><span class="score score-neg">-0.85</span></div>
+  <div class="row"><span class="name">Nail polish remover</span><span class="score score-neg">-0.81</span></div>
+  <div class="row"><span class="name">Paint</span><span class="score score-neg">-0.75</span></div>
+  <div class="row"><span class="name">Turpentine (pine oil)</span><span class="score score-neg">-0.73</span></div>
+  <div class="row"><span class="name">Kippery-smoked fish</span><span class="score score-neg">-0.69</span></div>
+  <div class="row"><span class="name">Fresh tobacco smoke</span><span class="score score-neg">-0.66</span></div>
+  <div class="row"><span class="name">Sauerkraut</span><span class="score score-neg">-0.60</span></div>
+  <div class="row"><span class="name">Camphor</span><span class="score score-neg">-0.55</span></div>
+  <div class="row"><span class="name">Cardboard</span><span class="score score-neg">-0.54</span></div>
+  <div class="row"><span class="name">Alcoholic</span><span class="score score-neg">-0.47</span></div>
+  <div class="row"><span class="name">Crushed weeds</span><span class="score score-neg">-0.21</span></div>
+  <div class="row"><span class="name">Garlic - onion</span><span class="score score-neg">-0.17</span></div>
+  <div class="row"><span class="name">Rope</span><span class="score score-neg">-0.16</span></div>
+  <div class="row"><span class="name">Beery</span><span class="score score-neg">-0.14</span></div>
+  <div class="row"><span class="name">Burnt candle</span><span class="score score-neg">-0.08</span></div>
+  <div class="row"><span class="name">Dry - powdery</span><span class="score score-neg">-0.07</span></div>
+  <div class="row"><span class="name">Yeasty</span><span class="score score-neg">-0.07</span></div>
+  <div class="row"><span class="name">Black pepper</span><span class="score score-pos">+0.19</span></div>
+  <div class="row"><span class="name">Cork</span><span class="score score-pos">+0.19</span></div>
+  <div class="row"><span class="name">Musky</span><span class="score score-pos">+0.21</span></div>
+  <div class="row"><span class="name">Raw potato</span><span class="score score-pos">+0.26</span></div>
+  <div class="row"><span class="name">Eggy (fresh eggs)</span><span class="score score-pos">+0.45</span></div>
+  <div class="row"><span class="name">Mushroom</span><span class="score score-pos">+0.52</span></div>
+  <div class="row"><span class="name">Beany</span><span class="score score-pos">+0.54</span></div>
+  <div class="row"><span class="name">Geranium leaves</span><span class="score score-pos">+0.57</span></div>
+  <div class="row"><span class="name">Grainy (as grain)</span><span class="score score-pos">+0.63</span></div>
+  <div class="row"><span class="name">Dill</span><span class="score score-pos">+0.87</span></div>
+  <div class="row"><span class="name">Woody - resinous</span><span class="score score-pos">+0.94</span></div>
+  <div class="row"><span class="name">Soapy</span><span class="score score-pos">+0.96</span></div>
+  <div class="row"><span class="name">Laurel leaves</span><span class="score score-pos">+0.97</span></div>
+  <div class="row"><span class="name">Eucalyptus</span><span class="score score-pos">+0.99</span></div>
+  <div class="row"><span class="name">Molasses</span><span class="score score-pos">+1.00</span></div>
+  <div class="row"><span class="name">Incense</span><span class="score score-pos">+1.01</span></div>
+  <div class="row"><span class="name">Malty</span><span class="score score-pos">+1.05</span></div>
+  <div class="row"><span class="name">Caraway</span><span class="score score-pos">+1.06</span></div>
+  <div class="row"><span class="name">Soupy</span><span class="score score-pos">+1.13</span></div>
+  <div class="row"><span class="name">Bark - birch bark</span><span class="score score-pos">+1.18</span></div>
+  <div class="row"><span class="name">Anise (liquorice)</span><span class="score score-pos">+1.21</span></div>
+  <div class="row"><span class="name">Oak wood - cognac</span><span class="score score-pos">+1.23</span></div>
+  <div class="row"><span class="name">Seasoning (for meat)</span><span class="score score-pos">+1.27</span></div>
+  <div class="row"><span class="name">Raw cucumber</span><span class="score score-pos">+1.30</span></div>
+  <div class="row"><span class="name">Leather</span><span class="score score-pos">+1.30</span></div>
+  <div class="row"><span class="name">Hay</span><span class="score score-pos">+1.31</span></div>
+  <div class="row"><span class="name">Crushed grass</span><span class="score score-pos">+1.34</span></div>
+  <div class="row"><span class="name">Celery</span><span class="score score-pos">+1.36</span></div>
+  <div class="row"><span class="name">Green pepper</span><span class="score score-pos">+1.39</span></div>
+  <div class="row"><span class="name">Tea leaves</span><span class="score score-pos">+1.40</span></div>
+  <div class="row"><span class="name">Aromatic</span><span class="score score-pos">+1.41</span></div>
+  <div class="row"><span class="name">Raisins</span><span class="score score-pos">+1.56</span></div>
+  <div class="row"><span class="name">Cooked vegetables</span><span class="score score-pos">+1.58</span></div>
+  <div class="row"><span class="name">Clove</span><span class="score score-pos">+1.67</span></div>
+  <div class="row"><span class="name">Nutty</span><span class="score score-pos">+1.92</span></div>
+  <div class="row"><span class="name">Coconut</span><span class="score score-pos">+1.93</span></div>
+  <div class="row"><span class="name">Grapefruit</span><span class="score score-pos">+1.95</span></div>
+  <div class="row"><span class="name">Perfumery</span><span class="score score-pos">+1.96</span></div>
+  <div class="row"><span class="name">Spicy</span><span class="score score-pos">+1.99</span></div>
+  <div class="row"><span class="name">Peanut butter</span><span class="score score-pos">+1.99</span></div>
+  <div class="row"><span class="name">Banana</span><span class="score score-pos">+2.00</span></div>
+  <div class="row"><span class="name">Almond</span><span class="score score-pos">+2.01</span></div>
+  <div class="row"><span class="name">Sweet</span><span class="score score-pos">+2.03</span></div>
+  <div class="row"><span class="name">Buttery - fresh butter</span><span class="score score-pos">+2.04</span></div>
+  <div class="row"><span class="name">Grape juice</span><span class="score score-pos">+2.07</span></div>
+  <div class="row"><span class="name">Honey</span><span class="score score-pos">+2.08</span></div>
+  <div class="row"><span class="name">Cedarwood</span><span class="score score-pos">+2.11</span></div>
+  <div class="row"><span class="name">Herbal - green - cut grass</span><span class="score score-pos">+2.14</span></div>
+  <div class="row"><span class="name">Cologne</span><span class="score score-pos">+2.16</span></div>
+  <div class="row"><span class="name">Fresh green vegetables</span><span class="score score-pos">+2.19</span></div>
+  <div class="row"><span class="name">Fruity - other than citrus</span><span class="score score-pos">+2.23</span></div>
+  <div class="row"><span class="name">Lavender</span><span class="score score-pos">+2.25</span></div>
+  <div class="row"><span class="name">Pear</span><span class="score score-pos">+2.26</span></div>
+  <div class="row"><span class="name">Maple syrup</span><span class="score score-pos">+2.26</span></div>
+  <div class="row"><span class="name">Caramel</span><span class="score score-pos">+2.32</span></div>
+  <div class="row"><span class="name">Coffee</span><span class="score score-pos">+2.33</span></div>
+  <div class="row"><span class="name">Meaty (cooked - good)</span><span class="score score-pos">+2.34</span></div>
+  <div class="row"><span class="name">Melon</span><span class="score score-pos">+2.41</span></div>
+  <div class="row"><span class="name">Popcorn</span><span class="score score-pos">+2.47</span></div>
+  <div class="row"><span class="name">Lemon</span><span class="score score-pos">+2.50</span></div>
+  <div class="row"><span class="name">Minty - peppermint</span><span class="score score-pos">+2.50</span></div>
+  <div class="row"><span class="name">Fragrant</span><span class="score score-pos">+2.52</span></div>
+  <div class="row"><span class="name">Fried chicken</span><span class="score score-pos">+2.53</span></div>
+  <div class="row"><span class="name">Cinnamon</span><span class="score score-pos">+2.54</span></div>
+  <div class="row"><span class="name">Cherry</span><span class="score score-pos">+2.55</span></div>
+  <div class="row"><span class="name">Vanilla</span><span class="score score-pos">+2.57</span></div>
+  <div class="row"><span class="name">Pineapple</span><span class="score score-pos">+2.59</span></div>
+  <div class="row"><span class="name">Apple</span><span class="score score-pos">+2.61</span></div>
+  <div class="row"><span class="name">Peach</span><span class="score score-pos">+2.67</span></div>
+  <div class="row"><span class="name">Violets</span><span class="score score-pos">+2.68</span></div>
+  <div class="row"><span class="name">Fruity - citrus</span><span class="score score-pos">+2.72</span></div>
+  <div class="row"><span class="name">Chocolate</span><span class="score score-pos">+2.78</span></div>
+  <div class="row"><span class="name">Floral</span><span class="score score-pos">+2.79</span></div>
+  <div class="row"><span class="name">Orange</span><span class="score score-pos">+2.86</span></div>
+  <div class="row"><span class="name">Strawberry</span><span class="score score-pos">+2.93</span></div>
+  <div class="row"><span class="name">Rose</span><span class="score score-pos">+3.08</span></div>
+  <div class="row"><span class="name">Bakery (fresh bread)</span><span class="score score-pos">+3.53</span></div>
+</div>
+
+  <p style="font-size:.85rem;color:var(--text-dim);margin-top:1rem">Hedonic scores are derived from panel ratings of pleasantness/unpleasantness as published in Dravnieks 1985, normalised to approximately the range [−4, +4]. The application reports the arithmetic mean when more than one descriptor is selected.</p>
+</section>
+
 <footer class="foot">
-  Odour Intensity Recorder · Technical Paper · Application v1.1.0 · Schema 2
+  Odour Intensity Recorder · Technical Paper · Application v1.2.0 · Schema 3
+  <div style="margin-top:.6rem;font-size:.75rem;opacity:.85">
+    <a href="https://odourlog.github.io/odour-recorder/user-guide.html" style="color:inherit">User Guide</a>
+    &nbsp;·&nbsp;
+    <a href="https://odourlog.github.io/odour-recorder/plain-english-guide.html" style="color:inherit">Plain English Guide</a>
+    &nbsp;·&nbsp;
+    <a href="https://odourlog.github.io/odour-recorder/" style="color:inherit">Recorder home</a>
+  </div>
 </footer>
 
 </div>
